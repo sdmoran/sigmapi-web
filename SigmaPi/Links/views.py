@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 
-from django.template import RequestContext
+from django.shortcuts import render, redirect
 from django.shortcuts import render, redirect
 
 from django.contrib.auth.decorators import permission_required, login_required
@@ -19,11 +19,11 @@ def view_all(request):
 	general_links = Link.objects.filter(promoted=False).order_by('-date')
 	promoted_links = Link.objects.filter(promoted=True).order_by('-date')
 
-	context = RequestContext(request, {
+	context = {
 		'linkform':linkform,
 		'general_links': general_links,
 		'promoted_links': promoted_links,
-		})
+	}
 
 	return render(request, "secure/links_view_all.html", context)
 
@@ -43,7 +43,7 @@ def add_link(request):
 			if not request.user.has_perm('Links.promote_link'):
 				link.promoted = False
 			link.save()
-			
+
 		return redirect('Links.views.view_all')
 	else:
 		return redirect('PubSite.views.permission_denied')

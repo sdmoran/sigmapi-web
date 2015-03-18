@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.template import RequestContext
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.html import strip_tags
@@ -98,7 +97,7 @@ def users(request):
 		sophomores = sophomores.exclude(username=herald.username)
 		freshmen = freshmen.exclude(username=herald.username)
 
-	context = RequestContext(request, {
+	context = {
 		'sage': sage,
 		'second': second,
 		'third': third,
@@ -109,7 +108,7 @@ def users(request):
 		'juniors': juniors,
 		'sophomores': sophomores,
 		'freshmen': freshmen
-		})
+	}
 
 	return render(request, 'users.html', context)
 
@@ -118,9 +117,9 @@ def add_users(request):
 	"""
 		Provides a view for adding a user
 	"""
-	context = RequestContext(request, {
+	context = {
 		'message': []
-		})
+	}
 
 	if request.method == 'POST':
 		add_type = request.POST['type']
@@ -151,9 +150,9 @@ def manage_users(request):
 
 	all_users = User.objects.all().order_by("last_name")
 
-	context = RequestContext(request, {
+	context = {
 		'all_users': all_users
-		})
+	}
 
 	return render(request, 'secure/manage_users.html', context)
 
@@ -186,14 +185,14 @@ def edit_user(request, user):
 			return redirect("UserInfo.views.manage_users")
 	else:
 		form = EditUserInfoForm(instance=requested_user.userinfo)
-	
 
 
-	context = RequestContext(request, {
+
+	context = {
 		'requested_user': requested_user,
 		'form': form,
 		'error': form.errors
-		})
+	}
 
 	return render(request, 'secure/edit_user.html', context)
 
@@ -203,9 +202,9 @@ def change_password(request):
 		Provides a view where a user can change their change_password
 	"""
 
-	context = RequestContext(request, {
+	context = {
 		'message': []
-		})
+	}
 
 	if request.method == 'POST':
 		form = PasswordChangeForm(user=request.user, data=request.POST)

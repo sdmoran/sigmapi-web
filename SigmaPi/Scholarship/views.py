@@ -1,5 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.template import RequestContext
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_GET, require_POST
@@ -7,7 +6,8 @@ from django.contrib import messages
 
 from sendfile import sendfile
 
-from Scholarship.models import TrackedUser, TrackedUserForm, StudyHoursRecord, StudyHoursRecordForm, AcademicResource, AcademicResourceForm, LibraryItem, LibraryItemForm
+from Scholarship.models import TrackedUser, StudyHoursRecord, AcademicResource, LibraryItem
+from Scholarship.forms import TrackedUserForm, StudyHoursRecordForm, AcademicResourceForm, LibraryItemForm
 from Scholarship import notify
 
 from django.http import HttpResponse
@@ -71,7 +71,7 @@ def study_hours(request):
 		tracked_user_records = StudyHoursRecord.objects.filter(user=request.user).order_by('-date')
 		tracked_user_records_this_week = [record for record in tracked_user_records if record.happened_this_week()]
 
-	context = RequestContext(request, {
+	context = {
 		'is_scholarship_head': is_scholarship_head,
 		'is_tracked_user': is_tracked_user,
 		'currently_tracked_users': currently_tracked_users,
@@ -79,7 +79,7 @@ def study_hours(request):
 		'record_hours_form': record_hours_form,
 		'tracked_user_object': tracked_user_object,
 		'tracked_user_records_this_week': tracked_user_records_this_week
-	})
+	}
 
 	return render(request, "scholarship_study_hours.html", context)
 
@@ -157,11 +157,11 @@ def resources(request):
 
 	resources = AcademicResource.objects.filter(approved=True)
 
-	context = RequestContext(request, {
+	context = {
 		'is_scholarship_head': is_scholarship_head,
 		'upload_resource_form': upload_resource_form,
 		'resources': resources
-	})
+	}
 
 	return render(request, "scholarship_resources.html", context)
 
@@ -209,7 +209,7 @@ def download_resource(request, resource):
 
 	resourceObject = AcademicResource.objects.get(pk=resource)
 
-	allowed = resourceObject.approved or request_is_from_scholarship_head(request)	
+	allowed = resourceObject.approved or request_is_from_scholarship_head(request)
 
 	if allowed:
 		filepath, extension = os.path.splitext(os.path.basename(resourceObject.resource_pdf.name))
@@ -227,7 +227,7 @@ def delete_resource(request, resource):
 	"""
 
 	resourceObject = AcademicResource.objects.get(pk=resource)
-	resourceObject.resource_pdf.delete() # Delete actual file 
+	resourceObject.resource_pdf.delete() # Delete actual file
 
 	resourceObject.delete()
 
@@ -245,11 +245,11 @@ def library(request):
 
 	items = LibraryItem.objects.filter(approved=True)
 
-	context = RequestContext(request, {
+	context = {
 		'is_scholarship_head': is_scholarship_head,
 		'upload_item_form': upload_item_form,
 		'items': items
-	})
+	}
 
 	return render(request, "scholarship_library.html", context)
 
@@ -297,7 +297,7 @@ def download_libraryitem(request, item):
 
 	itemObject = LibraryItem.objects.get(pk=item)
 
-	allowed = itemObject.approved or request_is_from_scholarship_head(request)	
+	allowed = itemObject.approved or request_is_from_scholarship_head(request)
 
 	if allowed:
 		filepath, extension = os.path.splitext(os.path.basename(itemObject.item_pdf.name))
@@ -327,11 +327,11 @@ def approve(request):
 	pendingItems = LibraryItem.objects.filter(approved=False)
 	pendingResources = AcademicResource.objects.filter(approved=False)
 
-	context = RequestContext(request, {
+	context = {
 		'items': pendingItems,
 		'resources': pendingResources,
 		'is_scholarship_head': request_is_from_scholarship_head(request)
-	})
+	}
 
 	return render(request, "scholarship_approve.html", context)
 
@@ -386,7 +386,7 @@ def decline_libraryitem(request, item):
 def decline_resource(request, resource):
 	try:
 		resourceObject = AcademicResource.objects.get(pk=resource)
-		resourceObject.resource_pdf.delete() # Delete actual file 
+		resourceObject.resource_pdf.delete() # Delete actual file
 
 		resourceObject.delete()
 

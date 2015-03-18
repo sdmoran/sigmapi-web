@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import permission_required, login_required
 from PartyList.models import Party
 from django.http import HttpResponse
-from django.template import RequestContext
 from PartyList.widgets import PartyForm, EditPartyInfoForm
 import json
 
@@ -13,9 +12,9 @@ def index(request):
 	"""
 
 	parties = Party.objects.all().order_by("date")
-	context = RequestContext(request, {
+	context = {
 		'all_parties': parties,
-	})
+	}
 	return render(request, 'parties.html', context)
 
 @login_required
@@ -23,7 +22,7 @@ def guests(request, party):
 	"""
 		View for all guests on the list for a party
 	"""
-	
+
 	try:
 		requested_party = Party.objects.get(pk=party)
 	except:
@@ -31,22 +30,22 @@ def guests(request, party):
 
 	partymode = requested_party.isPartyMode()
 
-	context = RequestContext(request, {
+	context = {
 			'party': requested_party,
 			'partymode': partymode,
-	})
-	
+	}
+
 	return render(request, 'partyguests.html', context)
-	
+
 
 @permission_required('PartyList.manage_parties', login_url='PubSite.views.permission_denied')
 def add_party(request):
 	"""
 		Provides a view to add a party.
 	"""
-	context = RequestContext(request, {
+	context = {
 		'message': []
-		})
+	}
 
 	if request.method == 'POST':
 		form = PartyForm(request.POST)
@@ -66,9 +65,9 @@ def manage_parties(request):
 
 	all_parties = Party.objects.all().order_by("date").reverse()
 
-	context = RequestContext(request, {
+	context = {
 		'all_parties': all_parties,
-		})
+	}
 
 	return render(request, 'manage_parties.html', context)
 
@@ -88,18 +87,18 @@ def edit_party(request, party):
 	if request.method == 'POST':
 		# If this is a POST request, the form has been submitted
 		form = EditPartyInfoForm(request.POST, request.FILES, instance=requested_party)
-		
+
 		if form.is_valid(): # Check that form is valid
 			form.save()
 			return redirect("PartyList.views.manage_parties")
 	else:
 		form = EditPartyInfoForm(instance=requested_party)
 
-	context = RequestContext(request, {
+	context = {
 		'requested_party': requested_party,
 		'form': form,
 		'error': form.errors
-		})
+	}
 
 	return render(request, 'edit_party.html', context)
 
@@ -108,7 +107,7 @@ def delete_party(request, party):
 	"""
 		Deletes the party with the ID that is sent in the post request
 	"""
-	
+
 	if request.method == 'POST':
 		try:
 			party = Party.objects.get(pk=party)
@@ -116,5 +115,5 @@ def delete_party(request, party):
 			return redirect("PartyList.views.manage_parties")
 
 		party.delete()
-	
+
 	return redirect("PartyList.views.manage_parties")

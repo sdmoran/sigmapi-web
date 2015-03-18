@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.template import RequestContext
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import permission_required
 from django.utils.html import strip_tags
@@ -53,11 +52,11 @@ def bylaws(request):
 
 	form = BylawsForm()
 
-	context = RequestContext(request, {
+	context = {
 		'latest': latest,
 		'bylaws': bylaws,
 		'form': form
-	})
+	}
 
 	return render(request, "secure/archives_bylaws.html", context)
 
@@ -114,11 +113,11 @@ def rules(request):
 	else:
 		latest = None
 
-	context = RequestContext(request, {
+	context = {
 		'latest': latest,
 		'rules': rules,
 		'form': form
-		})
+		}
 
 	return render(request, "secure/archives_rules.html", context)
 
@@ -174,10 +173,10 @@ def guides(request):
 			redirect('PubSite.views.permission_denied')
 
 	guides = Guide.objects.all()
-	context = RequestContext(request, {
+	context = {
 		'guides': guides,
 		'form': form,
-		})
+		}
 
 	return render(request, "secure/archives_guides.html", context)
 

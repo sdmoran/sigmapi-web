@@ -10,17 +10,31 @@ def timeStamped(fname, fmt='%Y-%m-%d_{fname}'):
 
 	return datetime.datetime.now().strftime(fmt).format(fname=fname)
 
+def guidepath(filename):
+	"""
+		Path on filesystem where this house guide document should be stored.
+	"""
+	return "protected/guides/" + timeStamped(filename)
+
+
+def bylaws_path(filename):
+	"""
+		Path on filesystem where this bylaws document should be stored.
+	"""
+	return "protected/bylaws/" + timeStamped(filename)
+
+def houserules_path(filename):
+	"""
+		Path on filesystem where this house rules document should be stored.
+	"""
+	return "protected/houserules/" + timeStamped(filename)
+
 
 class Bylaws(models.Model):
 	"""
 		Model for a single document of house bylaws.
 	"""
 
-	def bylaws_path(self, filename):
-		"""
-			Path on filesystem where this bylaws document should be stored.
-		"""
-		return "protected/bylaws/" + timeStamped(filename)
 
 	def __unicode__(self):
 		return self.date.__str__()
@@ -59,12 +73,6 @@ class HouseRules(models.Model):
 		Model for a single document of house rules.
 	"""
 
-	def houserules_path(self, filename):
-		"""
-			Path on filesystem where this house rules document should be stored.
-		"""
-		return "protected/houserules/" + timeStamped(filename)
-
 	def __unicode__(self):
 		return self.date.__str__()
 
@@ -100,12 +108,6 @@ class Guide(models.Model):
 	"""
 		Model for a single document of a house guide.
 	"""
-
-	def guidepath(self, filename):
-		"""
-			Path on filesystem where this house guide document should be stored.
-		"""
-		return "protected/guides/" + timeStamped(filename)
 
 	def __unicode__(self):
 		return self.name

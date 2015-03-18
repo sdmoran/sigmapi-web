@@ -1,4 +1,3 @@
-from django.template import RequestContext
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
@@ -11,7 +10,8 @@ from django.contrib.auth.models import User
 from datetime import datetime
 from django.core.mail import send_mail
 
-from Standards.models import JobRequest, JobRequestForm, Bone, PiPointsRecord, PiPointsRequest, PiPointsChangeRecord, PiPointsRequestForm, PiPointsAddBrotherForm, Probation, BoneChangeRecord, ProbationGivingForm, BoneGivingForm, BoneEditingForm, SummonsRequest, SummonsRequestForm, Summons, AddSummonsForm, AcceptSummonsForm, SummonsHistoryRecord
+from Standards.models import JobRequest, Bone, PiPointsRecord, PiPointsRequest, PiPointsChangeRecord, Probation, BoneChangeRecord, SummonsRequest, Summons, SummonsHistoryRecord
+from Standards.forms import JobRequestForm, PiPointsRequestForm, PiPointsAddBrotherForm, ProbationGivingForm, BoneGivingForm, BoneEditingForm, SummonsRequestForm, AddSummonsForm, AcceptSummonsForm
 from Standards import notify
 
 import json
@@ -25,9 +25,9 @@ def index(request):
 	current_bones = Bone.objects.filter(bonee=request.user, expirationDate__gt=datetime.now()).order_by('-expirationDate')
 	expired_bones = Bone.objects.filter(bonee=request.user, expirationDate__lte=datetime.now()).order_by('-expirationDate')
 	current_bone_count = current_bones.count()
-	
+
 	point_records = PiPointsRecord.objects.all().exclude(brother__groups__name='Alumni').order_by('-points')
-	
+
 	own_points = PiPointsRecord.objects.filter(brother=request.user)
 
 	if own_points.count() == 0:
@@ -55,8 +55,8 @@ def index(request):
 	pprCount = PiPointsRequest.objects.all().count()
 	positive_points = own_points.points > 0
 
-	error = None 
-	msg = None 
+	error = None
+	msg = None
 
 	try:
 		error = request.session['standards_index_error']
@@ -71,7 +71,7 @@ def index(request):
 		pass
 
 
-	context = RequestContext(request, {
+	context = {
 	'current_bone_count': current_bone_count,
 	'current_bones': current_bones,
 	'expired_bones': expired_bones,
@@ -90,7 +90,7 @@ def index(request):
 	'pprCount': pprCount,
 	'summons_form': summons_form,
 	'msg': msg,
-	})
+	}
 
 	return render(request, "secure/standards_index.html", context)
 
@@ -110,7 +110,7 @@ def request_points(request):
 			notify.points_requested() # Email notification to standards board
 			request.session['standards_index_msg'] = "Pi Points request successfully submitted!"
 
-		return redirect(index)	
+		return redirect(index)
 	else:
 		return redirect(index)
 
@@ -132,11 +132,11 @@ def edit_bones(request):
 	probation_form = ProbationGivingForm()
 	bone_form = BoneGivingForm()
 	pprCount = PiPointsRequest.objects.all().count()
-	
+
 	accept_summons_form = AcceptSummonsForm()
 
-	error = None 
-	msg = None 
+	error = None
+	msg = None
 
 	try:
 		error = request.session['standards_bone_error']
@@ -150,7 +150,7 @@ def edit_bones(request):
 	except KeyError:
 		pass
 
-	context = RequestContext(request, {
+	context = {
 	'active_bones': all_bones,
 	'expired_bones': expired_bones,
 	'all_probations': all_probations,
@@ -163,7 +163,7 @@ def edit_bones(request):
 	'msg': msg,
 	'accept_summons_form': accept_summons_form,
 	'summons_history': summons_history
-	})
+	}
 
 	return render(request, "secure/standards_bones.html", context)
 
@@ -214,13 +214,13 @@ def edit_bone(request, bone):
 		else:
 			bone_form = None
 		pprCount = PiPointsRequest.objects.all().count()
-		context = RequestContext(request, {
+		context = {
 			'bone': targetBone,
 			'expired': expired,
 			'bone_form': bone_form,
 			'bone_history': bone_history,
 			'pprCount': pprCount
-			})
+			}
 
 		return render(request, "secure/standards_edit_bone.html", context)
 
@@ -368,20 +368,20 @@ def manage_points(request):
 	"""
 		Provides a view for managing pi points
 	"""
-	
+
 	point_records = PiPointsRecord.objects.all().exclude(brother__groups__name='Alumni').order_by('-points')
 	point_requests = PiPointsRequest.objects.all()
 	point_changes = PiPointsChangeRecord.objects.all().order_by('-dateChanged')
 	add_brother_form = PiPointsAddBrotherForm()
 	pprCount = PiPointsRequest.objects.all().count()
-	
-	context = RequestContext(request, {
+
+	context = {
 	'point_records': point_records,
 	'point_requests': point_requests,
 	'add_brother_form': add_brother_form,
 	'point_changes': point_changes,
 	'pprCount': pprCount,
-	})
+	}
 
 	return render(request, "secure/standards_points.html", context)
 
@@ -478,9 +478,9 @@ def delete_request(request, pointreq):
 
 	if request.method == 'POST':
 		request = PiPointsRequest.objects.get(pk=pointreq)
-		
+
 		notify.point_request_denied(request)
-		
+
 		request.delete()
 
 	response = {}
@@ -495,7 +495,7 @@ def add_job_request(request, jobtype):
 		takingJob = jobtype == '2'
 
 		pipoints = PiPointsRecord.objects.get(brother=request.user)
-		
+
 		if form.is_valid():
 			jobreq = form.save(commit=False)
 
@@ -636,7 +636,7 @@ def send_summons_request(request):
 
 					summonsReq = SummonsRequest(summoner=request.user, summonee=recipientUser, reason=reason, dateRequestSent=datetime.now())
 					summonsReq.save()
-					
+
 					summonsSent = summonsSent + 1
 			except:
 				request.session['standards_index_error'] = "Unknown error occurred while processing summons recipient list. Please try again. If the problem persists, please contact the Web Chair."
@@ -664,7 +664,7 @@ def manage_summons(request):
 	current_requests = SummonsRequest.objects.all().order_by('-dateRequestSent')
 
 	add_summon_form = AddSummonsForm()
-	
+
 	pprCount = PiPointsRequest.objects.all().count()
 
 	error = None
@@ -682,13 +682,13 @@ def manage_summons(request):
 	except KeyError:
 		pass
 
-	context = RequestContext(request, {
+	context = {
 		'current_requests': current_requests,
 		'add_summon_form': add_summon_form,
 		'error': error,
 		'msg': msg,
 		'pprCount': pprCount
-		})
+		}
 
 	return render(request, "secure/standards_summons.html", context)
 
@@ -697,7 +697,7 @@ def reject_summons_request(request, summons_req):
 	"""
 		A view for denying a summons request.
 	"""
-	
+
 	if request.method == 'POST':
 		try:
 			summons_request = SummonsRequest.objects.get(pk=summons_req)
@@ -773,7 +773,7 @@ def accept_summons(request, summons):
 	"""
 		Accept a summons and turn it into a bone.
 	"""
-	
+
 	if request.method == 'POST':
 		try:
 			summons_obj = Summons.objects.get(pk=summons)
@@ -812,11 +812,11 @@ def accept_summons(request, summons):
 			record.newReason = bone.reason
 			record.previousExpirationDate = bone.expirationDate
 			record.newExpirationDate = bone.expirationDate
-			
+
 			record.save()
 
 			notify.bone_received(bone)
-			
+
 			request.session['standards_bone_msg'] = "Summons approved. A bone has been levied."
 		else:
 			request.session['standards_bone_error'] = "Summons failed to be approved: " + str(form.errors)

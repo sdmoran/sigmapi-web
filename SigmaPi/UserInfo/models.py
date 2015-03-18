@@ -3,6 +3,12 @@ from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.models import User
 
+def filepath(filename):
+	"""
+		Defines where files uploaded by the user should be stored
+	"""
+	return "users/" + self.user.username + "/" + filename
+
 class PledgeClass(models.Model):
 	"""
 		Model for user pledge class relationship.
@@ -26,12 +32,6 @@ class UserInfo(models.Model):
 		Model for site-specific user info.
 		Complements the built in User models
 	"""
-	def filepath(self, filename):
-		"""
-			Defines where files uploaded by the user should be stored
-		"""
-		return "users/" + self.user.username + "/" + filename
-
 	user = models.OneToOneField(User)
 	picture = models.FileField(upload_to=filepath, null=True)
 	phoneNumber = models.CharField(default="", max_length=100, blank=True)

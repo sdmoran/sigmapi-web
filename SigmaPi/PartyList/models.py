@@ -9,6 +9,12 @@ def timeStamped(fname, fmt='%Y-%m-%d_{fname}'):
 	"""
 	return datetime.now().strftime(fmt).format(fname=fname)
 
+def partyjobspath(filename):
+	"""
+		Defines where party job information should be stored
+	"""
+	return "parties/partyjobs/" + timeStamped(filename)
+
 class Party(models.Model):
 	"""
 		Model to represent a party.
@@ -16,11 +22,6 @@ class Party(models.Model):
 
 	# NOTE: In the future, this path should be changed to be in protected file space so it is not
 	# accessible to the public.
-	def partyjobspath(self, filename):
-		"""
-			Defines where party job information should be stored
-		"""
-		return "parties/partyjobs/" + timeStamped(filename)
 
 	name = models.CharField(max_length=100)
 	date = models.DateField()

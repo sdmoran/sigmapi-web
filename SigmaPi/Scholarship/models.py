@@ -2,15 +2,9 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django import forms
-from django.forms import ModelForm, ValidationError
-from django.forms import ModelChoiceField
 
 import datetime
 import re
-
-class CustomModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.first_name + " " + obj.last_name
 
 def validate_date(date):
 	if date > datetime.date.today():
@@ -70,13 +64,6 @@ class TrackedUser(models.Model):
 			("scholarship_head", "Can modify study hours."),
 		)
 
-class TrackedUserForm(ModelForm):
-	user = CustomModelChoiceField(queryset=User.objects.all().order_by('last_name').exclude(groups__name='Alumni'))
-	number_of_hours = forms.IntegerField(min_value=0)
-
-	class Meta:
-		model = TrackedUser
-
 class StudyHoursRecord(models.Model):
 	"""
 		Model for a record of study hours made by one tracked user for one day.
@@ -96,15 +83,6 @@ class StudyHoursRecord(models.Model):
 	number_of_hours = models.IntegerField(validators=[validate_number])
 	date = models.DateField(validators=[validate_date])
 	time_stamp = models.DateTimeField(auto_now_add=True, editable=False)
-
-
-class StudyHoursRecordForm(ModelForm):
-	date = forms.DateField()
-	number_of_hours = forms.IntegerField(min_value=1)
-
-	class Meta:
-		model = StudyHoursRecord
-		exclude=['user', 'time_stamp']
 
 
 class AcademicResource(models.Model):
@@ -129,7 +107,7 @@ class AcademicResource(models.Model):
 	professor_name = models.CharField(max_length=100)
 	resource_pdf = models.FileField(upload_to='protected/scholarship/resources')
 	submittedBy = models.ForeignKey(User)
-	approved = models.BooleanField()
+	approved = models.BooleanField(default=False)
 	year = models.IntegerField(blank=True)
 	term = models.CharField(blank=True, max_length=1,   \
 	                        choices = (('A','A Term'),  \
@@ -137,13 +115,6 @@ class AcademicResource(models.Model):
 										('C','C Term'), \
 										('D','D Term'), \
 										('E','E Term')))
-
-class AcademicResourceForm(ModelForm):
-	year = forms.IntegerField()
-
-	class Meta:
-		model = AcademicResource
-		fields = ['resource_name', 'course_number', 'professor_name', 'resource_pdf', 'year', 'term']
 
 class LibraryItem(models.Model):
 	"""
@@ -167,10 +138,6 @@ class LibraryItem(models.Model):
 	edition = models.CharField(max_length=100)
 	item_pdf = models.FileField(upload_to='protected/scholarship/library')
 	submittedBy = models.ForeignKey(User)
-	approved = models.BooleanField()
+	approved = models.BooleanField(default=False)
 
 
-class LibraryItemForm(ModelForm):
-	class Meta:
-		model = LibraryItem
-		fields = ['title', 'isbn_number', 'edition', 'item_pdf']
