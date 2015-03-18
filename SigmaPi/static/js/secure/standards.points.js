@@ -2,7 +2,7 @@ var requests_table;
 var changes_table;
 var points_table;
 
-$(document).ready(function() {  
+$(document).ready(function() {
   setupClickListeners();
 
   requests_table = $("#requests-table").DataTable();
@@ -11,19 +11,17 @@ $(document).ready(function() {
 });
 
 /**
- * Sets up click listeners 
+ * Sets up click listeners
  */
 function setupClickListeners()
 {
   $("#add-brother-form-submit").click(submitAddBrotherForm);
-
-  $(".modify-points-button").click(showModifyPointsForm);
-
   $("#modify-points-form-submit").click(submitModifyPointsForm);
-
   $(".approve-points-button").click(approveRequest);
-
   $(".deny-request-button").click(denyPointsRequest);
+
+
+  $("#points-table").on('click', 'a.modify-points-button', showModifyPointsForm);
 }
 
 /**
@@ -91,7 +89,7 @@ function modifyPiPoints(userid, newpoints)
         // Send the token only if the method warrants CSRF protection
         // Using the CSRFToken value acquired earlier
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
-      }       
+      }
      },
     url: url,
     data: {
@@ -141,7 +139,7 @@ function approveRequest()
         // Send the token only if the method warrants CSRF protection
         // Using the CSRFToken value acquired earlier
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
-      }       
+      }
      },
     url: url,
   }).done(function( data ) {
@@ -192,7 +190,7 @@ function deleteRequest(requestid)
         // Send the token only if the method warrants CSRF protection
         // Using the CSRFToken value acquired earlier
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
-      }       
+      }
      },
     url: url,
   }).done(function( data ) {
