@@ -1,0 +1,53 @@
+{% extends "secure_base.html" %}
+
+{% block module_nav %}
+<div class="sub-nav">
+	<ul class="nav nav-pills">
+		{% if '/overview' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'Standards.views.index' %}">
+				Overview
+			</a>
+		</li>
+
+		{% if perms.Standards.add_bone %}
+		{% if '/bones' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'Standards.views.edit_bones' %}">
+				Manage Bones
+			</a>
+		</li>
+		{% endif %}
+
+		{% if perms.Standards.add_pipointsrecord %}
+		{% if '/points' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'Standards.views.manage_points' %}">
+				Manage PiPoints (<span id="pprCount">{{pprCount}}</span>)
+			</a>
+		</li>
+		{% endif %}
+
+		{% if perms.Standards.delete_summonsrequest %}
+		{% if '/summons' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'Standards.views.manage_summons' %}">
+				Manage Summons
+			</a>
+		</li>
+		{% endif %}
+	</ul>
+</div>
+{% endblock %}

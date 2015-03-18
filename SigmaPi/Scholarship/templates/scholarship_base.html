@@ -1,0 +1,52 @@
+{% extends "secure_base.html" %}
+
+{% block module_nav %}
+	<div class="sub-nav">
+		<ul class="nav nav-pills">
+			{% if '/scholarship/resources/' in request.path %}
+			<li class="active">
+			{% else %}
+			<li>
+			{% endif %}
+				<a href="{% url 'Scholarship.views.resources' %}">
+					Academic Resources
+				</a>
+			</li>
+
+			{% if '/scholarship/library/' in request.path %}
+			<li class="active">
+			{% else %}
+			<li>
+			{% endif %}
+				<a href="{% url 'Scholarship.views.library' %}">
+					Library
+				</a>
+			</li>
+
+			{% if '/scholarship/study_hours/' in request.path %}
+			<li class="active">
+			{% else %}
+			<li>
+			{% endif %}
+				<a href="{% url 'Scholarship.views.study_hours' %}">
+					Study Hours
+				</a>
+			</li>
+
+			{% if is_scholarship_head %}
+
+			{% if '/scholarship/approve/' in request.path %}
+			<li class="active">
+			{% else %}
+			<li>
+			{% endif %}
+				<a href="{% url 'Scholarship.views.approve' %}">
+					Approve Content
+				</a>
+			</li>
+
+			{% endif %}
+
+		</ul>
+	</div>
+{% endblock %}

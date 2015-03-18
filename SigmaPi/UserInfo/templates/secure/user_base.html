@@ -1,0 +1,29 @@
+{% extends "secure_base.html" %}
+
+{% block module_nav %}
+{% if perms.UserInfo.manage_users %}
+<div class="sub-nav">
+	<ul class="nav nav-pills">
+	{% if not '/add' in request.path %}
+		<li class="active">
+	{% else %}
+		<li>
+	{% endif %}
+			<a href="{% url 'UserInfo.views.manage_users' %}">
+				Manage Users
+			</a>
+		</li>	
+
+	{% if '/add' in request.path %}
+		<li class="active">
+	{% else %}
+		<li>
+	{% endif %} 
+			<a href="{% url 'UserInfo.views.add_users' %}">
+				Add User
+			</a>
+		</li>
+	</ul>
+</div>
+{% endif %}
+{% endblock %}

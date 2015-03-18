@@ -1,0 +1,122 @@
+{% extends "secure/standards_base.html" %}
+
+{% block title %}Sigma Pi Secure - Manage Summons {% endblock %}
+
+{% block module_includes %}
+{% load static %}
+<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+{% endblock %}
+
+{% block content %}
+<h3>Manage Summons</h3>
+
+<div class="actions">
+	<ul class="nav nav-pills">
+		<li>
+			<a href="#" data-toggle="modal" data-target="#send-summons">
+				<span class="glyphicon glyphicon-envelope"></span> Send Summons
+			</a>
+		</li>
+	</ul>
+</div>
+
+<!-- Display any messages -->
+{% if error %}
+<div class="alert alert-warning">
+	<strong>Error!</strong>
+	{{ error }}
+</div>
+{% endif %}
+{% if msg %}
+<div class="alert alert-success">
+	<strong>Success!</strong>
+	{{ msg }}
+</div>
+{% endif %}
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+  <li role="presentation" class="active"><a href="#summons" role="tab">Summons Requests</a></li>
+</ul>
+<!-- Tab panes -->
+<div class="tab-content">
+	<!-- Summons -->
+	<div id="summons" class="tab-pane active">
+		<div class="table-responsive nospaced">
+	 		<table class="dataTable table">
+	 			<thead>
+	 				<tr>
+	 					<th class="two wide">Date</th>
+	 					<th class="two wide">Recipient</th>
+	 					<th class="ten wide">Reason</th>
+	 					<th class="two wide">Summoner</th>
+	 					<th class="one wide">Approve</th>
+	 					<th class="one wide">Reject</th>
+	 				</tr>
+	 			</thead>
+	 			<tbody>
+	 				{% for summons in current_requests %}
+	 				<tr>
+	 					<td>{{ summons.dateRequestSent }}</td>
+	 					<td>{{ summons.summonee.first_name }} {{ summons.summonee.last_name }}</td>
+	 					<td>{{ summons.reason }}</td>
+	 					<td>{{ summons.summoner.first_name }} {{ summons.summoner.last_name }}</td>
+	 					<td>
+	 						<form method="POST" action="{% url 'Standards.views.approve_summons_request' summons.pk %}">
+								{% csrf_token %}
+								<input type="submit" class="btn btn-success btn-sm" value="Approve"/>
+							</form>
+	 					</td>
+	 					<td>
+	 						<form method="POST" action="{% url 'Standards.views.reject_summons_request' summons.pk %}">
+								{% csrf_token %}
+								<input type="submit" class="btn btn-danger btn-sm" value="Reject"/>
+							</form>
+	 					</td>
+	 				</tr>
+	 				{% endfor %}
+	 			</tbody>
+	 		</table>
+	 	</div>
+ 	</div>
+</div>
+
+{% endblock %}
+
+{% block toplevel_content %}
+<div class="modal" id="send-summons">
+	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal">
+        			<span aria-hidden="true">&times;</span>
+        			<span class="sr-only">Close</span>
+       			</button>
+        		<h4 class="modal-title">Send Summons</h4>
+      		</div>
+      		<div class="modal-body">
+				<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.create_new_summons' %}" role="form" id="send-summons-form">
+					{% csrf_token %}
+					<div class="form-group">
+						<label for="id_summonee" class="control-label">Recipient*</label>
+						{{add_summon_form.summonee}}
+					</div>
+					<div class="form-group">
+						<label for="id_summoner" class="control-label">Summoner*</label>
+						{{add_summon_form.summoner}}
+					</div>
+					<div class="form-group">
+						<label for="id_reason" class="control-label">Reason*</label>
+						{{add_summon_form.reason}}
+					</div>
+				</form>
+      		</div>
+      		<div class="modal-footer">
+       			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        		<button type="button" class="btn btn-primary" onclick="$('#send-summons-form').submit()">Send Summons</button>
+      		</div>
+    	</div>
+  	</div>
+</div>
+{% endblock %}

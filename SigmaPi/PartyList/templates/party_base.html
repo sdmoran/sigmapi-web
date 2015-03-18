@@ -1,0 +1,42 @@
+{% extends "secure_base.html" %}
+
+{% block module_nav %}
+<div class="sub-nav">
+	<ul class="nav nav-pills">
+		{% if '/all' in request.path %}
+		<li class="active">
+		{% elif '/view' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'PartyList.views.index' %}">
+				Parties
+			</a>
+		</li>
+
+		{% if perms.PartyList.manage_parties %}
+		{% if '/manage' in request.path %}
+		<li class="active">
+		{% elif '/edit' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'PartyList.views.manage_parties' %}">
+				Manage Parties
+			</a>
+		</li>
+		{% if '/add' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'PartyList.views.add_party' %}">
+				Add Party
+			</a>
+		</li>
+		{% endif %}
+	</ul>
+</div>
+{% endblock %}

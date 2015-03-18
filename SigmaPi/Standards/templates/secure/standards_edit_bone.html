@@ -1,0 +1,149 @@
+{% extends "secure/standards_base.html" %}
+
+{% block title %}Sigma Pi Secure - {% if expired %}View Bone{% else %}Edit Bone{% endif %} {% endblock %}
+
+{% block module_includes %}
+{% load static %}
+<script type="text/javascript" src='{% static "js/lib/moment.min.js" %}'></script>
+<script type="text/javascript" src='{% static "js/lib/bootstrap-datetimepicker.min.js" %}'></script>
+
+<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+
+<link rel="stylesheet" type="text/css" href='{% static "css/lib/bootstrap-datetimepicker.min.css" %}'/>
+{% endblock %}
+
+{% block content %}
+<h3>
+	{% if expired %}
+	View Bone
+	{% else %}
+	Edit Bone
+	{% endif %}
+</h3>
+
+{% if expired %}
+<form class="medium centered">
+		<div class="form-group">
+			<label class="control-label">Recipient</label>
+			<div class="form-control-static">
+				{{bone.bonee.first_name}} {{ bone.bonee.last_name }}
+			</div>
+		</div>
+		<div class="form-group">
+				<label class="control-label">Given By</label>
+				<div class="form-control-static">
+					{{bone.boner.first_name}} {{ bone.boner.last_name }}
+				</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label">Reason</label>
+			<div class="form-control-static">
+				{{bone.reason}}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label">Date Receieved</label>
+			<div class="form-control-static">
+				{{bone.dateReceived}}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label">Expiration Date</label>
+			<div class="form-control-static">
+				{{bone.expirationDate}} - EXPIRED
+			</div>
+		</div>
+</form>
+{% else %}
+<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.edit_bone' bone.pk %}" id="edit-bone" class="medium centered">
+	{% csrf_token %}		
+	<div class="form-group">
+		<label class="control-label">Recipient</label>
+		<div class="form-control-static">
+			{{bone.bonee.first_name}} {{ bone.bonee.last_name }}
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label class="control-label">Given By</label>
+		<div class="form-control-static">
+			{{bone.boner.first_name}} {{ bone.boner.last_name }}
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="id_reason" class="control-label">Reason*</label>
+		{{bone_form.reason}}
+	</div>
+	<div class="form-group">
+		<label for="id_value" class="control-label">Value*</label>
+		{{bone_form.value}}
+	</div>
+	<div class="form-group">
+		<label class="control-label">Date Receieved</label>
+		<div class="form-control-static">
+			{{bone.dateReceived}}
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="id_expirationDate" class="control-label">Expiration Date*</label>
+		{{ bone_form.expirationDate }}
+	</div>
+</form>
+<form enctype="multipart/form-data" method="post" id="expire-bone" action="{% url 'Standards.views.expire_bone' bone.pk %}">
+	{% csrf_token %}
+</form>
+
+<div class="clearfix">
+	<button type="submit" class="btn btn-primary pull-right" onclick="$('#edit-bone').submit()">Apply Changes</button>
+	<button type="submit" class="btn btn-danger pull-right" onclick="$('#expire-bone').submit()">Expire Bone</button>
+	<a href="{% url 'Standards.views.edit_bones' %}" class="btn pull-right">Cancel</a>
+</div>
+
+{% endif %}
+<div class="separator"></div>
+<h3>Change History</h3>
+<div class="table-responsive">
+	<table class="dataTable table">
+		<thead>
+			<tr>
+				<th class="two wide">Date</th>
+				<th class="two wide">Changer</th>
+				<th class="two wide">Old Exp.</th>
+				<th class="two wide">New Exp.</th>
+				<th class="two wide">Old Reason</th>
+				<th class="two wide">New Reason</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for change in bone_history %}
+			<tr>	
+				<td>{{ change.dateChangeMade }}</td>
+				<td>{{ change.modifier.first_name }} {{ change.modifier.last_name }}</td>
+				<td>{{ change.previousExpirationDate }}</td>
+				<td>
+					{{ change.newExpirationDate }}
+				</td>
+				<td>{{ change.previousReason }}</td>
+				<td>{{ change.newReason }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}
+
+{% block embedded_js %}
+<!-- Page specific utility javascript -->
+<script type="text/javascript">
+	// Initialize all date pickers on the page.
+	// Set date format to format returned by the server
+	$("#id_expirationDate").attr("data-date-format", "YYYY-MM-DD"); 
+	$('#id_expirationDate').datetimepicker({
+		pickTime: false,
+		showToday: true,
+		minDate: moment()
+	});
+</script>
+{% endblock %}

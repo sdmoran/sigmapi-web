@@ -1,0 +1,46 @@
+{% extends "public_base.html" %}
+
+{% block local_includes %}
+	{% load staticfiles %}
+{% endblock %}
+
+{% block title %}
+Sigma Pi Gamma Iota
+{% endblock %}
+
+{% block content %}
+<h2>Welcome to Rush 2014!</h2>
+<div class="side-by-side">
+	<a href="{% static "img/home/rush-front.png" %}">
+		<img src="{% static "img/home/rush-front.png" %}">
+	</a>
+	<a href="{% static "img/home/rush-back.png" %}">
+		<img src="{% static "img/home/rush-back.png" %}">
+	</a>
+</div>
+
+<ul class="news">
+	<h2>
+		Recent News
+	</h2>
+	<li>
+		<h4>
+			Sigma Pi wins Chapter of the Year!
+		</h4>
+		<img src="{% static "img/home/awards.JPG" %}">
+		<p class="details">
+			We also won awards for Most Improved Chapter, Outstanding Leadership Development, and Outstanding Risk Management.
+		</p>
+	</li>
+	<li class="separator">
+		<h4>
+			Sigma Pi wins Greek Week Talent Show!
+		</h4>
+		<iframe width="560" height="315" src="//www.youtube.com/embed/NGgcKJ3XYDI" frameborder="0" allowfullscreen>
+		</iframe>
+		<p class="details">
+			 'N Sync versus Backstreet Boys throwdown!
+		</p>
+	</li>
+</ul>
+{% endblock %}

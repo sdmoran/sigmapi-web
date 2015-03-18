@@ -1,0 +1,456 @@
+{% extends "secure/standards_base.html" %}
+
+{% block title %}Sigma Pi Secure - Manage Bones {% endblock %}
+
+{% block module_includes %}
+{% load static %}
+<script type="text/javascript" src='{% static "js/lib/moment.min.js" %}'></script>
+<script type="text/javascript" src='{% static "js/lib/bootstrap-datetimepicker.min.js" %}'></script>
+
+<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+
+<link rel="stylesheet" type="text/css" href='{% static "css/lib/bootstrap-datetimepicker.min.css" %}'/>
+{% endblock %}
+
+{% block content %}
+<h3>Manage Bones</h3>
+
+<div class="actions">
+	<ul class="nav nav-pills">
+		<li>
+			<a href="#" data-toggle="modal" data-target="#levy-bone">
+				<span class="glyphicon glyphicon-tree-conifer"></span> Levy Bone
+			</a>
+		</li>
+		<li>
+			<a href="#" data-toggle="modal" data-target="#levy-probation">
+				<span class="glyphicon glyphicon-thumbs-down"></span> Levy Probation
+			</a>
+		</li>
+	</ul>
+</div>
+
+<!-- Display any messages -->
+{% if error %}
+<div class="alert alert-warning">
+	<strong>Error!</strong>
+	{{ error | safe }}
+</div>
+{% endif %}
+{% if msg %}
+<div class="alert alert-success">
+	<strong>Success!</strong>
+	{{ msg | safe }}
+</div>
+{% endif %}
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+  <li role="presentation" class="active"><a href="#summons" role="tab" data-toggle="tab">Summons</a></li>
+  <li role="presentation"><a href="#active-bones" role="tab" data-toggle="tab">Active Bones</a></li>
+  <li role="presentation"><a href="#probations" role="tab" data-toggle="tab">Probations</a></li>
+  <li role="presentation"><a href="#expired-bones" role="tab" data-toggle="tab">Expired Bones</a></li>
+  <li role="presentation"><a href="#bone-changes" role="tab" data-toggle="tab">Bone Change Log</a></li>
+  <li role="presentation"><a href="#summons-history" role="tab" data-toggle="tab">Summons History</a></li>
+</ul>
+<!-- Tab panes -->
+<div class="tab-content">
+	<!-- Summons -->
+	<div role="tabpanel" class="tab-pane fade in active" id="summons">
+		<div class="table-responsive nospaced">
+	 		<table class="dataTable table">
+	 			<thead>
+	 				<tr>
+	 					<th class="two wide">Date</th>
+	 					<th class="two wide">Recipient</th>
+	 					<th class="four wide">Reason</th>
+	 					<th class="two wide">Summoner</th>
+	 					<th class="two wide">Approver</th>
+	 					<th class="one wide">Bone</th>
+	 					<th class="one wide">Delete</th>
+	 				</tr>
+	 			</thead>
+	 			<tbody>
+	 				{% for summons in all_summons %}
+	 				<tr>
+	 					<td>{{ summons.dateSummonsSent }}</td>
+	 					<td>{{ summons.summonee.first_name }} {{ summons.summonee.last_name }}</td>
+	 					<td id="reason_{{ summons.pk }}">{{ summons.reason }}</td>
+	 					<td>{{ summons.summoner.first_name }} {{ summons.summoner.last_name }}</td>
+	 					<td>{{ summons.approver.first_name }} {{ summons.approver.last_name }}</td>
+	 					<td>
+	 						<a class="btn btn-success btn-sm approve-summons" id="{{ summons.pk }}">
+	 						Bone
+	 						</a>
+	 					</td>
+	 					<td>
+	 						<a class="btn btn-danger btn-sm reject-summons" id="{{summons.pk}}">Reject</a>
+	 					</td>
+	 				</tr>
+	 				{% endfor %}
+	 			</tbody>
+	 		</table>
+	 	</div>
+ 	</div>
+
+ 	<!-- Active Bones -->
+ 	<div role="tabpanel" class="tab-pane fade" id="active-bones">
+ 		<div class="table-responsive">
+	 		<table class="dataTable table">
+				<thead>
+					<tr>
+						<th class="three wide">Recipient</th>
+						<th class="two wide">Exp. Date</th>
+						<th class="two wide">Value</th>
+						<th class="six wide">Reason</th>
+						<th class="one wide">Edit</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for bone in active_bones %}
+					<tr>	
+						<td>{{ bone.bonee.first_name }} {{ bone.bonee.last_name }}</td>
+						<td>
+							{{ bone.expirationDate }}
+						</td>
+						<td>{{bone.value }}</td>
+						<td>{{ bone.reason }}</td>
+						<td>
+							<a class="btn btn-default btn-sm" href="{% url 'Standards.views.edit_bone' bone.pk%}">
+								Edit Bone
+							</a>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<!-- Probation -->
+	<div role="tabpanel" class="tab-pane fade" id="probations">
+		<div class="table-responsive">
+			<table class="dataTable table">
+				<thead>
+					<tr>
+						<th class="three wide">Recipient</th>
+						<th class="three wide">Given By</th>
+						<th class="two wide">Date</th>
+						<th class="two wide">Exp. Date</th>
+						<th class="one wide">End</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for probation in all_probations %}
+					<tr>	
+						<td>{{ probation.recipient.first_name }} {{ probation.recipient.last_name }}</td>
+						<td>{{ probation.giver.first_name }} {{ probation.giver.last_name }}</td>
+						<td>{{ probation.dateReceived }}</td>
+						<td>{{ probation.expirationDate }}</td>
+						<td> 
+							<form method="POST" action="{% url 'Standards.views.end_probation' probation.pk %}">
+								{% csrf_token %}
+								<input type="submit" class="btn btn-danger btn-sm" value="End Probation"/>
+							</form>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<!-- Expired Bones -->
+	<div role="tabpanel" class="tab-pane fade" id="expired-bones">
+		<div class="table-responsive">
+			<table class="table dataTable">
+				<thead>
+					<tr>
+						<th class="two wide">Recipient</th>
+						<th class="two wide">Exp. Date</th>
+						<th class="one wide">Value</th>
+						<th class="four wide">Reason</th>
+						<th class="one wide">Edit</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for bone in expired_bones %}
+					<tr>	
+						<td>{{ bone.bonee.first_name }} {{ bone.bonee.last_name }}</td>
+						<td>
+							{{ bone.expirationDate }}
+						</td>
+						<td>
+							{{ bone.value }}
+						</td>
+						<td>{{ bone.reason }}</td>
+						<td>
+							<a class="btn btn-default btn-sm" href="{% url 'Standards.views.edit_bone' bone.pk %}">
+								View Bone
+							</a>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div role="tabpanel" class="tab-pane fade" id="bone-changes">
+		<div class="table-responsive">
+			<table class="table dataTable">
+				<thead>
+					<tr>
+						<th class="one wide">Date</th>
+						<th class="one wide">Bone</th>
+						<th class="two wide">Changer</th>
+						<th class="two wide">Old Exp.</th>
+						<th class="two wide">New Exp.</th>
+						<th class="two wide">Old Reason</th>
+						<th class="two wide">New Reason</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for change in bone_edit_history %}
+					<tr>	
+						<td> {{ change.dateChangeMade }}</td>
+						<td>
+							<a class="btn btn-default btn-sm" href="{% url 'Standards.views.edit_bone' change.bone.pk %}">
+								View Bone
+							</a>
+						</td>
+						<td>{{ change.modifier.first_name }} {{ change.modifier.last_name }}</td>
+						<td>{{ change.previousExpirationDate }}</td>
+						<td>
+							{{ change.newExpirationDate }}
+						</td>
+						<td>{{ change.previousReason }}</td>
+						<td>{{ change.newReason }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div role="tabpanel" class="tab-pane fade" id="summons-history">
+		<div class="table-responsive">
+			<table class="table dataTable">
+				<thead>
+					<tr>
+						<th class="one wide">Date</th>
+						<th class="one wide">Summonee</th>
+						<th class="two wide">Summoner</th>
+						<th class="two wide">Summons Details</th>
+						<th class="two wide">Result</th>
+						<th class="two wide">Result Details</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for history in summons_history %}
+					<tr>	
+						<td>{{ history.date }}</td>
+						<td>{{ history.summonee.first_name }} {{ history.summonee.last_name }}</td>
+						<td>{{ history.summoner.first_name }} {{ history.summoner.last_name }}</td>
+						<td>
+							{{ history.details }}
+						</td>
+						<td>
+							{% if history.hasBone %}
+								<a href="{% url 'Standards.views.edit_bone' history.boneID %}">Boned</a>
+							{% else %}
+								Rejected
+							{% endif %}
+						</td>
+						<td>{{ history.resultReason }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block toplevel_content %}
+<!-- Accept Summons Form -->
+<div class="modal" id="accept-summons">
+	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal">
+        			<span aria-hidden="true">&times;</span>
+        			<span class="sr-only">Close</span>
+       			</button>
+        		<h4 class="modal-title">Levy Bone from Summons</h4>
+      		</div>
+      		<div class="modal-body">
+				<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.accept_summons' 0 %}" id="accept-summons-form" role="form">
+					{% csrf_token %}
+					<div class="form-group">
+						Levy a bone due to a summons.
+					</div>
+					<div class="form-group">
+						<label for="id_value" class="control-label">Value*</label>
+						{{accept_summons_form.value}}
+					</div>
+					<div class="form-group">
+						<label for="summons-datepicker" class="control-label">Expiration Date*</label>
+						<input type="text" id="summons-datepicker" class="datepicker" name="expirationDate" maxlength="50" />
+					</div>
+					<div class="form-group" id="accept-summons-reason">
+						<label for="id_reason" class="control-label">Reason/Details*</label>
+						{{accept_summons_form.reason}}
+					</div>
+				</form>
+      		</div>
+      		<div class="modal-footer">
+       			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        		<button type="button" class="btn btn-primary" onclick="$('#accept-summons-form').submit()">Levy Bone</button>
+      		</div>
+    	</div>
+  	</div>
+</div>
+
+<!-- Reject Summons Form -->
+<div class="modal" id="reject-summons">
+	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal">
+        			<span aria-hidden="true">&times;</span>
+        			<span class="sr-only">Close</span>
+       			</button>
+        		<h4 class="modal-title">Reject Summons</h4>
+      		</div>
+      		<div class="modal-body">
+				<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.reject_summons' 0 %}" id="reject-summons-form" role="form">
+					{% csrf_token %}
+					<div class="form-group">
+						<label for="reason" class="control-label">Reason/Details*</label>
+						<textarea class="form-control" id="reason" name="reason"></textarea>
+					</div>
+				</form>
+      		</div>
+      		<div class="modal-footer">
+       			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        		<button type="button" class="btn btn-primary" onclick="$('#reject-summons-form').submit()">Reject Summons</button>
+      		</div>
+    	</div>
+  	</div>
+</div>
+
+<!-- Levy Bone Form -->
+<div class="modal" id="levy-bone">
+	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal">
+        			<span aria-hidden="true">&times;</span>
+        			<span class="sr-only">Close</span>
+       			</button>
+        		<h4 class="modal-title">Levy Bone</h4>
+      		</div>
+      		<div class="modal-body">
+				<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.add_bone' %}" role="form" id="levy-bone-form">
+					{% csrf_token %}
+					<div class="form-group">
+						<label for="id_bonee" class="control-label">Recipient*</label>
+						{{bone_form.bonee}}
+					</div>
+					<div class="form-group">
+						<label for="id_reason" class="control-label">Reason*</label>
+						{{bone_form.reason}}
+					</div>
+					<div class="form-group">
+						<label for="id_value" class="control-label">Value*</label>
+						{{bone_form.value}}
+					</div>
+					<div class="form-group">
+						<label for="bone-datepicker" class="control-label">Expiration Date*</label>
+						<input type="text" id="bone-datepicker" class="datepicker" name="expirationDate" maxlength="50" />
+					</div>
+				</form>
+      		</div>
+      		<div class="modal-footer">
+       			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        		<button type="button" class="btn btn-primary" onclick="$('#levy-bone-form').submit()">Levy Bone</button>
+      		</div>
+    	</div>
+  	</div>
+</div>
+
+<!-- Levy Probation Form -->
+<div class="modal" id="levy-probation">
+	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal">
+        			<span aria-hidden="true">&times;</span>
+        			<span class="sr-only">Close</span>
+       			</button>
+        		<h4 class="modal-title">Levy Probation</h4>
+      		</div>
+      		<div class="modal-body">
+				<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.add_probation' %}" role="form" id="levy-probation-form">
+					{% csrf_token %}
+					<div class="form-group">
+						<label for="id_recipient" class="control-label">Recipient*</label>
+						{{probation_form.recipient}}
+					</div>
+					<div class="form-group">
+						<label for="probation-datepicker" class="control-label">Expiration Date*</label>
+						<input type="text" id="probation-datepicker" class="datepicker" name="expirationDate" maxlength="50" />
+					</div>
+				</form>
+      		</div>
+      		<div class="modal-footer">
+       			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        		<button type="button" class="btn btn-primary" onclick="$('#levy-probation-form').submit()">Levy Probation</button>
+      		</div>
+    	</div>
+  	</div>
+</div>
+{% endblock %}
+
+{% block embedded_js %}
+<!-- Page specific utility javascript -->
+<script type="text/javascript">
+	// Initialize all date pickers on the page.
+	$('.datepicker').datetimepicker({
+		pickTime: false,
+		showToday: true,
+		minDate: moment()
+	});
+
+	// Specify the target for the approve summons form when approve summons is clicked
+	$(".approve-summons").click(function(){
+    	var id = $( this ).attr('id');
+
+    	var oldAction = $("#accept-summons-form").attr('action');
+
+    	var newAction = oldAction.replace("/0/", "/" + id + "/");
+
+    	$("#accept-summons-form").attr('action', newAction);
+
+    	$("#accept-summons-reason > #id_reason").val($("#reason_" + id).html());
+
+    	$("#accept-summons").modal('show');
+    });
+
+    $(".reject-summons").click(function(){
+    	var id = $( this ).attr('id');
+
+    	var oldAction = $("#reject-summons-form").attr('action');
+
+    	var newAction = oldAction.replace("/0/", "/" + id + "/");
+
+    	$("#reject-summons-form").attr('action', newAction);
+
+
+    	$("#reject-summons").modal('show');
+    });
+</script>
+{% endblock %}

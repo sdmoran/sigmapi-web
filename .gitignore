@@ -1,0 +1,10 @@
+*.pyc*
+*.DS_Store
+
+.vagrant/
+
+venv/
+
+database
+SigmaPi/database
+SigmaPi/content/*

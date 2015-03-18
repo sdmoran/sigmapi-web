@@ -1,0 +1,99 @@
+{% extends 'secure/archives_base.html' %}
+{% block title %}Sigma Pi Secure - Archives - House Rules {% endblock %}
+
+{% block module_includes %}
+{% load staticfiles %}
+<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+{% endblock %}
+
+{% block content %}
+<h3>View the Chapter's house rules.</h3>
+
+{% if perms.Archives.add_houserules %}
+<div class="actions">
+	<ul class="nav nav-pills">
+		<li>
+			<a href="#" data-toggle="modal" data-target="#add-rules">
+				<span class="glyphicon glyphicon-plus"></span> Update House Rules
+			</a>
+		</li>
+	</ul>
+</div>
+{% endif %}
+
+{% if latest %}
+<p>
+	The most recent version of the house rules may be viewed <a href="{% url 'Archives.views.download_rules' latest.pk %}">here.</a>
+</p>
+{% endif %}
+{% if rules %}
+<p>
+	An archive of past house rules may be viewed below.
+<div class="table-responsive">
+	<table class="dataTable table">
+		<thead>
+			<tr>
+				<th class="ten wide">Date</th>
+				<th class="two wide">View</th>
+				{% if perms.Archives.delete_houserules %} <th class="one wide">Delete</th> {% endif %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for rule in rules %}
+			<tr>
+				<td>{{ rule.date }}</td>
+				<td>
+					<a href="{% url 'Archives.views.download_rules' rule.pk %}">View</a>
+				</td>
+				{% if perms.Archives.delete_houserules %}
+				<td>
+					<form method="post" action="{% url 'Archives.views.delete_rules' %}">
+						{% csrf_token %}
+						<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
+						<input type="hidden" name="post_id" value="{{ rule.pk }}"/>
+					</form>
+				</td>
+				{% endif %}
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+<p>
+	No house rules found. Check back later.
+</p>
+{% endif %}
+{% endblock %}
+
+{% if perms.Archives.add_houserules %}
+{% block toplevel_content %}
+<div class="modal" id="add-rules">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+        	<span aria-hidden="true">&times;</span>
+        	<span class="sr-only">Close</span>
+       	</button>
+        <h4 class="modal-title">Update House Rules</h4>
+      </div>
+      <div class="modal-body">
+		<form enctype="multipart/form-data" method="post" action="{% url 'Archives.views.rules' %}" id="add-rules-form">
+			{% csrf_token %}
+			<div class="form-group">
+				<label for="id_filepath" class="control-label">House Rules File*</label>
+				{{ form.filepath }}
+			</div>
+		</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="$('#add-rules-form').submit()">Update House Rules</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% endif %}

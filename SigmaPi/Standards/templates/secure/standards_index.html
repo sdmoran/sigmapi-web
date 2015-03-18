@@ -1,0 +1,436 @@
+{% extends "secure/standards_base.html" %}
+
+{% block title %}Sigma Pi Secure - Standards {% endblock %}
+
+{% block module_includes %}
+{% load staticfiles %}
+<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+{% endblock %}
+
+{% block content %}
+<h3>The Standards Board</h3>
+<div class="actions">
+	<ul class="nav nav-pills">
+		<li>
+			<a href="{% static 'media/standards/pipointsfaq.pdf' %}">
+				<span class="glyphicon glyphicon-info-sign"></span> View Pi Points FAQ
+			</a>
+		</li>
+		<li>
+			<a href="#" data-toggle="modal" data-target="#request-points">
+				<span class="glyphicon glyphicon-thumbs-up"></span> Request Pi Points
+			</a>
+		</li>
+		<li>
+			<a href="#" data-toggle="modal" data-target="#offer-cover">
+				<span class="glyphicon glyphicon-ok-sign"></span> Cover a Job
+			</a>
+		</li>
+		{% if positive_points %}
+		<li>
+			<a href="#" data-toggle="modal" data-target="#request-cover">
+				<span class="glyphicon glyphicon-question-sign"></span> Request Cover for a Job
+			</a>
+		</li>
+		{% endif %}
+		{% if perms.Standards.add_summonsrequest %}
+		<li>
+			<a href="#" data-toggle="modal" data-target="#send-summons">
+				<span class="glyphicon glyphicon-envelope"></span> Send Summons
+			</a>
+		</li>
+		{% endif %}
+	</ul>
+</div>
+
+<!-- Display any messages -->
+{% if error %}
+<div class="alert alert-warning">
+	<strong>Error!</strong>
+	{{ error | safe }}
+</div>
+{% endif %}
+{% if msg %}
+<div class="alert alert-success">
+	<strong>Success!</strong>
+	{{ msg | safe }}
+</div>
+{% endif %}
+
+<p>
+	You have {{ own_points.points }} Pi Point{{own_points.points|pluralize}}.
+	<br/>
+	You have {{current_bone_count}} current bone{{current_bone_count|pluralize}}.
+	<br/>
+	Based on how many jobs you have covered, you may reduce {{ own_points.jobsTaken }} bone{{own_points.jobsTaken|pluralize}}.
+	<br/>
+	{% if probation %}
+	You are on social probation.
+	{% endif %}
+</p>
+
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+  <li role="presentation" class="active"><a href="#bone-history" role="tab" data-toggle="tab">My Bone History</a></li>
+  <li role="presentation"><a href="#point-standings" role="tab" data-toggle="tab">Pi Point Standings</a></li>
+  <li role="presentation"><a href="#job-requests" role="tab" data-toggle="tab">Job Cover Requests ({{requests_count}})</a></li>
+</ul>
+<!-- Tab panes -->
+<div class="tab-content">
+	<div role="tabpanel" class="tab-pane fade in active" id="bone-history">
+  		<div class="table-responsive no-spaced">
+	  		<table class="dataTable table">
+				<thead>
+					<tr>
+						<th class="two wide">Date Received</th>
+						<th class="two wide">Expiration Date</th>
+						<th class="six wide">Reason</th>
+						<th class="two wide">Value</th>
+						<th class="two wide">Reduce</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for bone in current_bones %}
+					<tr>	
+						<td>{{ bone.dateReceived }}</td>
+						<td>
+							{{ bone.expirationDate }}
+						</td>
+						<td>{{ bone.reason }}</td>
+						<td>
+							{{ bone.value }}
+						</td>
+						<td>
+							<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.reduce_bone' bone.pk %}">
+								{% csrf_token %}
+								<button type="submit" class="btn btn-primary btn-sm">Reduce Bone</button>
+							</form>
+					</tr>
+					{% endfor %}
+
+					{% for bone in expired_bones %}
+					<tr class="danger">	
+						<td>{{ bone.dateReceived }}</td>
+						<td>
+							EXPIRED
+						</td>
+						<td>{{ bone.reason }}</td>
+						<td>
+							EXPIRED
+						</td>
+						<td>
+							EXPIRED
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+  	</div>
+
+
+  	<div role="tabpanel" class="tab-pane fade" id="point-standings">
+  		<div class="table-responsive no-spaced">
+			<table class="dataTable table">
+				<thead>
+					<tr>
+						<th class="six wide">Name</th>
+						<th class="six wide">Points</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for record in point_records %}
+					<tr>	
+						<td>{{ record.brother.first_name }} {{ record.brother.last_name }}</td>
+						<td>{{ record.points }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+  		</div>
+  	</div>
+
+  	<div role="tabpanel" class="tab-pane fade" id="job-requests">
+		<p>People looking for others to cover their job:</p>
+		<div class="table-responsive no-spaced">
+			<table class="dataTable table">
+				<thead>
+					<tr>
+						<th class="three wide">Date</th>
+						<th class="two wide">Requester</th>
+						<th class="three wide">Job (Pi Points Reward)</th>
+						<th class="four wide">Details</th>
+						<th class="two wide">Cover Job</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for job in job_givers %}
+					<tr>	
+						<td>{{ job.date }}</td>
+						<td>{{ job.requester.first_name }} {{ job.requester.last_name }}</td>
+						<td>{{ job.get_job_display }}</td>
+						<td>{{ job.details }}</td>
+						<td>
+							<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.accept_job_request' job.pk %}">
+								{% csrf_token %}
+								<button id="{{job.pk}}" type="submit" class="btn btn-success btn-sm">Cover Job</button>
+							</form>
+						</td>
+					</tr>
+					{% endfor %}
+					{% for job in own_givers %}
+					<tr>	
+						<td>{{ job.date }}</td>
+						<td>{{ job.requester.first_name }} {{ job.requester.last_name }}</td>
+						<td>{{ job.get_job_display }}</td>
+						<td>{{ job.details }}</td>
+						<td>
+							<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.delete_job_request' job.pk %}">
+								{% csrf_token %}
+								<button id="{{job.pk}}" class="btn btn-danger btn-sm">Delete</button>
+							</form>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="separator"></div>
+		<p>People looking to cover others' jobs:</p>
+		<div class="table-responsive no-spaced">
+			<table class="dataTable table">
+				<thead>
+					<tr>
+						<th class="three wide">Date</th>
+						<th class="two wide">Requester</th>
+						<th class="three wide">Job (Pi Points Cost)</th>
+						<th class="four wide">Details</th>
+						<th class="two wide">Give Job</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for job in job_doers %}
+					<tr>	
+						<td>{{ job.date }}</td>
+						<td>{{ job.requester.first_name }} {{ job.requester.last_name }}</td>
+						<td>{{ job.get_job_display }}</td>
+						<td>{{ job.details }}</td>
+						<td>
+							<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.accept_job_request' job.pk %}">
+								{% csrf_token %}
+								<button id="{{job.pk}}" type="submit" class="btn btn-success btn-sm">Give Job</button>
+							</form>
+						</td>
+					</tr>
+					{% endfor %}
+					{% for job in own_doers %}
+					<tr>	
+						<td>{{ job.date }}</td>
+						<td>{{ job.requester.first_name }} {{ job.requester.last_name }}</td>
+						<td>{{ job.get_job_display }}</td>
+						<td>{{ job.details }}</td>
+						<td>
+							<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.delete_job_request' job.pk %}">
+								{% csrf_token %}
+								<button id="{{job.pk}}" class="btn btn-danger btn-sm">Delete</button>
+							</form>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+  	</div>
+</div>
+{% endblock %}
+
+{% block toplevel_content %}
+<div class="modal" id="request-points">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+        	<span aria-hidden="true">&times;</span>
+        	<span class="sr-only">Close</span>
+       	</button>
+        <h4 class="modal-title">Request Pi Points</h4>
+      </div>
+      <div class="modal-body">
+		<form method="post" action="{% url 'Standards.views.request_points' %}" id="request-points-form">
+			{% csrf_token %}
+			<div class="form-group">
+				<label class="control-label" for="id_reason">Reason*</label>
+					{{points_form.reason}}
+			</div>
+			<div class="form-group">
+				<label for="id_witness" class="control-label">Witness</label>
+				{{points_form.witness}}
+			</div>
+		</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="$('#request-points-form').submit()">Request Points</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if positive_points %}
+<div class="modal" id="request-cover">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+        	<span aria-hidden="true">&times;</span>
+        	<span class="sr-only">Close</span>
+       	</button>
+        <h4 class="modal-title">Request Cover for a Job</h4>
+      </div>
+      <div class="modal-body">
+		<form id="request-cover-form" enctype="multipart/form-data" method="post" action="{% url 'Standards.views.add_job_request' 1 %}">
+			{% csrf_token %}
+			<div class="form-group">
+				Spend your Pi Points requesting coverage for a job you cannot perform.  
+				<br/><br/>You must have the necessary number of Pi Points to request coverage.
+			</div>	
+			<div class="form-group">
+				<label class="control-label" for="id_job">Job*</label>
+				{{jobs_form.job}}
+			</div>
+			<div class="form-group">
+				<label for="id_details" class="control-label">Details*</label>
+				{{jobs_form.details}}
+			</div>
+		</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="$('#request-cover-form').submit()">Request Job Cover</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="modal" id="offer-cover">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+        	<span aria-hidden="true">&times;</span>
+        	<span class="sr-only">Close</span>
+       	</button>
+        <h4 class="modal-title">Offer to Cover a Job</h4>
+      </div>
+      <div class="modal-body">
+		<form id="offer-cover-form" enctype="multipart/form-data" method="post" action="{% url 'Standards.views.add_job_request' 2 %}">
+			{% csrf_token %}
+			<div class="form-group">
+				You will receive the corresponding number of Pi Points once you have covered the job.
+			</div>	
+			<div class="form-group">
+				<label class="control-label" for="id_job">Job*</label>
+				{{jobs_form.job}}
+			</div>
+			<div class="form-group">
+				<label for="id_details" class="control-label">Details*</label>
+				{{jobs_form.details}}
+			</div>
+		</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="$('#offer-cover-form').submit()">Offer Job Cover</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if perms.Standards.add_summonsrequest %}
+<div class="modal" id="send-summons">
+ 	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal">
+        			<span aria-hidden="true">&times;</span>
+        			<span class="sr-only">Close</span>
+       			</button>
+        		<h4 class="modal-title">Send Summons</h4>
+      		</div>
+      		<div class="modal-body">
+				<form id="send-summons-form" enctype="multipart/form-data" method="post" action="{% url 'Standards.views.send_summons_request' %}">
+					{% csrf_token %}
+					<div class="form-group">
+						Submit a request to summons a Brother/Pledge. The summons request will be reviewed by the Fourth Counselor and sent to Standards Board.
+					</div>	
+					<div class="form-group" id="recipient-template">
+						<label class="control-label" for="id_summonee">Recipient*</label>
+						{{ summons_form.summonee }}
+					</div>
+					<div class="form-group">
+						<a href="#" id="add-summons-recipient">
+							<span class="glyphicon glyphicon-plus"></span> Add Recipient
+						</a>
+					</div>
+					<div class="form-group">
+						<label for="id_reason" class="control-label">Reason*</label>
+						{{ summons_form.reason }}
+					</div>
+
+					<input type="hidden" id="recipient-count" name="recipient-count" value="1" class="hidden" style="display:none;"/>
+				</form>
+      		</div>
+      		<div class="modal-footer">
+       			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        		<button type="button" class="btn btn-primary" onclick="$('#send-summons-form').submit()">Send Summons</button>
+      		</div>
+    	</div>
+  	</div>
+</div>
+
+<!-- Add summons recipient script -->
+<script type="text/javascript">
+	// This should be redone in the future. It is not the best design possible. Was put in quickly to get the functionality working.
+	var summonsRecipientCount = 1;
+	$(document).ready(function() {
+
+		$("#recipient-count").val(summonsRecipientCount); // Make sure count is set to 1. Workaround for browsers that cache form values
+
+		$("#add-summons-recipient").click(function(){
+
+			summonsRecipientCount = summonsRecipientCount + 1;
+			$("#recipient-count").val(summonsRecipientCount);
+
+			var copiedTemplate = $("#recipient-template").clone();
+
+			var idVal = "summonee_" + summonsRecipientCount
+
+			copiedTemplate.attr("id", idVal);
+
+			var inputForm = copiedTemplate.find("select");
+
+			inputForm.attr("id", idVal);
+			inputForm.attr("name", idVal);
+
+			copiedTemplate.find("label").html("Recipient " + summonsRecipientCount + "*");
+
+			if ( summonsRecipientCount == 2 )
+			{
+				$("#recipient-template").after(copiedTemplate);
+			}
+			else
+			{
+				$(".form-group#summonee_" + (summonsRecipientCount - 1)).after(copiedTemplate);
+			}
+
+		});
+
+	});
+
+</script>
+{% endif %}
+
+{% endblock %}

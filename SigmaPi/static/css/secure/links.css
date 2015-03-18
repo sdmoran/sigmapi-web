@@ -1,0 +1,22 @@
+.link {
+	margin-bottom: 10px;
+	width: 100%;
+}
+
+.link > .content > .header > span
+{
+	margin-right: 10px;
+}
+
+.link > .content > .details {
+	margin-left: 30px;
+}
+
+.link > .content > .metadata {
+	display:inline;
+}
+
+.links-list {
+	margin: auto;
+	width: 100%;	
+}

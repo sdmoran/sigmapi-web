@@ -1,0 +1,228 @@
+{% extends 'scholarship_base.html' %}
+
+{% block title %}Sigma Pi Secure - Academic Resources {% endblock %}
+
+{% block module_includes %}
+{% load static %}
+<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+
+<!-- Async file upload library -->
+<script type="text/javascript" src='{% static "js/lib/jquery.ui.widget.js" %}'></script>
+<script type="text/javascript" src='{% static "js/lib/jquery.iframe-transport.js" %}'></script>
+<script type="text/javascript" src='{% static "js/lib/jquery.fileupload.js" %}'></script>
+
+<link rel="stylesheet" type="text/css" href='{% static "css/lib/jquery.fileupload.css" %}'/>
+{% endblock %}
+
+{% block content %}
+<h3>View academic resources.</h3>
+
+<div class="actions">
+	<ul class="nav nav-pills">
+		<li>
+			<a href="#" data-toggle="modal" data-target="#upload-resource">
+				<span class="glyphicon glyphicon-plus"></span> Upload Academic Resource
+			</a>
+		</li>
+	</ul>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+{% if message.level == 40 %}
+<div class="alert alert-danger">
+	<strong>Error! </strong>
+{% else %}
+<div class="alert alert-info">
+	<strong>Info! </strong>
+{% endif %}
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+{% if resources %}
+<div class="table-responsive">
+	<table class="table dataTable">
+		<thead>
+			<tr>
+				<th>Resource Name</th>
+				<th>Course Number</th>
+				<th>Professor</th>
+				<th>Year</th>
+				<th>Term</th>
+				<th>PDF</th>
+				{% if is_scholarship_head %}
+				<th>Delete</th>
+				{% endif %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for resource in resources %}
+			<tr>
+				<td>{{resource.resource_name}}</td>
+				<td>{{resource.course_number}}</td>
+				<td>{{resource.professor_name}}</td>
+				<td>{{resource.year}}</td>
+				<td>{{resource.term}}</td>
+				<td>
+					<a href="{% url 'Scholarship.views.download_resource' resource.pk %}">
+						Download
+					</a>
+				</td>
+				{% if is_scholarship_head %}
+				<td>
+					<form type="multipart/form-data" method="post" action="{% url 'Scholarship.views.delete_resource' resource.pk %}" id="delete-{{resource.pk}}">
+						{% csrf_token %}
+						<a href="#" onclick="$('#delete-{{resource.pk}}').submit();">
+							Delete
+						</a>
+					</form>
+				</td>
+				{% endif %}
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+
+<p>
+	There are no resources uploaded. Check back later.
+</p>
+
+{% endif %}
+
+{% endblock %}
+
+{% block toplevel_content %}
+<!-- Modify Points Form -->
+<div class="modal" id="upload-resource">
+	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal">
+        			<span aria-hidden="true">&times;</span>
+        			<span class="sr-only">Close</span>
+       			</button>
+        		<h4 class="modal-title">Upload Academic Resource</h4>
+      		</div>
+      		<div class="modal-body">
+      			<form enctype="multipart/form-data" method="post" action="{% url 'Scholarship.views.upload_resource' %}" id="upload-resource-form">
+      				{% csrf_token %}
+      				<div class="form-group">
+						<label class="control-label">Resource Name*</label>
+						{{ upload_resource_form.resource_name }}
+					</div>
+
+					<div class="form-group">
+						<label class="control-label">Course Number*</label>
+						{{ upload_resource_form.course_number }}
+					</div>
+
+					<div class="form-group">
+						<label class="control-label">Professor Name*</label>
+						{{ upload_resource_form.professor_name }}
+					</div>
+
+					<div class="form-group">
+						<label class="control-label">Term*</label>
+						{{ upload_resource_form.term }}
+					</div>
+
+					<div class="form-group">
+						<label class="control-label">Year*</label>
+						{{ upload_resource_form.year }}
+						<p class="help-block">Note: Must be a positive integer.</p>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label">Resource File (PDF)*</label>
+						<div>
+							<div class="btn btn-success fileinput-button" style="display:inline-block;">
+	       						<span>Select File...</span>
+	        					<!-- The file input field used as target for the file upload widget -->
+	        					{{ upload_resource_form.resource_pdf }}
+	    					</div>
+	    					<span id="file-pdf-name"></span>
+	    				</div>
+					</div>
+					<p>
+	      				{% if is_scholarship_head %}
+	      				Note: Your submission will be visible immediately to all users.
+	      				{% else %}
+	      				Note: Your submission will not be accessible until it is approved by the Scholarship Chair.
+	      				{% endif %}
+      				</p>
+      			</form>
+      		</div>
+      		<div class="modal-footer">
+				<div class="progress hidden" id="upload-progress">
+					<div class="progress-bar" id="upload-progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+						0%
+					</div>
+				</div>
+				<div id="upload-btns">
+	       			<button type="button" class="btn btn-default" id="cancel-btn" data-dismiss="modal">Cancel</button>
+	        		<button type="button" class="btn btn-primary" id="submit-btn">Submit Resource</button>
+        		</div>
+      		</div>
+    	</div>
+  	</div>
+</div>
+{% endblock %}
+
+{% block embedded_js %}
+
+<!-- Async file upload page specific script -->
+<script type="text/javascript">
+
+	// Initialize file uploader.
+	$("#id_resource_pdf").fileupload({
+		url: './upload/',
+		type: 'POST',
+		dataType: 'json',
+		dropZone: null, // Disable drag/drop files
+		pasteZone: null, // Disable paste files
+		singleFileUploads: true, // Upload a single file per XHR request
+		autoUpload: false
+	});
+
+	// Bind file upload action listeners.
+	$("#id_resource_pdf")
+		.on('fileuploadadd', function (e, data) {
+			// Display the name of each file added.
+			$.each(data.files, function (index, file) {
+	            $("#file-pdf-name").html(file.name);
+	        });
+
+			// Add an action listener for click on submit.
+	        $("#submit-btn").click(function(){
+	        	$("#upload-progress").removeClass("hidden");
+	        	$("#upload-btns").addClass("hidden");
+
+	        	data.submit();
+	        });
+		})
+		.on('fileuploadprogressall', function ( e, data ) {
+        	var progress = parseInt(data.loaded / data.total * 100, 10);
+	        $('#upload-progress-bar').css(
+	            'width',
+	            progress + '%'
+	        );
+	        $('#upload-progress-bar').html(progress + "%");
+		})
+		.on('fileuploaddone', function ( e, data ) {
+			location.reload(); // Refresh the page when the upload is done
+		});
+
+		$("#id_resource_name").val("");
+		$("#id_course_number").val("");
+		$("#id_professor_name").val("");
+		$("#id_term").val("");
+		$("#id_year").val("");
+		$("#id_resource_pdf").val("");
+</script>
+
+{% endblock %}

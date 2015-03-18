@@ -1,0 +1,46 @@
+{% extends "secure/user_base.html" %}
+
+{% block title %}Sigma Pi Secure - Manage Users {% endblock %}
+
+{% block module_includes %}
+{% load staticfiles %}
+<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+{% endblock %}
+
+{% block content %}
+<h3>View and edit existing users.</h3>
+
+{% if all_users %}
+<div class="table-responsive">
+	<table class="dataTable table">
+		<thead>
+			<tr>
+				<th class="three wide">First Name</th>
+				<th class="three wide">Last Name</th>
+				<th class="three wide">Username</th>
+				<th class="one wide">Edit</th>
+				<th class="two wide">Password</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for user in all_users %}
+			<tr>
+				<td>{{ user.first_name }}</td>
+				<td>{{ user.last_name }}</td>
+				<td>{{ user.username }}</td>
+				<td>
+					<a href="{% url 'UserInfo.views.edit_user' user.username %}">Edit</a>
+				</td>
+				<td>
+					<a href="{% url 'UserInfo.views.reset_password' user.username %}">Reset</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+No users found.  <a href="{% url 'UserInfo.views.add_users' %}">Create a new one.</a>
+{% endif %}
+{% endblock %}

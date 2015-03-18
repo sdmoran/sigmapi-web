@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% load staticfiles %}
+	<script type='text/javascript' src='{% static "js/lib/jquery-1.11.1.min.js" %}'></script>
+	<script type="text/javascript" src='{% static "bootstrap/js/bootstrap.min.js" %}'></script>
+
+	<link rel="stylesheet" type="text/css" href='{% static "bootstrap/css/bootstrap.min.css" %}'/>
+	<link rel="stylesheet" type="text/css" href='{% static "css/sigmapi_theme.css" %}'/>
+
+	<link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" />
+
+	<!-- Include Response.js to enable media queries/responsive design for IE 8 and below -->
+	<!--[if lt IE 9]>
+	<script src='{% static "js/lib/respond.min.js" %}'></script>
+	<![endif]-->
+
+	{% block local_includes %}
+		<!-- include on child templates to add page specific js and css files -->
+	{% endblock %}
+	<title>{% block title %}{% endblock %}</title>
+
+	<meta name="description" content="The official website of the Gamma Iota chapter of Sigma Pi Fraternity International,  located at Worcester Polytechnic Institute in Worcester, MA.  Check out information on our history, our commitment to community service, and our brotherhood.">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+<body>
+	<div id="wrapper">
+		<div id="banner-top">
+			<div id="banner-wrapper">
+				<a href="/"><img id="banner-img" src="/static/img/banner-crest.png"/></a>
+				<div class="text">
+					Sigma Pi 
+				</div>
+				<div class="sub-text"> 
+					<span class="sub-text-main">Gamma Iota Chapter</span> <span class="sub-text-extra">at Worcester Polytechnic Institute</span> <span class="sub-text-extra-small">at WPI</span>
+				</div>
+			</div>
+		</div>
+
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="container-fluid">
+			{% block navbar %}
+			{% endblock %}
+			</div>
+		</nav>
+
+		{% block subnav %}
+		{% endblock %}
+
+		<div class="container-fluid" id="content">
+			{% block content %}{% endblock %}
+		</div>
+	</div>
+	<div id="footer-wrapper">
+		<div id="footer-content">
+			<div id="values-wrapper">
+				<div id="title">Our Values</div>
+				<div id="values">Scholarship | Chivalry | Culture | Character | Service</div>
+			</div>
+
+			{% block footer-content %}
+
+			{% endblock %}
+		</div>
+	</div>
+	<!-- Block included for any content that must be rendered at the top level of the body -->
+	{% block toplevel_content %}
+	{% endblock %}
+
+	<!-- Embedded JS -->
+	<script type="text/javascript">
+		// Hack to fix Windows Phone 8 IE rendering bug
+		if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+		  var msViewportStyle = document.createElement('style')
+		  msViewportStyle.appendChild(
+		    document.createTextNode(
+		      '@-ms-viewport{width:auto!important}'
+		    )
+		  )
+		  document.querySelector('head').appendChild(msViewportStyle)
+		}
+
+		// Hack to fix stock Android browser rendering of select inputs
+		$(function () {
+		  var nua = navigator.userAgent
+		  var isAndroid = (nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > -1 && nua.indexOf('AppleWebKit') > -1 && nua.indexOf('Chrome') === -1)
+		  if (isAndroid) {
+		    $('select.form-control').removeClass('form-control').css('width', '100%')
+		  }
+		})
+	</script>
+
+	{% block embedded_js %}
+	{% endblock %}
+</body>
+</html>

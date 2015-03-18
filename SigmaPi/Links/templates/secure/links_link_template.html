@@ -1,0 +1,24 @@
+<!-- Single link in the system -->
+<div class="link">
+	<div class="content">
+		<!-- Title -->
+		<a class="header" href="{{link.url}}"><span class="glyphicon glyphicon-link"></span>{{link.title}}</a>
+		<!-- Details -->
+		<div class="details">
+			({{ link.url|truncatechars:30 }})
+			<!-- Metadata for link -->
+			<div class="metadata">
+				Posted {{ link.date }} by {{ link.poster.first_name }} {{ link.poster.last_name }}
+			</div>
+			<!-- Actions on a link -->
+			<div class="link-actions">
+				{% if perms.Links.delete_link %}
+				<form action="{% url 'Links.views.delete_link' link.pk %}" method="post" id="delete_link_{{ link.pk }}">
+					{% csrf_token %}
+					<a href="javascript:$('#delete_link_{{ link.pk }}').submit();" name="Delete Link">Delete Link</a>
+				</form>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>

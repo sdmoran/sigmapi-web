@@ -1,0 +1,39 @@
+{% extends "secure/user_base.html" %}
+{% block title %}Sigma Pi Secure - Add User {% endblock %}
+{% block content %}
+<h3>Add a new user.</h3>
+
+<form enctype="multipart/form-data" method="post" action="{% url 'UserInfo.views.add_users' %}" role="form" class="small centered">
+	{% if message %}
+	<div class="alert alert-info">
+		<strong>Message! </strong>
+		{% for msg in message %}
+		<p>{{ msg }}</p>
+		{% endfor %}
+	</div>
+	{% endif %}
+	{% csrf_token %}
+	<div class="form-group">
+  		<label for="id_username" class="control-label">WPI Username</label>
+  		<input type="text" id="id_username" name="username" maxlength="50" class="form-control" />
+	</div>
+	<div class="form-group">
+  		<label for="id_firstname" class="control-label">First Name</label>
+  		<input type="text" id="id_firstname" name="firstname" maxlength="50" class="form-control" />
+	</div>
+	<div class="form-group">
+  		<label for="id_lastname" class="control-label">Last Name</label>
+  		<input type="text" id="id_lastname" name="lastname" maxlength="50" class="form-control"/>
+	</div>
+	<div class="form-group">
+  		<label for="id_major" class="control-label">Major</label>
+  		<input type="text" id="id_major" name="major" maxlength="50" class="form-control"/>
+	</div>
+	<div class="form-group">		  		
+		<label for="id_class" class="control-label">Class Year</label>
+  		<input type="text" id="id_class" name="class" maxlength="50" class="form-control"/>
+	</div>
+  	<input type="hidden" id="id_type" name="type" value="SINGLE" style="display:none;"/>
+	<button type="submit" class="btn btn-primary pull-right">Add User</button>
+</form>
+{% endblock %}

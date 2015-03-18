@@ -1,0 +1,171 @@
+@media (max-width:520px){
+	.section > li 
+	{
+		display: block !important;
+	}
+}
+
+#footer 
+{
+	display: none; /* Hide the footer in the guests list view */
+}
+
+#message-ux
+{
+	display: block;
+	margin-bottom: 5px;
+}
+
+.loader
+{
+	background: url('/static/img/loader-large.gif') no-repeat scroll 48% 0px transparent;
+
+	width: 80% !important;
+	height: 100px !important;
+
+	text-align: center;
+
+	padding-top: 65px;
+}
+
+.guest
+{
+	max-width: 350px;
+	padding: 10px;
+	border: 2px solid #AAA;
+
+	margin-bottom: 5px;
+
+	/* Disable user text selection */
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.guest.filtered
+{
+	display: none;
+	visiblity: hidden;
+}
+
+.guest.filtered-2
+{
+	display: none;
+	visiblity: hidden;
+}
+
+.guest:hover
+{
+	cursor: pointer;
+}
+
+.guest > .name 
+{
+	font-weight: bold;
+
+	/* Disable user text selection */
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.guest > .details
+{
+	color: #555;
+	margin-left: 10px;
+
+	/* Disable user text selection */
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.guest > .status 
+{
+	float: right;
+	font-size: 1.3em;
+
+	display: none;
+
+	/* Disable user text selection */
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.guest > .status.remove-guest:hover 
+{
+	color: rgb(150, 150, 150);
+}
+
+.guest > .status.present
+{
+	display: inline-block;
+}
+
+.guest-list.male > .guest
+{
+	background-color: rgb(130, 200, 240);
+}
+
+.guest-list.male > .guest:hover
+{
+	background-color: rgb(160, 220, 255);
+}
+
+.guest-list.female > .guest
+{
+	background-color: rgb(255, 200, 255);
+}
+
+.guest-list.female > .guest:hover
+{
+	background-color: rgb(255, 230, 255);
+}
+
+.add-guest-form
+{
+	display: inline-block;
+	width: 100%;
+	margin-bottom: 15px;
+}
+
+.add-guest-form > input
+{
+	display: inline-block;
+}
+
+.add-guest-form > button
+{
+	display: inline-block;
+
+	margin-top: -4px;
+}
+
+@media (max-width:315px){
+	.add-guest-form > button
+	{
+		display: block;
+		margin-top: 3px;
+		float:right;
+	}
+
+	.add-guest-form > input
+	{
+		display: block;
+		max-width: 100%;
+		width: 100%;
+	}
+}

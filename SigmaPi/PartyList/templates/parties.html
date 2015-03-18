@@ -1,0 +1,50 @@
+{% extends "party_base.html" %}
+
+{% block title %}Sigma Pi Secure - View All Parties {% endblock %}
+
+{% block content %}
+<h3>View all parties.</h3>
+
+{% if all_parties %}
+<div class="table-responsive">
+	<table class="table">
+		<thead>
+			<tr>
+				<th class="six wide">Party Name</th>
+				<th class="two wide">Party Date</th>
+				<th class="two wide">Jobs</th>
+				<th class="two wide">Guest List</th>
+			</tr>
+		</thead>
+	    <tbody>
+		{% for p in all_parties reversed %}
+	  	    <tr>
+		    	<td>{{ p.name }}</td>
+		      	<td>{{ p.date }}</td>
+		      	<td>
+			      	{% if p.jobs %}
+					<a href="{{ p.jobs.url }}">
+					Jobs
+					</a>
+				  	{% else %}
+				  	Not Posted
+				  	{% endif %}
+			  	</td>
+		      	<td>
+					<a href="{% url 'PartyList.views.guests' p.pk %}">
+						Guest List
+					</a>
+		      	</td>
+		    </tr>
+		{% endfor %}
+	    </tbody>
+	</table>
+</div>
+
+{% else %}
+<p>
+	No parties exist. Check back later.
+</p>
+
+{% endif %}
+{% endblock %}

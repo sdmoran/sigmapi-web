@@ -1,0 +1,93 @@
+.user-panel
+{
+  display:inline;
+  width: 100%;
+}
+
+.user-panel > h3
+{
+  padding-left:15px;
+}
+
+.user-panel > .panel-body
+{
+  color: rgb(82, 77, 77);
+  padding: 0px;
+  padding-left: 15px;
+  max-width: 100%;
+}
+
+.user-panel > .panel-body > img
+{
+  vertical-align: top !important;
+
+  padding-left: 10px;
+
+  max-width: 215px;
+}
+
+@media (max-width:265px){
+    .user-panel > .panel-body > img
+    {
+      max-width:100%;
+      width:100%;
+
+      float:none !important;
+    }
+}
+
+.user-panel > .panel-body > .content
+{
+  display:inline-block;
+  margin-top: 10px;
+  margin-left: 10px;
+
+  max-width: 60%;
+}
+
+@media (max-width:860px){
+    .user-panel > .panel-body > .content
+    {
+      max-width: 50%;
+    }
+}
+
+@media (max-width:767px){
+    .user-panel > .panel-body > .content
+    {
+      max-width: 60%;
+    }
+}
+
+@media (max-width:686px){
+    .user-panel > .panel-body > .content
+    {
+      max-width: 50%;
+    }
+}
+
+@media (max-width:540px){
+    .user-panel > .panel-body > .content
+    {
+      max-width: 100%;
+    }
+}
+
+.user-panel > .panel-body > .content > .nameval
+{
+  margin-top:2px;
+  margin-bottom: 5px;
+}
+
+.user-panel > .panel-body > .content > .nameval > .name
+{
+  font-weight:bold;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.user-panel > .panel-body > .content > .nameval > .value
+{
+  word-wrap: break-word;
+  margin-left: 20px;
+}

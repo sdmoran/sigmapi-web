@@ -1,0 +1,43 @@
+{% extends "secure/user_base.html" %}
+
+{% block title %}Sigma Pi Secure - Edit User Profile {% endblock %}
+
+{% block content %}
+<h3>Edit the fields below to change the user's info.</h3>
+	<form enctype="multipart/form-data" method="post" action="{% url 'UserInfo.views.edit_user' requested_user.username %}" class="medium centered" role="form">
+		{% csrf_token %}
+		{% if error %}
+		<div class="alert alert-warning">
+			<strong>Error! </strong>
+				<p>{{ error }}</p>
+		</div>
+		{% endif %}
+		<div class="form-group">
+	  		<label for="id_major" class="control-label">Major</label>
+  			{{form.major}}
+		</div>
+		<div class="form-group">
+			<label class="control-label">Phone Number</label>
+	  		{{form.phoneNumber}}
+		</div>
+		<div class="form-group">
+			<label class="control-label">Hometown</label> 
+			{{form.hometown}}
+		</div>
+		<div class="form-group">
+			<label class="control-label">Activities</label> 
+			{{form.activities}}
+		</div>
+		<div class="form-group">
+			<label class="control-label">Interests</label> 
+			{{form.interests}}
+		</div>
+		<div class="form-group">
+			<label class="control-label">Favorite Memory</label> 
+			{{form.favoriteMemory}}
+		</div>		
+		<button type="submit" class="btn btn-primary pull-right">Save Changes</div>
+	</form>
+</div>
+
+{% endblock %}
