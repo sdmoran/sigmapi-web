@@ -20,7 +20,7 @@
   	<li role="presentation"><a href="#point-changes" role="tab" data-toggle="tab">Pi Point Change Log</a></li>
 </ul>
 <!-- Tab panes -->
-<div class="tab-content">	
+<div class="tab-content">
 	<!-- Pi Point Standings -->
 	<div role="tabpanel" class="tab-pane fade in active" id="point-standings">
 		<p>
@@ -38,7 +38,7 @@
 				</thead>
 				<tbody>
 					{% for record in point_records %}
-					<tr id="{{record.pk}}" class="points-row">	
+					<tr id="{{record.pk}}" class="points-row">
 						<td id="{{record.pk}}" class="points-name-field">{{ record.brother.first_name }} {{ record.brother.last_name }}</td>
 						<td id="{{record.pk}}" class="points-points-field">{{ record.points }}</td>
 						<td><a id="{{record.pk}}" class="btn btn-primary btn-sm modify-points-button">Modify Points</a></td>
@@ -64,7 +64,7 @@
 				</thead>
 				<tbody>
 					{% for request in point_requests %}
-					<tr id="{{request.pk}}" class="requests_row">	
+					<tr id="{{request.pk}}" class="requests_row">
 						<td>{{ request.requester.first_name }} {{ request.requester.last_name }}</td>
 						<td>{{ request.get_reason_display }}</td>
 						<td>{{ request.witness }}</td>
@@ -94,8 +94,8 @@
 				</thead>
 				<tbody>
 					{% for change in point_changes %}
-					<tr>	
-						<td>{{ change.dateChanged }}</td>
+					<tr>
+						<td>{{ change.dateChanged|date:"y-m-d P" }}</td>
 						<td>{{ change.modifier.first_name }} {{ change.modifier.last_name }}</td>
 						<td>{{ change.brother.brother.first_name }} {{ change.brother.brother.last_name }}</td>
 						<td>{{ change.oldValue }}</td>

@@ -371,7 +371,7 @@ def manage_points(request):
 
 	point_records = PiPointsRecord.objects.all().exclude(brother__groups__name='Alumni').order_by('-points')
 	point_requests = PiPointsRequest.objects.all()
-	point_changes = PiPointsChangeRecord.objects.all().order_by('-dateChanged')
+	point_changes = PiPointsChangeRecord.objects.all().order_by('dateChanged')
 	add_brother_form = PiPointsAddBrotherForm()
 	pprCount = PiPointsRequest.objects.all().count()
 
