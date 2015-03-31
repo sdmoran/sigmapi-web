@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.models import User
 
-def filepath(filename):
+def filepath(self, filename):
 	"""
 		Defines where files uploaded by the user should be stored
 	"""
