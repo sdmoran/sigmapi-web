@@ -6,7 +6,7 @@ from Standards.models import JobRequest, PiPointsRequest, Bone, Probation, Summo
 
 class CustomModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return obj.first_name + " " + obj.last_name
+        return obj.last_name + ", " + obj.first_name
 
 
 class JobRequestForm(forms.ModelForm):
