@@ -211,13 +211,13 @@ def export_list(request, party):
 	writer.writerow(['Name', 'Signed In'])
 
 	for pg in femaleGuests:
-		writer.writerow([pg.guest.name])
+		writer.writerow([unicode(s).encode("utf-8") for s in [pg.guest.name]])
 
 	writer.writerow(['Male Guests'])
 	writer.writerow(['Name', 'Signed In'])
 
 	for pg in maleGuests:
-		writer.writerow([pg.guest.name])
+		writer.writerow([unicode(s).encode("utf-8") for s in [pg.guest.name]])
 
 	return response
 

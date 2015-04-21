@@ -606,13 +606,14 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender)
 		if (gender === "M")
 		{
 			thisOuter.maleList.addGuest(addedGuest);
+			PartyModule.displayMessage("Guest added.");
 		}
-		else
+		else if (gender === "F")
 		{
 			thisOuter.femaleList.addGuest(addedGuest);
+			PartyModule.displayMessage("Guest added.");
 		}
 
-		PartyModule.displayMessage("Guest added.");
 
 	}).fail(function( jqXHR, textStatus, errorThrown ) {
 		// If failed, we alert the user
