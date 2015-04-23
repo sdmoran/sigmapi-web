@@ -9,7 +9,7 @@ def timeStamped(fname, fmt='%Y-%m-%d_{fname}'):
 	"""
 	return datetime.now().strftime(fmt).format(fname=fname)
 
-def partyjobspath(filename):
+def partyjobspath(_, filename):
 	"""
 		Defines where party job information should be stored
 	"""
