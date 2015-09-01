@@ -4,7 +4,7 @@ This Python Django application powers the Sigma Pi Gamma Iota Chapter's website,
 
 This project uses [Vagrant](https://www.vagrantup.com/) to keep the build environment standard between developers. In particular, I would recommend you install [Vagrant 1.6.3](https://www.vagrantup.com/download-archive/v1.6.3.html).
 
-## First time setup.
+## First time setup
 
 These steps will walk you through deploying the site on your local machine for the first time.
 
@@ -45,7 +45,6 @@ These steps will walk you through deploying the site on your local machine for t
   ```
 
 5.
-
   Collect static assets (CSS, JS, images, etc.).
 
   ```
@@ -63,3 +62,30 @@ These steps will walk you through deploying the site on your local machine for t
   Open a web browser on your computer, and navigate to localhost:8000 to view the site. You can make changes to the code and your running instance will be updated automatically. You can log into the site with the admin account credentials you created earlier.
 
   When you are done working, it is best to run `vagrant suspend` from your host (not from the VM) in order to stop the VM from running in the background. Later you can `vagrant resume` to bring the VM back to the state it was in previously.
+
+
+## Deploying to WebFaction
+
+1.
+  SSH into our WebFaction box. Credentials are redacted, contact @austintrose if you need them.
+
+  ```
+  $ ssh our_username@our.webfactional.url
+  ```
+
+2.
+  Navigate to the deploy folder, and run the deploy script.
+
+  ```
+  $ cd deploy
+  $ ./deploy.sh
+  ```
+
+  Note that the `deploy.sh` script in that folder should be a copy of the one in this repository. It is kept here for version controlling.
+
+  At this point you should be *done*, unless...
+
+3.
+  There may be warnings on deploy, but if there is a failure in production after deployment then you should perform a rollback. In the same directory as the `delpoy.sh` script is `rollback.sh`, which will revert production to its previous deploy.
+
+Note that there are additional complications if you wish to deploy a code change which requires a database migration. For now defer to @austintrose for that.
