@@ -17,7 +17,7 @@ def guidepath(filename):
 	return "protected/guides/" + timeStamped(filename)
 
 
-def bylaws_path(filename):
+def bylaws_path(_, filename):
 	"""
 		Path on filesystem where this bylaws document should be stored.
 	"""
