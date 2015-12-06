@@ -73,10 +73,10 @@ class PiPointsRecord(models.Model):
 	points = models.PositiveIntegerField(default=0)
 
 	def __unicode__(self):
-		return self.user
+		return self.brother.username
 
 	def __str__(self):
-		return self.user
+		return self.brother.username
 
 	class Meta:
 		verbose_name = "Pi Points Record"
