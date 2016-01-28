@@ -68,7 +68,7 @@ def download_bylaw(request, bylaw):
 	"""
 
 	bylawObject = Bylaws.objects.get(pk=bylaw)
-	return sendfile(request, bylawObject.filepath.path, attachment=True, attachment_filename="Bylaws " + str(bylawObject.date))
+	return sendfile(request, bylawObject.filepath.path, attachment=True, attachment_filename="Bylaws " + str(bylawObject.date) + ".pdf")
 
 
 @permission_required('Archives.delete_bylaws', login_url='PubSite.views.permission_denied')
