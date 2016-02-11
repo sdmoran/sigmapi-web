@@ -42,9 +42,11 @@ def create(request, party):
 
 		# See if the guest already exists
 		guestName = request.POST.get('name')
+		guestGender = request.POST.get('gender')
 		guest = None
 		try:
-			guest = Guest.objects.get(name__exact=guestName)
+			guest = Guest.objects.get(name__exact=guestName,
+									  gender__exact=guestGender)
 		except:
 			pass # Don't need to do anything if failed to find the guest
 
