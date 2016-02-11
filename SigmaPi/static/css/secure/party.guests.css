@@ -1,11 +1,18 @@
+@media (max-width: 768px) {
+	#guests-container {
+		margin-bottom: 100px;
+	}
+}
+
 @media (max-width:520px){
-	.section > li 
+
+	.section > li
 	{
 		display: block !important;
 	}
 }
 
-#footer 
+#footer
 {
 	display: none; /* Hide the footer in the guests list view */
 }
@@ -62,7 +69,7 @@
 	cursor: pointer;
 }
 
-.guest > .name 
+.guest > .name
 {
 	font-weight: bold;
 
@@ -89,7 +96,7 @@
     user-select: none;
 }
 
-.guest > .status 
+.guest > .status
 {
 	float: right;
 	font-size: 1.3em;
@@ -105,7 +112,7 @@
     user-select: none;
 }
 
-.guest > .status.remove-guest:hover 
+.guest > .status.remove-guest:hover
 {
 	color: rgb(150, 150, 150);
 }

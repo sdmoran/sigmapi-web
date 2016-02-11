@@ -3,7 +3,7 @@
 {% block title %}Sigma Pi Secure - {{ party.name }}{% endblock %}
 
 {% block module_includes %}
-	{% load staticfiles %}	
+	{% load staticfiles %}
 	<script type="text/javascript" src="{% static 'js/secure/party.guest.js' %}"></script>
 
 	<link rel='stylesheet' type='text/css' href='{% static "css/secure/party.guests.css" %}' />
@@ -31,14 +31,14 @@
 	{% if not partymode %}
 		<li class="title">View:</li>
 		<li class="active">
-			<a href="#" id="all-guests">All Guests 
+			<a href="#" id="all-guests">All Guests
 				<span class="badge">T: <span id="all-guests-count">0</span></span>
 				<span class="badge">M: <span id="all-male-count">0</span></span>
 				<span class="badge">F: <span id="all-female-count">0</span></span>
 			</a>
 		</li>
 		<li>
-			<a href="#" id="my-guests">My Guests 
+			<a href="#" id="my-guests">My Guests
 				<span class="badge">T: <span id="my-guests-count">0</span></span>
 				<span class="badge">M: <span id="my-male-count">0</span></span>
 				<span class="badge">F: <span id="my-female-count">0</span></span>
@@ -47,10 +47,10 @@
 	{% else %}
 		<li class="title">Counts:</li>
 		<li>
-			
+
 			Guys: <span class="count" id="M">0</span>
 			<button type="button" class="btn btn-default btn-sm sub-count" id="M">
-				<span class="glyphicon glyphicon-minus"></span> 
+				<span class="glyphicon glyphicon-minus"></span>
 			</button>
 			<button type="button" class="btn btn-default btn-sm add-count" id="M">
 			 	<span class="glyphicon glyphicon-plus"></span>
@@ -59,7 +59,7 @@
 		<li>
 			Girls: <span class="count" id="F">0</span>
 			<button type="button" class="btn btn-default btn-sm sub-count" id="F">
-				<span class="glyphicon glyphicon-minus"></span> 
+				<span class="glyphicon glyphicon-minus"></span>
 			</button>
 			<button type="button" class="btn btn-default btn-sm add-count" id="F">
 			 	<span class="glyphicon glyphicon-plus"></span>
@@ -80,7 +80,7 @@
 </div>
 
 <!-- Guest List -->
-<div class="container-fluid">
+<div id="guests-container" class="container-fluid">
 	<div class="row">
 		<div class="col-xs-12 col-sm-6">
 			<h4>Male Guests</h4>
