@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from PartyList.models import Party, Guest, PartyGuest
 from django.http import HttpResponse
+from django.contrib.auth.decorators import permission_required
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from PartyList.widgets import GuestForm
@@ -33,6 +34,7 @@ def getFullGuest(party, date, id):
 
 @login_required
 @csrf_exempt
+@permission_required('PartyList.add_partyguest')
 def create(request, party):
 	"""
 		create a guest object as well as a partyguest object for the given party
