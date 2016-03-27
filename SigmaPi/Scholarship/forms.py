@@ -13,6 +13,7 @@ class TrackedUserForm(forms.ModelForm):
 
   class Meta:
     model = TrackedUser
+    fields=['user', 'number_of_hours']
 
 class StudyHoursRecordForm(forms.ModelForm):
   date = forms.DateField()
