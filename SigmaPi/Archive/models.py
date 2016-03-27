@@ -10,7 +10,7 @@ def timeStamped(fname, fmt='%Y-%m-%d_{fname}'):
 
 	return datetime.datetime.now().strftime(fmt).format(fname=fname)
 
-def guidepath(filename):
+def guidepath(_, filename):
 	"""
 		Path on filesystem where this house guide document should be stored.
 	"""
