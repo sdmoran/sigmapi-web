@@ -22,6 +22,18 @@
 				</a>
 			</li>
 
+      {% if perms.Archive.access_guide %}
+      {% if '/secure/archives' in request.path %}
+      <li class="active">
+      {% else %}
+      <li>
+      {% endif %}
+      <a id="archives" href="{{ '/secure/archives' }}">
+              Archives
+      </a>
+      </li>
+      {% endif %}
+
 			{% if '/secure/scholarship' in request.path %}
 			<li class="active">
 			{% else %}
