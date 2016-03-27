@@ -10,7 +10,7 @@
 {% block content %}
 <h3>View the Chapter's house rules.</h3>
 
-{% if perms.Archives.add_houserules %}
+{% if perms.Archive.add_houserules %}
 <div class="actions">
 	<ul class="nav nav-pills">
 		<li>
@@ -24,7 +24,7 @@
 
 {% if latest %}
 <p>
-	The most recent version of the house rules may be viewed <a href="{% url 'Archives.views.download_rules' latest.pk %}">here.</a>
+	The most recent version of the house rules may be viewed <a href="{% url 'Archive.views.download_rules' latest.pk %}">here.</a>
 </p>
 {% endif %}
 {% if rules %}
@@ -36,7 +36,7 @@
 			<tr>
 				<th class="ten wide">Date</th>
 				<th class="two wide">View</th>
-				{% if perms.Archives.delete_houserules %} <th class="one wide">Delete</th> {% endif %}
+				{% if perms.Archive.delete_houserules %} <th class="one wide">Delete</th> {% endif %}
 			</tr>
 		</thead>
 		<tbody>
@@ -44,11 +44,11 @@
 			<tr>
 				<td>{{ rule.date }}</td>
 				<td>
-					<a href="{% url 'Archives.views.download_rules' rule.pk %}">View</a>
+					<a href="{% url 'Archive.views.download_rules' rule.pk %}">View</a>
 				</td>
-				{% if perms.Archives.delete_houserules %}
+				{% if perms.Archive.delete_houserules %}
 				<td>
-					<form method="post" action="{% url 'Archives.views.delete_rules' %}">
+					<form method="post" action="{% url 'Archive.views.delete_rules' %}">
 						{% csrf_token %}
 						<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
 						<input type="hidden" name="post_id" value="{{ rule.pk }}"/>
@@ -67,7 +67,7 @@
 {% endif %}
 {% endblock %}
 
-{% if perms.Archives.add_houserules %}
+{% if perms.Archive.add_houserules %}
 {% block toplevel_content %}
 <div class="modal" id="add-rules">
   <div class="modal-dialog">
@@ -80,7 +80,7 @@
         <h4 class="modal-title">Update House Rules</h4>
       </div>
       <div class="modal-body">
-		<form enctype="multipart/form-data" method="post" action="{% url 'Archives.views.rules' %}" id="add-rules-form">
+		<form enctype="multipart/form-data" method="post" action="{% url 'Archive.views.rules' %}" id="add-rules-form">
 			{% csrf_token %}
 			<div class="form-group">
 				<label for="id_filepath" class="control-label">House Rules File*</label>

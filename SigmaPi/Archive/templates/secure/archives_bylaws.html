@@ -8,9 +8,9 @@
 {% endblock %}
 
 {% block content %}
-<h3>View the Chapter's bylaws.</h3>  
+<h3>View the Chapter's bylaws.</h3>
 
-{% if perms.Archives.add_bylaws %}
+{% if perms.Archive.add_bylaws %}
 <div class="actions">
 	<ul class="nav nav-pills">
 		<li>
@@ -24,7 +24,7 @@
 
 {% if latest %}
 <p>
-	The most recent version of the bylaws may be viewed <a href="{% url 'Archives.views.download_bylaw' latest.pk %}">here.</a>
+	The most recent version of the bylaws may be viewed <a href="{% url 'Archive.views.download_bylaw' latest.pk %}">here.</a>
 </p>
 {% endif %}
 {% if bylaws %}
@@ -37,7 +37,7 @@
 			<tr>
 				<th class="ten wide">Date</th>
 				<th class="two wide">View</th>
-				{% if perms.Archives.delete_bylaws %} <th class="one wide">Delete</th> {% endif %}
+				{% if perms.Archive.delete_bylaws %} <th class="one wide">Delete</th> {% endif %}
 			</tr>
 		</thead>
 		<tbody>
@@ -45,11 +45,11 @@
 			<tr>
 				<td>{{ bylaw.date }}</td>
 				<td>
-					<a href="{% url 'Archives.views.download_bylaw' bylaw.pk %}">View</a>
+					<a href="{% url 'Archive.views.download_bylaw' bylaw.pk %}">View</a>
 				</td>
-				{% if perms.Archives.delete_bylaws %}
+				{% if perms.Archive.delete_bylaws %}
 				<td>
-					<form method="post" action="{% url 'Archives.views.delete_bylaw' %}">
+					<form method="post" action="{% url 'Archive.views.delete_bylaw' %}">
 						{% csrf_token %}
 						<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
 						<input type="hidden" name="post_id" value="{{ bylaw.pk }}"/>
@@ -68,7 +68,7 @@
 {% endif %}
 {% endblock %}
 
-{% if perms.Archives.add_bylaws %}
+{% if perms.Archive.add_bylaws %}
 {% block toplevel_content %}
 <div class="modal" id="add-bylaws">
   <div class="modal-dialog">
@@ -81,7 +81,7 @@
         <h4 class="modal-title">Update Bylaws</h4>
       </div>
       <div class="modal-body">
-		<form enctype="multipart/form-data" method="post" action="{% url 'Archives.views.bylaws' %}" id="add-bylaws-form">
+		<form enctype="multipart/form-data" method="post" action="{% url 'Archive.views.bylaws' %}" id="add-bylaws-form">
 			{% csrf_token %}
 			<div class="form-group">
 				<label for="id_filepath" class="control-label">Bylaws File*</label>

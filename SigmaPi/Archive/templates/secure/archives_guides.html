@@ -10,7 +10,7 @@
 {% block content %}
 <h3>View house guides, documentation and files.</h3>
 
-{% if perms.Archives.add_guide %}
+{% if perms.Archive.add_guide %}
 <div class="actions">
 	<ul class="nav nav-pills">
 		<li>
@@ -38,7 +38,7 @@
 				<th class="three wide">Title</th>
 				<th class="five wide">Description</th>
 				<th class="two wide">View</th>
-				{% if perms.Archives.delete_guide %} <th class="one wide">Delete</th> {% endif %}
+				{% if perms.Archive.delete_guide %} <th class="one wide">Delete</th> {% endif %}
 			</tr>
 		</thead>
 		<tbody>
@@ -48,11 +48,11 @@
 				<td>{{ guide.name }}</td>
 				<td>{{ guide.description }}</td>
 				<td>
-					<a href="{% url 'Archives.views.download_guides' guide.pk %}">View</a>
+					<a href="{% url 'Archive.views.download_guides' guide.pk %}">View</a>
 				</td>
-				{% if perms.Archives.delete_guide %}
+				{% if perms.Archive.delete_guide %}
 				<td>
-					<form method="post" action="{% url 'Archives.views.delete_guide' %}">
+					<form method="post" action="{% url 'Archive.views.delete_guide' %}">
 						{% csrf_token %}
 						<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
 						<input type="hidden" name="post_id" value="{{ guide.pk }}"/>
@@ -71,7 +71,7 @@
 {% endif %}
 {% endblock %}
 
-{% if perms.Archives.add_guide %}
+{% if perms.Archive.add_guide %}
 {% block toplevel_content %}
 <div class="modal" id="add-guide">
   <div class="modal-dialog">
@@ -84,7 +84,7 @@
         <h4 class="modal-title">Add New Guide/File</h4>
       </div>
       <div class="modal-body">
-		<form enctype="multipart/form-data" method="post" action="{% url 'Archives.views.guides' %}" id="add-guide-form">
+		<form enctype="multipart/form-data" method="post" action="{% url 'Archive.views.guides' %}" id="add-guide-form">
 			{% csrf_token %}
 			<div class="form-group">
 		  		<label for="id_name" class="control-label">Title*</label>
@@ -95,7 +95,7 @@
 		  		{{form.description}}
 			</div>
 			<div class="form-group">
-				<label for="id_filepath" class="control-label">Guide/File*</label> 
+				<label for="id_filepath" class="control-label">Guide/File*</label>
 				{{form.filepath}}
 			</div>
 		</form>

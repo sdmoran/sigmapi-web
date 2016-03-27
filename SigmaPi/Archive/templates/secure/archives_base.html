@@ -3,37 +3,37 @@
 {% block module_nav %}
 <div class="sub-nav">
 	<ul class="nav nav-pills">
-		{% if perms.Archives.access_guide %}
+		{% if perms.Archive.access_guide %}
 			{% if '/guides' in request.path %}
-			<li class="active">	
+			<li class="active">
 			{% else %}
-			<li>		
+			<li>
 			{% endif %}
-				<a href="{% url 'Archives.views.guides' %}">
+				<a href="{% url 'Archive.views.guides' %}">
 					Guides/Files
 				</a>
 			</li>
 		{% endif %}
 
-		{% if perms.Archives.access_bylaws %}
+		{% if perms.Archive.access_bylaws %}
 			{% if '/bylaws' in request.path %}
-			<li class="active">		
+			<li class="active">
 			{% else %}
-			<li>	
+			<li>
 			{% endif %}
-				<a href="{% url 'Archives.views.bylaws' %}">
+				<a href="{% url 'Archive.views.bylaws' %}">
 					Bylaws
 				</a>
 			</li>
 		{% endif %}
 
-		{% if perms.Archives.access_houserules %}
+		{% if perms.Archive.access_houserules %}
 			{% if '/rules' in request.path %}
 			<li class="active">
 			{% else %}
 			<li>
 			{% endif %}
-				<a href="{% url 'Archives.views.rules' %}">
+				<a href="{% url 'Archive.views.rules' %}">
 					House Rules
 				</a>
 			</li>

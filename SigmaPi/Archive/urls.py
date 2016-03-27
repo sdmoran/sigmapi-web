@@ -4,20 +4,20 @@ from django.conf.urls.static import static
 
 
 urlpatterns = patterns('',
-	url(r'^$', 'Archives.views.index'),
+	url(r'^$', 'Archive.views.index'),
 
 	# Bylaws
-	url(r'^bylaws/$', 'Archives.views.bylaws'),
-	url(r'^bylaws/(?P<bylaw>[\d]+)/$', 'Archives.views.download_bylaw'),
-	url(r'^bylaws/delete/$', 'Archives.views.delete_bylaw'),
+	url(r'^bylaws/$', 'Archive.views.bylaws'),
+	url(r'^bylaws/(?P<bylaw>[\d]+)/$', 'Archive.views.download_bylaw'),
+	url(r'^bylaws/delete/$', 'Archive.views.delete_bylaw'),
 
 	# House guides
-	url(r'^guides/$', 'Archives.views.guides'),
-	url(r'^guides/delete/$', 'Archives.views.delete_guide'),
-	url(r'^guides/(?P<guides>[\d]+)/$', 'Archives.views.download_guides'),
+	url(r'^guides/$', 'Archive.views.guides'),
+	url(r'^guides/delete/$', 'Archive.views.delete_guide'),
+	url(r'^guides/(?P<guides>[\d]+)/$', 'Archive.views.download_guides'),
 
 	# House rules
-	url(r'^rules/$', 'Archives.views.rules'),
-	url(r'^rules/delete/$', 'Archives.views.delete_rules'),
-	url(r'^rules/(?P<rules>[\d]+)/$', 'Archives.views.download_rules'),
+	url(r'^rules/$', 'Archive.views.rules'),
+	url(r'^rules/delete/$', 'Archive.views.delete_rules'),
+	url(r'^rules/(?P<rules>[\d]+)/$', 'Archive.views.download_rules'),
 )

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from Archives.models import Guide, HouseRules, Bylaws
+from Archive.models import Guide, HouseRules, Bylaws
 
 # I'm commenting this stuff out because it doesn't do anything necessary,
 # and is mildly confusing. Will remove later if nothing breaks.

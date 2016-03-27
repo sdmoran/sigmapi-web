@@ -6,7 +6,7 @@ from django.utils.html import strip_tags
 from django.template.defaultfilters import slugify
 from datetime import datetime
 from sendfile import sendfile
-from Archives.models import Guide, GuideForm, HouseRules, HouseRulesForm, Bylaws, BylawsForm
+from Archive.models import Guide, GuideForm, HouseRules, HouseRulesForm, Bylaws, BylawsForm
 
 
 @login_required
@@ -15,16 +15,16 @@ def index(request):
 		View for the index page of the archives.
 	"""
 
-	if request.user.has_perm('Archives.access_guide'):
+	if request.user.has_perm('Archive.access_guide'):
 		return redirect(guides)
-	elif request.user.has_perm('Archives.access_bylaws'):
+	elif request.user.has_perm('Archive.access_bylaws'):
 		return redirect(bylaws)
-	elif request.user.has_perm('Archives.access_houserules'):
+	elif request.user.has_perm('Archive.access_houserules'):
 		return redirect(rules)
 	else:
 		return redirect('PubSite.views.permission_denied')
 
-@permission_required('Archives.access_bylaws', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_bylaws', login_url='PubSite.views.permission_denied')
 def bylaws(request):
 	"""
 		View for all bylaws.
@@ -32,7 +32,7 @@ def bylaws(request):
 
 	if request.method == 'POST':
 
-		if request.user.has_perm('Archives.add_bylaws'):
+		if request.user.has_perm('Archive.add_bylaws'):
 
 			form = BylawsForm(request.POST, request.FILES)
 
@@ -61,7 +61,7 @@ def bylaws(request):
 	return render(request, "secure/archives_bylaws.html", context)
 
 
-@permission_required('Archives.access_bylaws', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_bylaws', login_url='PubSite.views.permission_denied')
 def download_bylaw(request, bylaw):
 	"""
 		View for downloading bylaws
@@ -71,7 +71,7 @@ def download_bylaw(request, bylaw):
 	return sendfile(request, bylawObject.filepath.path, attachment=True, attachment_filename="Bylaws " + str(bylawObject.date) + ".pdf")
 
 
-@permission_required('Archives.delete_bylaws', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.delete_bylaws', login_url='PubSite.views.permission_denied')
 def delete_bylaw(request):
 	"""
 		Deletes the bylaws with the given primary key.
@@ -84,10 +84,10 @@ def delete_bylaw(request):
 
 		post.filepath.delete() # Delete actual file
 		post.delete()
-	return redirect('Archives.views.bylaws')
+	return redirect('Archive.views.bylaws')
 
 
-@permission_required('Archives.access_houserules', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_houserules', login_url='PubSite.views.permission_denied')
 def rules(request):
 	"""
 		View for all house rules
@@ -97,7 +97,7 @@ def rules(request):
 	# If its a POST, we're trying to update the rules.
 	if request.method == 'POST':
 		# Check permissions before going forward
-		if request.user.has_perm('Archives.add_houserules'):
+		if request.user.has_perm('Archive.add_houserules'):
 			form = HouseRulesForm(request.POST, request.FILES)
 
 			if form.is_valid():
@@ -122,7 +122,7 @@ def rules(request):
 	return render(request, "secure/archives_rules.html", context)
 
 
-@permission_required('Archives.access_houserules', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_houserules', login_url='PubSite.views.permission_denied')
 def download_rules(request, rules):
 	"""
 		View for downloading rules
@@ -133,7 +133,7 @@ def download_rules(request, rules):
 	return sendfile(request, houseRuleObject.filepath.path, attachment=True, attachment_filename="House Rules " + str(houseRuleObject.date))
 
 
-@permission_required('Archives.delete_houserules', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.delete_houserules', login_url='PubSite.views.permission_denied')
 def delete_rules(request):
 	"""
 		Deletes the rules with the given primary key.
@@ -147,9 +147,9 @@ def delete_rules(request):
 		post.filepath.delete() # Delete actual file
 
 		post.delete()
-	return redirect('Archives.views.rules')
+	return redirect('Archive.views.rules')
 
-@permission_required('Archives.access_guide', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_guide', login_url='PubSite.views.permission_denied')
 def guides(request):
 	"""
 		View for all guides
@@ -160,7 +160,7 @@ def guides(request):
 	# If its a POST we're trying to create a guide.
 	if request.method == 'POST':
 		# Check if user has permission to do so first.
-		if request.user.has_perm('Archives.add_guide'):
+		if request.user.has_perm('Archive.add_guide'):
 			form = GuideForm(request.POST, request.FILES)
 
 			if form.is_valid():
@@ -178,10 +178,10 @@ def guides(request):
 		'form': form,
 		}
 
-	return render(request, "secure/archives_guides.html", context)
+  return render(request, "secure/archives_guides.html", context)
 
 
-@permission_required('Archives.access_guide', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_guide', login_url='PubSite.views.permission_denied')
 def download_guides(request, guides):
 	"""
 		View for downloading guides
@@ -192,7 +192,7 @@ def download_guides(request, guides):
 	return sendfile(request, guideObject.filepath.path, attachment=True, attachment_filename=guideObject.name)
 
 
-@permission_required('Archives.delete_guide', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.delete_guide', login_url='PubSite.views.permission_denied')
 def delete_guide(request):
 	"""
 		Deletes the guide with the given primary key.
@@ -206,4 +206,4 @@ def delete_guide(request):
 		post.filepath.delete() # Delete actual file
 
 		post.delete()
-	return redirect('Archives.views.guides')
+	return redirect('Archive.views.guides')
