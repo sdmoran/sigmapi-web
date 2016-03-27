@@ -130,7 +130,7 @@ def download_rules(request, rules):
 
 	houseRuleObject = HouseRules.objects.get(pk=rules)
 
-	return sendfile(request, houseRuleObject.filepath.path, attachment=True, attachment_filename="House Rules " + str(houseRuleObject.date))
+	return sendfile(request, houseRuleObject.filepath.path, attachment=True, attachment_filename="House Rules " + str(houseRuleObject.date) + ".pdf")
 
 
 @permission_required('Archive.delete_houserules', login_url='PubSite.views.permission_denied')
@@ -189,7 +189,7 @@ def download_guides(request, guides):
 
 	guideObject = Guide.objects.get(pk=guides)
 
-	return sendfile(request, guideObject.filepath.path, attachment=True, attachment_filename=guideObject.name)
+	return sendfile(request, guideObject.filepath.path, attachment=True, attachment_filename=guideObject.name + ".pdf")
 
 
 @permission_required('Archive.delete_guide', login_url='PubSite.views.permission_denied')

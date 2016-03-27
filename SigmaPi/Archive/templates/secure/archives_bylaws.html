@@ -84,6 +84,7 @@
 		<form enctype="multipart/form-data" method="post" action="{% url 'Archive.views.bylaws' %}" id="add-bylaws-form">
 			{% csrf_token %}
 			<div class="form-group">
+        <p>Bylaws file MUST be a PDF.</p>
 				<label for="id_filepath" class="control-label">Bylaws File*</label>
 				{{ form.filepath }}
 			</div>
