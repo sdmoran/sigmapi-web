@@ -178,7 +178,7 @@ def guides(request):
 		'form': form,
 		}
 
-  return render(request, "secure/archives_guides.html", context)
+	return render(request, "secure/archives_guides.html", context)
 
 
 @permission_required('Archive.access_guide', login_url='PubSite.views.permission_denied')
