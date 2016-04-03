@@ -144,7 +144,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'PubSite',
     'UserInfo',
-    # 'Archive',
+    'Archive',
     'PartyList',
     'Secure',
     'Links',
