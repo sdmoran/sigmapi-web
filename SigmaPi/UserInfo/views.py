@@ -44,9 +44,8 @@ def users(request):
 		herald = None
 
 	# Get the rest of the users.  Exclude pledges or any execs.
-	seniors = User.objects.filter(userinfo__graduationYear__lte=senior_year).prefetch_related('userinfo').order_by("last_name")
-	seniors = seniors.exclude(groups__name='Pledges')
-	seniors = seniors.exclude(groups__name='Alumni')
+	seniors = User.objects.filter(groups__name='Brothers')
+	seniors = seniors.filter(userinfo__graduationYear__lte=senior_year).prefetch_related('userinfo').order_by("last_name")
 
 	juniors = User.objects.filter(userinfo__graduationYear=(senior_year + 1)).prefetch_related('userinfo').order_by("last_name")
 	juniors = juniors.exclude(groups__name='Pledges')
