@@ -44,7 +44,7 @@ def users(request):
 		herald = None
 
 	# Get the rest of the users.  Exclude pledges or any execs.
-	seniors = User.objects.filter(userinfo__graduationYear=senior_year).prefetch_related('userinfo').order_by("last_name")
+	seniors = User.objects.filter(userinfo__graduationYear__lte=senior_year).prefetch_related('userinfo').order_by("last_name")
 	seniors = seniors.exclude(groups__name='Pledges')
 	seniors = seniors.exclude(groups__name='Alumni')
 
@@ -217,4 +217,3 @@ def change_password(request):
 	context['form'] = PasswordChangeForm(user=request.user)
 
 	return render(request, 'secure/reset_password.html', context)
-
