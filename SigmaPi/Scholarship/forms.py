@@ -34,4 +34,4 @@ class AcademicResourceForm(forms.ModelForm):
 class LibraryItemForm(forms.ModelForm):
   class Meta:
     model = LibraryItem
-    fields = ['title', 'isbn_number', 'edition', 'item_pdf']
+    fields = ['title', 'isbn_number', 'course', 'edition', 'item_pdf']

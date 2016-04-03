@@ -50,6 +50,7 @@
 			<tr>
 				<th>Name</th>
 				<th>ISBN Number</th>
+				<th>Course</th>
 				<th>Edition</th>
 				<th>PDF</th>
 				{% if is_scholarship_head %}
@@ -62,6 +63,7 @@
 			<tr>
 				<td>{{item.title}}</td>
 				<td>{{item.isbn_number}}</td>
+				<td>{{item.course}}</td>
 				<td>{{item.edition}}</td>
 				<td>
 					<a href="{% url 'Scholarship.views.download_libraryitem' item.pk %}">
@@ -116,7 +118,10 @@
 						<label class="control-label">ISBN Number*</label>
 						{{ upload_item_form.isbn_number }}
 					</div>
-
+					<div class="form-group">
+						<label class="control-label">Course</label>
+						{{ upload_item_form.course }}
+					</div>
 					<div class="form-group">
 						<label class="control-label">Edition*</label>
 						{{ upload_item_form.edition }}
@@ -131,7 +136,7 @@
 	        					{{ upload_item_form.item_pdf }}
 	    					</div>
 	    					<span id="file-pdf-name"></span>
-	    				</div>		
+	    				</div>
 					</div>
 					<p>
 	      				{% if is_scholarship_head %}

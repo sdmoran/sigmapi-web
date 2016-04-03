@@ -135,9 +135,8 @@ class LibraryItem(models.Model):
 
 	title = models.CharField(max_length=1000)
 	isbn_number = models.CharField(max_length=100)
+	course = models.CharField(max_length=10, default="", blank=True)
 	edition = models.CharField(max_length=100)
 	item_pdf = models.FileField(upload_to='protected/scholarship/library')
 	submittedBy = models.ForeignKey(User)
 	approved = models.BooleanField(default=False)
-
-
