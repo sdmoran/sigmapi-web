@@ -14,11 +14,11 @@ def index(request):
 
 def get_url(request):
 	groups = request.user.groups
-	if (len(groups.filter(name="Philanthropy Chair")) > 0):
-		key = "ksa354443e2fdb07ef"
-	elif (len(groups.filter(name="Social Chair")) > 0): 
-		key = "ks8866f0514e5d6a2f"
 
-	url = "https://teamup.com/%s?view=d&sidepanel=c" % key
-	
+	url = None
+	if (len(groups.filter(name="Philanthropy Chair")) > 0):
+		url = "https://teamup.com/ksa354443e2fdb07ef?view=d&sidepanel=c"
+	elif (len(groups.filter(name="Social Chair")) > 0):
+		url = "https://teamup.com/ks8866f0514e5d6a2f?view=d&sidepanel=c"
+
 	return url;
