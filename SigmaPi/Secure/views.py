@@ -7,6 +7,18 @@ def index(request):
 	""" View for the index landing page of the site """
 	context = {
 		'title': 'Sigma Pi - Secure',
-		'secure_index': True
+		'secure_index': True,
+		'calendar_url': get_url(request)
 	}
 	return render(request,'secure_home.html',context)
+
+def get_url(request):
+	groups = request.user.groups
+	if (len(groups.filter(name="Philanthropy Chair")) > 0):
+		key = "ksa354443e2fdb07ef"
+	elif (len(groups.filter(name="Social Chair")) > 0): 
+		key = "ks8866f0514e5d6a2f"
+
+	url = "https://teamup.com/%s?view=d&sidepanel=c" % key
+	
+	return url;

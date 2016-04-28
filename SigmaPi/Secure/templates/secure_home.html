@@ -3,6 +3,8 @@
 
 {% block content %}
 
-<h3>Sigma Pi Secure Site</h3>
-
+<h3>{{title}}</h3>
+<div class="table-responsive nospaced">
+<iframe width="100%" style="height: 100vh;" src="{{calendar_url}}" frameborder="0"></iframe>
+</div>
 {% endblock %}
