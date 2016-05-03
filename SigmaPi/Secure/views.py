@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 
 from Secure.models import CalendarKey
 
@@ -9,11 +10,12 @@ def index(request):
     context = {
         'title': 'Sigma Pi - Secure',
         'secure_index': True,
-        'calendar_url': get_url(request)
+        'calendar_url': get_special_url(request),
+        'general_calendar_url': get_general_url()
     }
     return render(request,'secure_home.html',context)
 
-def get_url(request):
+def get_special_url(request):
     groups = request.user.groups.all()
 
     for group in groups:
@@ -22,3 +24,8 @@ def get_url(request):
             return "https://teamup.com/%s?view=d&sidepanel=c" % cal_key.key
 
     return False
+
+def get_general_url():
+    brothers = Group.objects.get(name="Brothers")
+    cal_key = CalendarKey.objects.get(group=brothers)
+    return "https://teamup.com/%s?view=d&sidepanel=c" % cal_key.key
