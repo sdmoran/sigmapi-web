@@ -21,7 +21,7 @@ def get_special_url(request):
     for group in groups:
         if len(CalendarKey.objects.filter(group=group)) > 0:
             cal_key = CalendarKey.objects.get(group=group)
-            return "https://teamup.com/%s?view=d&sidepanel=c" % cal_key.key
+            return "https://teamup.com/%s?view=l&sidepanel=c" % cal_key.key
 
     return False
 
