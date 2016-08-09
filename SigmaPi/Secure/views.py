@@ -16,7 +16,7 @@ def index(request):
     return render(request,'secure_home.html',context)
 
 def get_special_url(request):
-    groups = request.user.groups.all()
+    groups = request.user.groups.exclude(name="Brothers")
 
     for group in groups:
         if len(CalendarKey.objects.filter(group=group)) > 0:
