@@ -6,13 +6,12 @@
 <h3>{{title}}</h3>
 
 {% if calendar_url %}
-<p>Click <a href="{{calendar_url}}">here</a> to view your calendar in its own page.</p>
-<p>Click <a href="{{general_calendar_url}}">here</a> to view the combined Sigma Pi calendar.</p>
+<p>Click <a href="{{calendar_url}}" target="_blank">here</a> to view the calendar in its own page.</p>
 <div class="table-responsive nospaced">
   <iframe width="100%" style="height: 60vh;" src="{{calendar_url}}" frameborder="0"></iframe>
 </div>
 {% else %}
-<p>Click <a href="{{general_calendar_url}}">here</a> to view the calendar in its own page.</p>
+<p>Click <a href="{{general_calendar_url}}" target="_blank">here</a> to view the calendar in its own page.</p>
 <div class="table-responsive nospaced">
   <iframe width="100%" style="height: 60vh;" src="{{general_calendar_url}}" frameborder="0"></iframe>
 </div>
