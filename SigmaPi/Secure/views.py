@@ -20,17 +20,18 @@ def index(request):
 def get_special_url(request):
     groups = request.user.groups.exclude(name="Brothers")
 
-    for group in groups:
-        if len(CalendarKey.objects.filter(group=group)) > 0:
-            cal_key = CalendarKey.objects.get(group=group)
-            return "https://teamup.com/%s?view=l&sidepanel=c" % cal_key.key
-
-    return False
+    try:
+        for group in groups:
+            if len(CalendarKey.objects.filter(group=group)) > 0:
+                cal_key = CalendarKey.objects.get(group=group)
+                return "https://teamup.com/%s?view=l&sidepanel=c" % cal_key.key
+    except:
+        return False
 
 def get_general_url():
     try:
         brothers = Group.objects.get(name="Brothers")
         cal_key = CalendarKey.objects.get(group=brothers)
         return "https://teamup.com/%s?view=d&sidepanel=c" % cal_key.key
-    except Group.DoesNotExist, CalendarKey.DoesNotExist:
+    except:
         return False

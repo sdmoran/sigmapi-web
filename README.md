@@ -38,27 +38,34 @@ These steps will walk you through deploying the site on your local machine for t
   ```
 
 4.
-  Create the database. Note that you will need to follow the prompts to create an admin user account. This is only for your local machine, so you don't need to worry about what you put here but you should remember it.
+  Create the database. You will only have to do this once. When prompted to create an admin user, say no. An admin account is loaded from the fixture data in the next step.
 
   ```
   $ python manage.py syncdb
   ```
 
 5.
+  Load initial data for the database, like an admin, groups, and various users. You will only have to do this once. Read more about what initial data is loaded in the "Fixture Data" section below.
+
+  ```
+  $ python manage.py loaddata fixtures/dev_data.json
+  ```
+
+6.
   Collect static assets (CSS, JS, images, etc.).
 
   ```
   $ python manage.py collectstatic
   ```
 
-6.
+7.
   Run Django.
 
   ```
   $ python manage.py runserver 0.0.0.0:8000
   ```
 
-7.
+8.
   Open a web browser on your computer, and navigate to localhost:8000 to view the site. You can make changes to the code and your running instance will be updated automatically. You can log into the site with the admin account credentials you created earlier.
 
   When you are done working, it is best to run `vagrant suspend` from your host (not from the VM) in order to stop the VM from running in the background. Later you can `vagrant resume` to bring the VM back to the state it was in previously.
@@ -89,3 +96,43 @@ These steps will walk you through deploying the site on your local machine for t
   There may be warnings on deploy, but if there is a failure in production after deployment then you should perform a rollback. In the same directory as the `delpoy.sh` script is `rollback.sh`, which will revert production to its previous deploy.
 
 Note that there are additional complications if you wish to deploy a code change which requires a database migration. For now defer to @austintrose for that.
+
+## Fixture Data
+
+When you load the dev fixture data, the following users are created (along with their associated groups):
+
+```
+admin:password # The admin user.
+
+brother:brother # A regular active brother account.
+
+first:first # The first counselor.
+
+second:second # The second counselor.
+
+third:third # The third counselor.
+
+fourth:fourth # The fourth counselor.
+
+alumnichair:alumnichair # The alumni relations chair.
+
+newmember:newmember # A new member.
+
+bacchair:bacchair # The BAC chair.
+
+housemanager:housemanager # The house manager.
+
+parliamentarian:parliamentarian # The parliamentarian.
+
+philanthropychair:philanthropychair # The philanthropy chair.
+
+rushchair:rushchair # The rush chair.
+
+sage:sage # The sage.
+
+scholarshipchair:scholarshipchair # The scholarship chair.
+
+socialchair:socialchair # The social chair
+
+steward:steward # The steward.
+```
