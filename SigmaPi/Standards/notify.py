@@ -36,9 +36,16 @@ def summons_sent(summons):
 	subject = "Standards Board: Summons"
 	message = "Date: " + summons.dateSummonsSent.strftime("%Y-%m-%d") + ". "
 	message = message + "You are receiving this email because you are being summoned."
-	message = message + " The reason for your summon is as follows: " + summons.reason + "."
+	if summons.spokeWith:
+		message = message + " The recorded outcome of your conversation with the summonee (" +\
+		          summons.summonee.last_name + ", " + summons.summonee.first_name + ") is: "
+		message = message + summons.outcomes
+		message = message + ". The summonee has requested this case be sent to Standards Board for the following reason: " + summons.standards_action
+		message = message + "."
+	else:
+		message = message + " The reason for your summon is as follows: " + summons.special_circumstance + "."
 	message = message + " If you feel that you are being unfairly sanctioned, you may attend the next Standards Board meeting to dispute the summon."
-	message = message + " If you plan to attend, please notify standards-sigmapi@wpi.edu. If you do not attend, you will automatically be given a bone."
+	message = message + " If you plan to attend, please notify standards-sigmapi@wpi.edu. If you do not attend, you will automatically be given a punishment by standards."
 
 	try:
 		fourth = User.objects.get(groups__name='4th Counselor')

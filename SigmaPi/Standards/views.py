@@ -615,10 +615,27 @@ def send_summons_request(request):
 		numRecipients = int(request.POST["recipient-count"])
 
 		# Check for reason
-		reason = request.POST["reason"]
-		if len(reason.strip()) == 0:
-			request.session['standards_index_error'] = "Summons request failed to send. You must include a reason with the request."
+		spokeWithStr = request.POST.get("spokeWith", "error")
+		spokeWith = False
+		if spokeWithStr == "yes":
+			spokeWith = True
+		elif spokeWithStr != "no":
+			request.session['standards_index_error'] = "Summons request failed to send. You must fill in all fields."
 			return redirect(index)
+		outcomes = request.POST.get("outcomes", "")
+		standards_action = request.POST.get("standards_action", "")
+		special_circumstance = request.POST.get("special_circumstance", "")
+
+		if spokeWith:
+			if len(outcomes.strip()) == 0:
+				request.session['standards_index_error'] = "Summons request failed to send. You must include outcomes of the conversation."
+				return redirect(index)
+			elif len(standards_action.strip()) == 0:
+				request.session['standards_index_error'] = "Summons request failed to send. You must include suggested further action by standards."
+				return redirect(index)
+		elif len(special_circumstance.strip()) == 0:
+				request.session['standards_index_error'] = "Summons request failed to send. You must include the special circumstance."
+				return redirect(index)
 
 		# Check for recipients
 		summonsSent = 0
@@ -634,10 +651,10 @@ def send_summons_request(request):
 
 					recipientUser = User.objects.get(pk=recipientInt)
 
-					summonsReq = SummonsRequest(summoner=request.user, summonee=recipientUser, reason=reason, dateRequestSent=datetime.now())
+					summonsReq = SummonsRequest(summoner=request.user, summonee=recipientUser, spokeWith=spokeWith, outcomes=outcomes, standards_action=standards_action, special_circumstance=special_circumstance, dateRequestSent=datetime.now())
 					summonsReq.save()
 
-					summonsSent = summonsSent + 1
+					summonsSent += 1
 			except:
 				request.session['standards_index_error'] = "Unknown error occurred while processing summons recipient list. Please try again. If the problem persists, please contact the Web Chair."
 				return redirect(index)
@@ -730,7 +747,10 @@ def approve_summons_request(request, summons_req):
 		approved_summons.summoner = summons_request.summoner
 		approved_summons.summonee = summons_request.summonee
 		approved_summons.approver = request.user
-		approved_summons.reason = summons_request.reason
+		approved_summons.spokeWith = summons_request.spokeWith
+		approved_summons.outcomes = summons_request.outcomes
+		approved_summons.standards_action = summons_request.standards_action
+		approved_summons.special_circumstance = summons_request.special_circumstance
 		approved_summons.dateSummonsSent = datetime.now()
 
 		approved_summons.save()
@@ -753,6 +773,7 @@ def create_new_summons(request):
 
 		if form.is_valid():
 			summons = form.save(commit=False)
+			summons.spokeWith = False
 
 			summons.dateSummonsSent = datetime.now()
 			summons.approver = request.user
@@ -795,7 +816,7 @@ def accept_summons(request, summons):
 			summonsHistory = SummonsHistoryRecord()
 			summonsHistory.summonee = summons_obj.summonee
 			summonsHistory.summoner = summons_obj.summoner
-			summonsHistory.details = summons_obj.reason
+			summonsHistory.details = summons_obj.reason()
 			summonsHistory.resultReason = bone.reason
 			summonsHistory.date = datetime.now()
 			summonsHistory.boneID = bone.id

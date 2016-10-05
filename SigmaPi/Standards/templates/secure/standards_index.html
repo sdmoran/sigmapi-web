@@ -375,11 +375,33 @@
 							<span class="glyphicon glyphicon-plus"></span> Add Recipient
 						</a>
 					</div>
-					<div class="form-group">
-						<label for="id_reason" class="control-label">Reason*</label>
-						{{ summons_form.reason }}
+                    <div class="form-group" id="summoner-template">
+						<label class="control-label">Summoner:&nbsp;</label>
+						{{user.last_name}}, {{ user.first_name }}
 					</div>
-
+					<div class="form-group" id="spoke-with-select">
+						<label class="control-label">Did you speak with the person(s) being summoned before filling out this request?</label>
+						{{summons_form.spokeWith}}
+					</div>
+					<div id="summons_form_spokewith" style="display: none;">
+						<div class="form-group">
+							<label class="control-label" for="id_outcomes">What outcomes resulted from your conversation(s) with the accused?</label>
+							{{summons_form.outcomes}}
+						</div>
+						<div class="form-group">
+							<label class="control-label" for="id_standards_action">Why do you believe action is still required from the Standards Board after having these conversations?</label>
+							{{summons_form.standards_action}}
+						</div>
+					</div>
+					<div id="summons_form_didnotspeak" style="display: none;">
+						<p>
+							Unless you have special circumstance to warrant otherwise, this summons request will be denied on the grounds that the summoner should confront the summoned on the issue before resorting to judicial action.
+						</p>
+						<div class="form-group">
+							<label class="control-label" for="id_special_circumstance">If you have a special circumstance, please describe it below:</label>
+							{{summons_form.special_circumstance}}
+						</div>
+					</div>
 					<input type="hidden" id="recipient-count" name="recipient-count" value="1" class="hidden" style="display:none;"/>
 				</form>
       		</div>
@@ -398,7 +420,10 @@
 	$(document).ready(function() {
 
 		$("#recipient-count").val(summonsRecipientCount); // Make sure count is set to 1. Workaround for browsers that cache form values
-
+		$("#spoke-with-select").val("");
+		$("#id_outcomes").val("");
+		$("#id_standards_action").val("");
+		$("#id_special_circumstance").val("");
 		$("#add-summons-recipient").click(function(){
 
 			summonsRecipientCount = summonsRecipientCount + 1;
@@ -428,6 +453,20 @@
 
 		});
 
+		$("#spoke-with-select input[type=radio]").prop('checked', false);
+		$("#spoke-with-select input[type=radio]").change(function()
+		{
+			if(this.value == 'yes')
+			{
+				$("#summons_form_spokewith").show();
+				$("#summons_form_didnotspeak").hide();
+			}
+			else if(this.value == 'no')
+			{
+				$("#summons_form_spokewith").hide();
+				$("#summons_form_didnotspeak").show();
+			}
+		});
 	});
 
 </script>
