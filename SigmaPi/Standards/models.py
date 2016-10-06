@@ -171,14 +171,24 @@ class SummonsRequest(models.Model):
 
 	summoner = models.ForeignKey(User, related_name='+')
 	summonee = models.ForeignKey(User, related_name='+')
-	reason = models.TextField()
+	spokeWith = models.BooleanField()
+	outcomes = models.TextField(blank=True)
+	standards_action = models.TextField(blank=True)
+	special_circumstance = models.TextField(blank=True)
+
 	dateRequestSent = models.DateField()
 
+	def reason(self):
+		if self.spokeWith:
+			return "Conversation outcome: " + self.outcomes + ". Further action required because: " + self.standards_action
+		else:
+			return self.special_circumstance
+
 	def __unicode__(self):
-		return summoner + " wants to summon " + summonee + " for " + self.reason
+		return self.summoner.last_name + ", " + self.summoner.first_name + " wants to summon " + self.summonee.last_name + ", " + self.summonee.first_name
 
 	def __str__(self):
-		return summoner + " wants to summon " + summonee + " for " + self.reason
+		return self.summoner.last_name + ", " + self.summoner.first_name + " wants to summon " + self.summonee.last_name + ", " + self.summonee.first_name
 
 	class Meta:
 		verbose_name = "Summons Request"
@@ -191,14 +201,23 @@ class Summons(models.Model):
 	summoner = models.ForeignKey(User, related_name='+')
 	summonee = models.ForeignKey(User, related_name='+')
 	approver = models.ForeignKey(User, related_name='+')
-	reason = models.TextField()
+	spokeWith = models.BooleanField()
+	outcomes = models.TextField(blank=True)
+	standards_action = models.TextField(blank=True)
+	special_circumstance = models.TextField(blank=True)
 	dateSummonsSent = models.DateField()
 
+	def reason(self):
+		if self.spokeWith:
+			return "Conversation outcome: " + self.outcomes + ". Further action required because: " + self.standards_action
+		else:
+			return self.special_circumstance
+
 	def __unicode__(self):
-		return summoner + " has summoned " + summonee + " for " + self.reason
+		return self.summoner.last_name + ", " + self.summoner.first_name + " has summoned " + self.summonee.last_name + ", " + self.summonee.first_name
 
 	def __str__(self):
-		return summoner + " has summoned " + summonee + " for " + self.reason
+		return self.summoner.last_name + ", " + self.summoner.first_name + " has summoned " + self.summonee.last_name + ", " + self.summonee.first_name
 
 	class Meta:
 		verbose_name = "Summons"

@@ -60,7 +60,11 @@
 	 				<tr>
 	 					<td>{{ summons.dateRequestSent }}</td>
 	 					<td>{{ summons.summonee.first_name }} {{ summons.summonee.last_name }}</td>
-	 					<td>{{ summons.reason }}</td>
+						{% if summons.spokeWith %}
+	 					<td><strong>Conversation outcome:</strong> {{ summons.outcomes }}. <strong>Further action requested because:</strong> {{summons.standards_action}}</td>
+						{% else %}
+						<td><strong>Special circumstance: </strong>{{summons.special_circumstance}}</td>
+						{% endif %}
 	 					<td>{{ summons.summoner.first_name }} {{ summons.summoner.last_name }}</td>
 	 					<td>
 	 						<form method="POST" action="{% url 'Standards.views.approve_summons_request' summons.pk %}">
@@ -108,7 +112,7 @@
 					</div>
 					<div class="form-group">
 						<label for="id_reason" class="control-label">Reason*</label>
-						{{add_summon_form.reason}}
+						{{add_summon_form.special_circumstance}}
 					</div>
 				</form>
       		</div>
