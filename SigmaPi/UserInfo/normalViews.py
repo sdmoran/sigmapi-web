@@ -19,27 +19,27 @@ def users(request):
 
 	# Get the execs.  Use try/catch to avoid crashing the site if an exec is missing.
 	try:
-		sage = User.objects.get(groups__name='newSage')
+		sage = User.objects.get(groups__name='Sage')
 	except:
 		sage = None
 	try:
-		second = User.objects.get(groups__name='new2nd')
+		second = User.objects.get(groups__name='2nd Counselor')
 	except:
 		second = None
 	try:
-		third = User.objects.get(groups__name='new3rd')
+		third = User.objects.get(groups__name='3rd Counselor')
 	except:
 		third = None
 	try:
-		fourth = User.objects.get(groups__name='new4th')
+		fourth = User.objects.get(groups__name='4th Counselor')
 	except:
 		fourth = None
 	try:
-		first = User.objects.get(groups__name='new1st')
+		first = User.objects.get(groups__name='1st Counselor')
 	except:
 		first = None
 	try:
-		herald = User.objects.get(groups__name='newHerald')
+		herald = User.objects.get(groups__name='Herald')
 	except:
 		herald = None
 
