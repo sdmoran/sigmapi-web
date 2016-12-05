@@ -185,7 +185,7 @@ def edit_user(request, user):
 	else:
 		try:
 			form = EditUserInfoForm(instance=requested_user.userinfo)
-		except RelatedObjectDoesNotExist, e:
+		except UserInfo.DoesNotExist, e:
 			form = EditUserInfoForm()
 
 	context = {
