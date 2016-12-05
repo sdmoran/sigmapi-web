@@ -183,9 +183,10 @@ def edit_user(request, user):
 			form.save()
 			return redirect("UserInfo.views.manage_users")
 	else:
-		form = EditUserInfoForm(instance=requested_user.userinfo)
-
-
+		try:
+			form = EditUserInfoForm(instance=requested_user.userinfo)
+		except RelatedObjectDoesNotExist e:
+			form = EditUserInfoForm()
 
 	context = {
 		'requested_user': requested_user,
