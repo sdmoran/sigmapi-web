@@ -176,22 +176,24 @@ def edit_user(request, user):
 	requested_user = User.objects.get(username__exact=user)
 	if (not requested_user == request.user) and not request.user.is_staff:
 		return redirect('PubSite.views.permission_denied')
-
+	message = ""
 	if request.method == 'POST':
-		form = EditUserInfoForm(request.POST)
-		if form.is_valid():
-			try:
+		try:
+			form = EditUserInfoForm(request.POST, instance=requested_user.userinfo)
+			if form.is_valid():
 				form.save()
-			except Exception:
-				UserInfo.objects.get_or_create(user=request.user,
-				                               pledgeClass=PledgeClass.objects.get(id=request.POST["pledgeClass"]),
-				                               phoneNumber=request.POST["phoneNumber"],
-				                               major=request.POST["major"],
-				                               hometown=request.POST["hometown"],
-				                               activities=request.POST["activities"],
-				                               interests=request.POST["interests"],
-				                               favoriteMemory=request.POST["favoriteMemory"])
-			return redirect("UserInfo.views.manage_users")
+				message = "Profile successfully updated"
+		except UserInfo.DoesNotExist:
+			form = EditUserInfoForm(request.POST)
+			UserInfo.objects.get_or_create(user=request.user,
+			                               pledgeClass=PledgeClass.objects.get(id=request.POST["pledgeClass"]),
+			                               phoneNumber=request.POST["phoneNumber"],
+			                               major=request.POST["major"],
+			                               hometown=request.POST["hometown"],
+			                               activities=request.POST["activities"],
+			                               interests=request.POST["interests"],
+			                               favoriteMemory=request.POST["favoriteMemory"])
+			message = "Profile successfully updated"
 	else:
 		try:
 			form = EditUserInfoForm(instance=requested_user.userinfo)
@@ -203,6 +205,8 @@ def edit_user(request, user):
 		'form': form,
 		'error': form.errors
 	}
+	if message is not "":
+		context['message'] = [message]
 
 	return render(request, 'secure/edit_user.html', context)
 
