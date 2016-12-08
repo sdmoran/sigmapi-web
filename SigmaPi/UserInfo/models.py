@@ -36,7 +36,6 @@ class UserInfo(models.Model):
 	picture = models.FileField(upload_to=filepath, null=True)
 	phoneNumber = models.CharField(default="", max_length=100, blank=True)
 	graduationYear = models.PositiveIntegerField(default=2020)
-	classYear = models.CharField(default="Lambda", max_length=20, blank=True)
 	major = models.CharField(max_length=100, blank=True)
 	hometown = models.CharField(max_length=100, blank=True)
 	activities = models.TextField(blank=True)
@@ -73,4 +72,4 @@ class EditUserInfoForm(ModelForm):
 
 	class Meta:
 		model = UserInfo
-		exclude = ['picture', 'graduationYear', 'classYear', 'user', 'bigBrother']
+		exclude = ['picture', 'graduationYear', 'user', 'bigBrother']
