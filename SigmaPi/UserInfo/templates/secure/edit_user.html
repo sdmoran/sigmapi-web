@@ -12,6 +12,14 @@
 				<p>{{ error }}</p>
 		</div>
 		{% endif %}
+		{% if message %}
+		<div class="alert alert-info">
+			<strong>Message</strong>
+			{% for msg in message %}
+			<p>{{ msg }}</p>
+			{% endfor %}
+		</div>
+		{% endif %}
 		<div class="form-group">
 	  		<label class="control-label">Pledge Class</label>
   			{{form.pledgeClass}}
