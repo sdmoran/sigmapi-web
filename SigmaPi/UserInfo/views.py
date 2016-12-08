@@ -6,7 +6,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.html import strip_tags
 
 from UserInfo import utils
-from UserInfo.models import UserInfo, EditUserInfoForm
+from UserInfo.models import UserInfo, EditUserInfoForm, PledgeClass
 
 def users(request):
 	"""
@@ -178,14 +178,24 @@ def edit_user(request, user):
 		return redirect('PubSite.views.permission_denied')
 
 	if request.method == 'POST':
-		form = EditUserInfoForm(request.POST, instance=requested_user.userinfo)
+		form = EditUserInfoForm(request.POST)
 		if form.is_valid():
-			form.save()
+			try:
+				form.save()
+			except Exception:
+				UserInfo.objects.get_or_create(user=request.user,
+				                               pledgeClass=PledgeClass.objects.get(id=request.POST["pledgeClass"]),
+				                               phoneNumber=request.POST["phoneNumber"],
+				                               major=request.POST["major"],
+				                               hometown=request.POST["hometown"],
+				                               activities=request.POST["activities"],
+				                               interests=request.POST["interests"],
+				                               favoriteMemory=request.POST["favoriteMemory"])
 			return redirect("UserInfo.views.manage_users")
 	else:
 		try:
 			form = EditUserInfoForm(instance=requested_user.userinfo)
-		except UserInfo.DoesNotExist, e:
+		except UserInfo.DoesNotExist as e:
 			form = EditUserInfoForm()
 
 	context = {

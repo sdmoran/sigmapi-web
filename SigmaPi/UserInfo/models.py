@@ -35,7 +35,7 @@ class UserInfo(models.Model):
 	user = models.OneToOneField(User)
 	picture = models.FileField(upload_to=filepath, null=True)
 	phoneNumber = models.CharField(default="", max_length=100, blank=True)
-	graduationYear = models.PositiveIntegerField(default=2015)
+	graduationYear = models.PositiveIntegerField(default=2020)
 	classYear = models.CharField(default="Lambda", max_length=20, blank=True)
 	major = models.CharField(max_length=100, blank=True)
 	hometown = models.CharField(max_length=100, blank=True)
@@ -69,7 +69,8 @@ class EditUserInfoForm(ModelForm):
 	activities = forms.CharField(widget=forms.Textarea, required=False)
 	interests = forms.CharField(widget=forms.Textarea, required=False)
 	favoriteMemory = forms.CharField(widget=forms.Textarea, required=False)
+	pledgeClass = forms.ModelChoiceField(queryset=PledgeClass.objects.all(), widget=forms.Select)
 
 	class Meta:
 		model = UserInfo
-		exclude = ['picture', 'graduationYear', 'classYear', 'user', 'bigBrother', 'pledgeClass']
+		exclude = ['picture', 'graduationYear', 'classYear', 'user', 'bigBrother']
