@@ -62,7 +62,7 @@ USE_TZ = False
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = './content/'
+MEDIA_ROOT = './media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -182,3 +182,128 @@ LOGGING = {
         },
     }
 }
+
+
+######################
+# Django CMS stuff   #
+######################
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'SigmaPiCMS', 'templates'), ],
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.i18n',
+                'django.core.context_processors.debug',
+                'django.core.context_processors.request',
+                'django.core.context_processors.media',
+                'django.core.context_processors.csrf',
+                'django.core.context_processors.tz',
+                'sekizai.context_processors.sekizai',
+                'django.core.context_processors.static',
+                'cms.context_processors.cms_settings'
+            ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'django.template.loaders.eggs.Loader'
+            ],
+        },
+    },
+]
+
+MIDDLEWARE_CLASSES += (
+    'cms.middleware.utils.ApphookReloadMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
+    'cms.middleware.page.CurrentPageMiddleware',
+    'cms.middleware.toolbar.ToolbarMiddleware',
+    'cms.middleware.language.LanguageCookieMiddleware'
+)
+
+INSTALLED_APPS += (
+    'djangocms_admin_style',
+    'django.contrib.sitemaps',
+    #'django.contrib.messages',
+    'cms',
+    'menus',
+    'sekizai',
+    'treebeard',
+    'djangocms_text_ckeditor',
+    'filer',
+    'easy_thumbnails',
+    'djangocms_column',
+    'djangocms_link',
+    'cmsplugin_filer_file',
+    'cmsplugin_filer_folder',
+    'cmsplugin_filer_image',
+    'cmsplugin_filer_utils',
+    # 'djangocms_style',
+    'djangocms_snippet',
+    'djangocms_video',
+    'aldryn_style',
+    'aldryn_bootstrap3',
+    'aldryn_locations',
+    'django.template.context_processors',
+    'SigmaPiCMS',
+)
+
+LANGUAGES = (
+    ## Customize this
+    ('en-us', 'en'),
+)
+
+CMS_LANGUAGES = {
+    ## Customize this
+    'default': {
+        'public': True,
+        'hide_untranslated': False,
+        'redirect_on_fallback': True,
+    },
+    1: [
+        {
+            'public': True,
+            'code': 'en',
+            'hide_untranslated': False,
+            'name': 'en',
+            'redirect_on_fallback': True,
+        },
+    ],
+}
+
+CMS_TEMPLATES = (
+    ## Customize this
+    ('home.html', 'Home'),
+    ('members.html', 'Members'),
+    ('activities.html', 'Activities'),
+    ('history.html', 'History')
+)
+
+ALDRYN_LOCATIONS_GOOGLEMAPS_APIKEY = "AIzaSyBFfVE8EX-FnTfrOaoILzh74qQF0_huOeA"
+
+CMS_PERMISSION = True
+
+CMS_PLACEHOLDER_CONF = {
+    'cover_image': {
+        'plugins': ['FilerImagePlugin'],
+        'name': 'Cover Image',
+        'limits': {'global': 1},
+    }
+
+}
+
+MIGRATION_MODULES = {
+
+}
+
+THUMBNAIL_PROCESSORS = (
+    'easy_thumbnails.processors.colorspace',
+    'easy_thumbnails.processors.autocrop',
+    'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+    'easy_thumbnails.processors.filters'
+)

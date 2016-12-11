@@ -1,7 +1,9 @@
 *.pyc*
 *.DS_Store
+*.swp
 
 .vagrant/
+build/
 
 venv/
 

@@ -9,6 +9,9 @@ apt-get install -y build-essential python python-dev python-setuptools python-pi
 # Git
 apt-get install -y git
 
+# JPEG development library
+apt-get install -y libjpeg-dev
+
 pip install -r /vagrant/SigmaPi/requirements.txt
 
 # Cleanup
