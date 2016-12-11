@@ -19,7 +19,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^users/', include('UserInfo.urls')),
     url(r'^secure/', include('Secure.urls')),
-    url(r'^cms/', include('SigmaPiCMS.urls')),
     url(r'^', include('PubSite.urls')),
 )
 
