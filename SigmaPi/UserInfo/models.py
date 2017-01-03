@@ -26,6 +26,7 @@ class PledgeClass(models.Model):
 	class Meta:
 		verbose_name_plural = "Pledge Classes"
 		verbose_name = "Pledge Class"
+		ordering = ['dateInitiated']
 
 class UserInfo(models.Model):
 	"""
