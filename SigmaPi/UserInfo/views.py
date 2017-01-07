@@ -185,7 +185,7 @@ def edit_user(request, user):
 				message = "Profile successfully updated"
 		except UserInfo.DoesNotExist:
 			if request.user.is_staff:
-				user_to_update = User.objects.get(username=request.META["HTTP_REFERER"].split("/")[-2])
+				user_to_update = requested_user
 			else:
 				user_to_update = request.user
 			form = EditUserInfoForm(request.POST)
