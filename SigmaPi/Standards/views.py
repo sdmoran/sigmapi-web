@@ -11,7 +11,7 @@ from datetime import datetime
 from django.core.mail import send_mail
 
 from Standards.models import JobRequest, Bone, PiPointsRecord, PiPointsRequest, PiPointsChangeRecord, Probation, BoneChangeRecord, SummonsRequest, Summons, SummonsHistoryRecord
-from Standards.forms import JobRequestForm, PiPointsRequestForm, PiPointsAddBrotherForm, ProbationGivingForm, BoneGivingForm, BoneEditingForm, SummonsRequestForm, AddSummonsForm, AcceptSummonsForm
+from Standards.forms import JobRequestForm, PiPointsRequestForm, PiPointsAddBrotherForm, ProbationGivingForm, BoneGivingForm, BoneEditingForm, SummonsRequestForm, AcceptSummonsForm
 from Standards import notify
 
 import json
@@ -680,8 +680,6 @@ def manage_summons(request):
 
 	current_requests = SummonsRequest.objects.all().order_by('-dateRequestSent')
 
-	add_summon_form = AddSummonsForm()
-
 	pprCount = PiPointsRequest.objects.all().count()
 
 	error = None
@@ -701,7 +699,6 @@ def manage_summons(request):
 
 	context = {
 		'current_requests': current_requests,
-		'add_summon_form': add_summon_form,
 		'error': error,
 		'msg': msg,
 		'pprCount': pprCount
@@ -759,32 +756,6 @@ def approve_summons_request(request, summons_req):
 		notify.summons_sent(approved_summons)
 
 		request.session['standards_summons_msg'] = "Summons request successfully accepted."
-		return redirect(manage_summons)
-	else:
-		return redirect(manage_summons)
-
-@permission_required('Standards.add_summons', login_url='PubSite.views.permission_denied')
-def create_new_summons(request):
-	"""
-		A view for creating a new summons.
-	"""
-	if request.method == 'POST':
-		form = AddSummonsForm(request.POST)
-
-		if form.is_valid():
-			summons = form.save(commit=False)
-			summons.spokeWith = False
-
-			summons.dateSummonsSent = datetime.now()
-			summons.approver = request.user
-			summons.save()
-
-			notify.summons_sent(summons)
-
-			request.session['standards_summons_msg'] = "Summons sent successfully."
-		else:
-			request.session['standards_summons_error'] = "Summons failed to be sent: " + str(form.errors)
-
 		return redirect(manage_summons)
 	else:
 		return redirect(manage_summons)

@@ -130,21 +130,6 @@ class SummonsRequestForm(forms.ModelForm):
 		model = SummonsRequest
 		exclude = ['summoner', 'dateRequestSent']
 
-
-class AddSummonsForm(forms.ModelForm):
-	"""
-	  Form for sending a summons
-	"""
-
-	special_circumstance = forms.CharField(widget=forms.Textarea)
-	summonee = CustomModelChoiceField(queryset=User.objects.all().order_by('last_name').exclude(groups__name='Alumni'))
-	summoner = CustomModelChoiceField(queryset=User.objects.all().order_by('last_name').exclude(groups__name='Alumni'))
-
-	class Meta:
-		model = Summons
-		exclude = ['dateSummonsSent', 'approver', 'outcomes', 'standards_action', 'spokeWith']
-
-
 class AcceptSummonsForm(forms.ModelForm):
 	"""
 	  Form for accepting a summons
