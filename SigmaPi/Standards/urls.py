@@ -5,7 +5,6 @@ urlpatterns = patterns('',
 	url(r'^$', RedirectView.as_view(pattern_name='Standards.views.index')), # Keep the old index URL for backwards compatibility.
 	url(r'^overview/$', 'Standards.views.index'),
 	url(r'^summons/$', 'Standards.views.manage_summons'),
-	url(r'^summons/new/$', 'Standards.views.create_new_summons'),
 	url(r'^summons/approve/(?P<summons_req>[\d]+)/$', 'Standards.views.approve_summons_request'),
 	url(r'^summons/reject/(?P<summons_req>[\d]+)/$', 'Standards.views.reject_summons_request'),
 	url(r'^summons/request/$', 'Standards.views.send_summons_request'),
