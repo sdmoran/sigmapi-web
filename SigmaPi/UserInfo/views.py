@@ -184,12 +184,7 @@ def edit_user(request, user):
 				form.save()
 				message = "Profile successfully updated"
 		except UserInfo.DoesNotExist:
-			if request.user.is_staff:
-				user_to_update = requested_user
-			else:
-				user_to_update = request.user
-			form = EditUserInfoForm(request.POST)
-			UserInfo.objects.get_or_create(user=user_to_update,
+			UserInfo.objects.get_or_create(user=requested_user,
 			                               pledgeClass=PledgeClass.objects.get(id=request.POST["pledgeClass"]),
 			                               phoneNumber=request.POST["phoneNumber"],
 			                               major=request.POST["major"],
