@@ -11,27 +11,50 @@ def index(request):
     context = {
         'title': 'Sigma Pi - Secure',
         'secure_index': True,
-        'calendar_url': get_special_url(request),
-        'general_calendar_url': get_general_url()
+        'calendar_name_url_pairs': get_name_url_pairs(request),
     }
 
     return render(request, 'secure_home.html', context)
 
-def get_special_url(request):
-    groups = request.user.groups.exclude(name="Brothers")
+# Return a list of (group name, group calendar URL) pairs.
+# Make sure that the Brothers or Pledges pair is last in the list, because
+#   the embedded calendar is set to the URL from the last pair in the list,
+#   and we want office positions' calendars to show up with priority over
+#   the general Brothers/Pledges calendar.
+def get_name_url_pairs(request):
 
-    try:
-        for group in groups:
-            if len(CalendarKey.objects.filter(group=group)) > 0:
-                cal_key = CalendarKey.objects.get(group=group)
-                return "https://teamup.com/%s?view=l&sidepanel=c" % cal_key.key
-    except:
+    # Given a list of (group name, group calendar URL) pairs and a group,
+    #   if there is a calendar key for the group, add to the list.
+    def append_pair(pairs, g):
+        url_template = "https://teamup.com/%s?view=l&sidepanel=c"
+        try:
+            if len(CalendarKey.objects.filter(group=g)) > 0:
+                cal_key = CalendarKey.objects.get(group=g)
+                pairs.append((g.name, url_template % cal_key.key))
+                return True
+        except:
+            pass
         return False
 
-def get_general_url():
+    # Collect a list of (group name, group calendar URL) pairs from all groups
+    #   excluding Brothers and Pledges
+    name_url_pairs = []
+    for group in request.user.groups.all():
+        if group.name != "Brothers" and group.name != "Pledges":
+            append_pair(name_url_pairs, group)
+
+    # If the user is in the Brothers or Pledges group, add the corresponding
+    # key to the list
     try:
-        brothers = Group.objects.get(name="Brothers")
-        cal_key = CalendarKey.objects.get(group=brothers)
-        return "https://teamup.com/%s?view=d&sidepanel=c" % cal_key.key
+        bros_group = request.user.groups.get(name="Brothers")
     except:
-        return False
+        bros_group = None
+    try:
+        pledges_group = request.user.groups.get(name="Pledges")
+    except:
+        pledges_group = None
+    if not (bros_group and append_pair(name_url_pairs, bros_group)):
+        if pledges_group:
+            append_pair(name_url_pairs, pledges_group)
+
+    return name_url_pairs
