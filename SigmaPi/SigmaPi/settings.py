@@ -2,16 +2,31 @@
 
 import os
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
+import environment_settings
+
+# These are settings which must change, depending on whether this is development
+# or production. So, we store them in a separate file.
+DEBUG = environment_settings.DEBUG
+ADMINS = environment_settings.ADMINS
+DATABASES = environment_settings.DATABASES
+ALLOWED_HOSTS = environment_settings.ALLOWED_HOSTS
+SENDFILE_BACKEND = environment_settings.SENDFILE_BACKEND
+MEDIA_ROOT = environment_settings.MEDIA_ROOT
+STATIC_ROOT = environment_settings.STATIC_ROOT
+STATICFILES_DIRS = environment_settings.STATICFILES_DIRS
+SECRET_KEY = environment_settings.SECRET_KEY
+EMAIL_HOST = environment_settings.EMAIL_HOST
+EMAIL_PORT = environment_settings.EMAIL_PORT
+EMAIL_HOST_USER = environment_settings.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = environment_settings.EMAIL_HOST_PASSWORD
+DEFAULT_FROM_EMAIL = environment_settings.DEFAULT_FROM_EMAIL
+SERVER_EMAIL = environment_settings.SERVER_EMAIL
+
 
 TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.request',)
 
 BASE_DIR = os.getcwd()
-DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
-ADMINS = (
-    ('Austin Rose', 'austin.rose94@gmail.com'),
-)
 
 EC_EMAIL = "sigmapi@wpi.edu"
 ACTIVES_EMAIL = "sigmapiactives@wpi.edu"
@@ -19,23 +34,8 @@ ALUMNI_EMAIL = "sigmapialumni@wpi.edu"
 
 MANAGERS = ADMINS
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'database',                      # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
-    }
-}
 
-# Hosts/domain names that are valid for this site; required if DEBUG is False
-# See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
 
-SENDFILE_BACKEND = 'sendfile.backends.development'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -60,48 +60,24 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = False
 
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-# Example: "/var/www/example.com/media/"
-MEDIA_ROOT = './content/'
-
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://example.com/media/", "http://media.example.com/"
 MEDIA_URL = '/content/'
 
-# Absolute path to the directory static files should be collected to.
-# Don't put anything in this directory yourself; store your static files
-# in apps' "static/" subdirectories and in STATICFILES_DIRS.
-# Example: "/var/www/example.com/static/"
-STATIC_ROOT = './static_dir'
-
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
-# Additional locations of static files
-STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.join(BASE_DIR,'static'),
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/secure/'
-
-# List of finder classes that know how to find static files in
-# various locations.
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
-
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 'bg#3p7$1l7i=^frmpvx!##nzsbt-eg$cy!(1-a#m9k(l0rksw7'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
