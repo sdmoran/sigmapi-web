@@ -92,15 +92,12 @@ def updateCount(request, party):
 			return HttpResponse('Error: Invalid gender or count parameters. Contact webmaster.', status=500)
 
 		if gender == 'M':
-			partyObj.guycount += delta
-			if partyObj.guycount < 0:
-				partyObj.guycount = 0
+			partyObj.guycount = PartyGuest.objects.filter(party_id=party, signedIn=True, guest__gender='M').count()
 		elif gender == 'F':
-			partyObj.girlcount += delta
-			if partyObj.girlcount < 0:
-				partyObj.girlcount = 0
+			partyObj.girlcount = PartyGuest.objects.filter(party_id=party, signedIn=True, guest__gender='F').count()
 		else:
 			return HttpResponse('Error: Invalid gender parameter. Contact webmaster.', status=500)
+
 
 		partyObj.save()
 
