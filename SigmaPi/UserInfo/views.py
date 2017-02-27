@@ -184,7 +184,7 @@ def edit_user(request, user):
 				form.save()
 				message = "Profile successfully updated"
 		except UserInfo.DoesNotExist:
-			UserInfo.objects.get_or_create(user=requested_user,
+			new_userinfo, created = UserInfo.objects.get_or_create(user=requested_user,
 			                               pledgeClass=PledgeClass.objects.get(id=request.POST["pledgeClass"]),
 			                               phoneNumber=request.POST["phoneNumber"],
 			                               major=request.POST["major"],
@@ -192,6 +192,7 @@ def edit_user(request, user):
 			                               activities=request.POST["activities"],
 			                               interests=request.POST["interests"],
 			                               favoriteMemory=request.POST["favoriteMemory"])
+			form = EditUserInfoForm(request.POST, new_userinfo)
 			message = "Profile successfully updated"
 	else:
 		try:
