@@ -8,7 +8,7 @@ echo '';
 echo 'Copying REPO ~/deploy/sigmapi-web-repo/static/* TO PROD ~/webapps/sigma_pi_web_static';
 rm -rf /home/sigmapiwpi/webapps/sigma_pi_web_static/*;
 rm -rf /home/sigmapiwpi/webapps/sigma_pi_web/SigmaPi/static;
-cp -rf /home/sigmapiwpi/deploy/sigmapi-web/SigmaPi/static/* /home/sigmapiwpi/webapps/sigma_pi_web_static;
+cp -rf /home/sigmapiwpi/deploy/sigmapi-web-repo/SigmaPi/static/* /home/sigmapiwpi/webapps/sigma_pi_web_static;
 echo '';
 
 echo 'Copying admin panel static files.';
