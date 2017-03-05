@@ -76,6 +76,16 @@
 			</a>
 			</li>
 
+			{% if '/secure/mafia' in request.path %}
+			<li class="active">
+			{% else %}
+			<li>
+			{% endif %}
+			<a id="mafia" href="{{ '/secure/mafia' }}">
+				Mafia
+			</a>
+			</li>
+
 			{% if perms.UserInfo.manage_users %}
 				{% if '/secure/users' in request.path %}
 				<li class="active">
