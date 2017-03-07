@@ -50,43 +50,50 @@ class MafiaActionType(ChoiceEnumeration):
 
     CODE_LENGTH = 2
 
-    def __init__(self, code, name, num_targets, apparant_name=None, targets_dead=False):
+    def __init__(self, code, name, num_targets, ordering, 
+                 apparant_name=None, targets_dead=False, 
+                 can_target_self=True, self_target=False):
         super(MafiaActionType, self).__init__(code, name)
         self.num_targets = num_targets
+        self.ordering = ordering
         self.apparant_name = apparant_name or name
         self.targets_dead = targets_dead
+        self.can_self_target = can_self_target
+        self.self_target = self_target
+        if self.self_target and self.num_targets > 0:
+            raise ValueError("self_target can only be True when num_targets == 0")
 
-MafiaActionType.REVEAL = MafiaActionType('Re', 'Reveal', 0)
-MafiaActionType.INVESTIGATE = MafiaActionType('In', 'Investigate', 1)
-MafiaActionType.INSANE_INVESTIGATE = MafiaActionType('II', 'Insane Investigate', 1, apparant_name='Investigate')
-MafiaActionType.FORGETFUL_INVESTIGATE = MafiaActionType('FI', 'Forgetful Investigate', 1)
-MafiaActionType.PROTECT = MafiaActionType('Pr', 'Protect', 1)
-MafiaActionType.SWITCH = MafiaActionType('Sw', 'Switch', 2)
-MafiaActionType.FOLLOW = MafiaActionType('Fo', 'Follow', 1)
-MafiaActionType.WATCH = MafiaActionType('Wa', 'Watch', 1)
-MafiaActionType.SEDUCE = MafiaActionType('Se', 'Seduce', 1)
-MafiaActionType.SLAY = MafiaActionType('Sl', 'Slay', 1)
-MafiaActionType.ON_GUARD = MafiaActionType('OG', 'On Guard', 0)
-MafiaActionType.DEFEND = MafiaActionType('De', 'Defend', 1)
-MafiaActionType.SCRUTINIZE = MafiaActionType('Sc', 'Scrutinize', 1)
-MafiaActionType.DISPOSE = MafiaActionType('Di', 'Dispose', 1)
-MafiaActionType.FRAME = MafiaActionType('Fr', 'Frame', 1)
-MafiaActionType.CORRUPT = MafiaActionType('Co', 'Corrupt', 1)
-MafiaActionType.SABOTAGE = MafiaActionType('Sa', 'Sabotage', 1)
-MafiaActionType.SNIPE = MafiaActionType('Sn', 'Snipe', 1)
-MafiaActionType.AMBUSH = MafiaActionType('Am', 'Ambush', 1)
-MafiaActionType.DOUSE = MafiaActionType('Do', 'Douse', 1)
-MafiaActionType.UN_DOUSE = MafiaActionType('UD', 'Un-Douse', 1)
-MafiaActionType.IGNITE = MafiaActionType('Ig', 'Ignite', 0)
-MafiaActionType.CONTROL = MafiaActionType('Co', 'Control', 2)
-MafiaActionType.REMEMBER = MafiaActionType('Re', 'Remember', 1, targets_dead=True)
-MafiaActionType.BULLETPROOF_VEST = MafiaActionType('BV', 'Bulletproof Vest', 0)
+MafiaActionType.SEDUCE = MafiaActionType('Se', 'Seduce', 1, 0)
+MafiaActionType.REMEMBER = MafiaActionType('Re', 'Remember', 1, 10, targets_dead=True)
+MafiaActionType.ON_GUARD = MafiaActionType('OG', 'On Guard', 0, 10, self_target=True)
+MafiaActionType.SWITCH = MafiaActionType('Sw', 'Switch', 2, 20)
+MafiaActionType.CONTROL = MafiaActionType('Co', 'Control', 2, 30)
+MafiaActionType.FRAME = MafiaActionType('Fr', 'Frame', 1, 40)
+MafiaActionType.INVESTIGATE = MafiaActionType('In', 'Investigate', 1, 50, can_target_self=False)
+MafiaActionType.INSANE_INVESTIGATE = MafiaActionType('II', 'Insane Investigate', 1, 50, apparant_name='Investigate', can_target_self=False)
+MafiaActionType.FORGETFUL_INVESTIGATE = MafiaActionType('FI', 'Forgetful Investigate', 1, 50)
+MafiaActionType.SCRUTINIZE = MafiaActionType('Sc', 'Scrutinize', 1, 50)
+MafiaActionType.PROTECT = MafiaActionType('Pr', 'Protect', 1, 60, can_target_self=False)
+MafiaActionType.DEFEND = MafiaActionType('De', 'Defend', 1, 60)
+MafiaActionType.BULLETPROOF_VEST = MafiaActionType('BV', 'Bulletproof Vest', 0, 60, self_target=True)
+MafiaActionType.CORRUPT = MafiaActionType('Co', 'Corrupt', 1, 60, can_target_self=False)
+MafiaActionType.SLAY = MafiaActionType('Sl', 'Slay', 1, 70)
+MafiaActionType.IGNITE = MafiaActionType('Ig', 'Ignite', 0, 70)
+MafiaActionType.SNIPE = MafiaActionType('Sn', 'Snipe', 1, 70)
+MafiaActionType.SABOTAGE = MafiaActionType('Sa', 'Sabotage', 1, 70)
+MafiaActionType.AMBUSH = MafiaActionType('Am', 'Ambush', 1, 70)
+MafiaActionType.DOUSE = MafiaActionType('Do', 'Douse', 1, 80)
+MafiaActionType.UN_DOUSE = MafiaActionType('UD', 'Un-Douse', 1, 80)
+MafiaActionType.DISPOSE = MafiaActionType('Di', 'Dispose', 1, 90)
+MafiaActionType.REVEAL = MafiaActionType('Re', 'Reveal', 0, 100)
+MafiaActionType.FOLLOW = MafiaActionType('Fo', 'Follow', 1, 110)
+MafiaActionType.WATCH = MafiaActionType('Wa', 'Watch', 1, 110)
 
 class MafiaRole(ChoiceEnumeration):
 
     CODE_LENGTH = 2
 
-    def __init__(self, code, name, faction, actions, apparant_name=None):
+    def __init__(self, code, name, faction, actions, apparant_name=None, night_immune=False):
         super(MafiaRole, self).__init__(code, name)
         self.faction = faction
         self.actions = actions
@@ -200,6 +207,7 @@ MafiaRole.JESTER = MafiaRole(
 MafiaRole.SERIAL_KILLER = MafiaRole(
     'RK', 'Serial Killer', MafiaFaction.ROGUE,
     [MafiaActionType.SLAY],
+    night_immune=True,
 )
 MafiaRole.MASS_MURDERER = MafiaRole(
     'RM', 'Mass Murderer', MafiaFaction.ROGUE,
@@ -208,6 +216,7 @@ MafiaRole.MASS_MURDERER = MafiaRole(
 MafiaRole.ARSONIST = MafiaRole(
     'RA', 'Arsonist', MafiaFaction.ROGUE,
     [MafiaActionType.DOUSE, MafiaActionType.UN_DOUSE, MafiaActionType.IGNITE],
+    night_immune=True
 )
 MafiaRole.WITCH = MafiaRole(
     'RW', 'Witch', MafiaFaction.ROGUE,
@@ -235,14 +244,17 @@ MafiaPlayerStatus.KILLED = MafiaPlayerStatus('K', 'Killed')
 
 class MafiaPlayer(models.Model):
     game = models.ForeignKey(MafiaGame)
-    player = models.ForeignKey(User)
+    user = models.ForeignKey(User)
     previous_role = models.CharField(
         max_length=MafiaRole.CODE_LENGTH,
         choices=MafiaRole.get_choice_tuples(),
         default=None
     )
-    role = models.CharField(max_length=2, choices=MafiaRole.get_choice_tuples())
-    times_action_used = models.IntegerField(default=0)
+    role = models.CharField(
+        max_length=MafiaRole.CODE_LENGTH,
+        choices=MafiaRole.get_choice_tuples()
+    )
+    times_action_used = models.SmallIntegerField(default=0)
     doused = models.BooleanField(default=False)
     status = models.CharField(
         max_length=MafiaPlayerStatus.CODE_LENGTH,
@@ -251,13 +263,25 @@ class MafiaPlayer(models.Model):
     )
     executioner_target = models.ForeignKey(User, null=True, related_name='executioner_target')
 
+class MafiaActionStatus(ChoiceEnumeration):
+    CODE_LENGTH = 1
+
+MafiaActionStatus.UNPROCESSED = MafiaActionStatus('U', 'Unprocessed')
+MafiaActionStatus.PERFORMED = MafiaActionStatus('P', 'Performed')
+MafiaActionStatus.CANCELLED = MafiaActionStatus('C', 'Cancelled')
+
 class MafiaAction(models.Model):
     game = models.ForeignKey(MafiaGame)
-    player = models.ForeignKey(User)
+    performer = models.ForeignKey(User)
     action_type = models.CharField(
         max_length=MafiaActionType.CODE_LENGTH,
         choices=MafiaActionType.get_choice_tuples()
     )
+    night = models.PositiveSmallIntegerField()
     target1 = models.ForeignKey(User, related_name='target1', default=None)
     target2 = models.ForeignKey(User, related_name='target2', default=None)
-    target3 = models.ForeignKey(User, related_name='target3', default=None)
+    status = models.CharField(
+        max_length=MafiaActionStatus.CODE_LENGTH,
+        choices=MafiaActionStatus.get_choice_tuples(),
+        default=MafiaActionStatus.UNPROCESSED.code
+    )
