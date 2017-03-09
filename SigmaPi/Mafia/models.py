@@ -51,44 +51,48 @@ class MafiaAction(ChoiceEnumeration):
 
     CODE_LENGTH = 2
 
-    def __init__(self, code, name, num_targets, 
-                 apparant_name=None, targets_dead=False, 
+    def __init__(self, code, name, targets_can_be_self,
+                 apparant_name=None, targets_dead=False,
                  can_target_self=True, is_direct_offense=False,
                  is_covert=False):
         super(MafiaAction, self).__init__(code, name)
-        self.num_targets = num_targets
+        self.targets_can_be_self = targets_can_be_self
         self.apparant_name = apparant_name or name
-        self.targets_dead = targets_dead
+        self.targets_can_be_self = targets_can_be_self
         self.can_target_self = can_target_self
         self.is_direct_offense = is_direct_offense
         self.is_covert = True
 
-MafiaAction.NO_ACTION = MafiaAction('NA', 'No Action', 0)
-MafiaAction.SEDUCE = MafiaAction('Se', 'Seduce', 1, can_target_self=False)
-MafiaAction.REMEMBER = MafiaAction('Re', 'Remember', 1, targets_dead=True)
-MafiaAction.ON_GUARD = MafiaAction('OG', 'On Guard', 0)
-MafiaAction.SWITCH = MafiaAction('Sw', 'Switch', 2)
-MafiaAction.CONTROL = MafiaAction('Co', 'Control', 2, can_target_self=False)
+    @property
+    def num_targets(self):
+        return len(targets_can_be_self)
+
+MafiaAction.NO_ACTION = MafiaAction('NA', 'No Action', [])
+MafiaAction.SEDUCE = MafiaAction('Se', 'Seduce', [False])
+MafiaAction.REMEMBER = MafiaAction('Re', 'Remember', [False], targets_dead=True)
+MafiaAction.ON_GUARD = MafiaAction('OG', 'On Guard', [])
+MafiaAction.SWITCH = MafiaAction('Sw', 'Switch', [True, True])
+MafiaAction.CONTROL = MafiaAction('Co', 'Control', [False, True])
 MafiaAction.FRAME = MafiaAction('Fr', 'Frame', 1)
-MafiaAction.INVESTIGATE = MafiaAction('In', 'Investigate', 1, can_target_self=False)
-MafiaAction.INSANE_INVESTIGATE = MafiaAction('II', 'Insane Investigate', 1, apparant_name='Investigate', can_target_self=False)
-MafiaAction.FORGETFUL_INVESTIGATE = MafiaAction('FI', 'Forgetful Investigate', 1)
+MafiaAction.INVESTIGATE = MafiaAction('In', 'Investigate', [False])
+MafiaAction.INSANE_INVESTIGATE = MafiaAction('II', 'Insane Investigate', [False], apparant_name='Investigate')
+MafiaAction.FORGETFUL_INVESTIGATE = MafiaAction('FI', 'Forgetful Investigate', [True])
 MafiaAction.SCRUTINIZE = MafiaAction('Sc', 'Scrutinize', 1)
-MafiaAction.PROTECT = MafiaAction('Pr', 'Protect', 1, can_target_self=False)
-MafiaAction.DEFEND = MafiaAction('De', 'Defend', 1, can_target_self=False)
-MafiaAction.BULLETPROOF_VEST = MafiaAction('BV', 'Bulletproof Vest', 0)
-MafiaAction.CORRUPT = MafiaAction('Co', 'Corrupt', 1, can_target_self=False, is_direct_offense=True)
-MafiaAction.SLAY = MafiaAction('Sl', 'Slay', 1, is_direct_offense=True)
-MafiaAction.IGNITE = MafiaAction('Ig', 'Ignite', 0)
-MafiaAction.SNIPE = MafiaAction('Sn', 'Snipe', 1, is_covert=True)
-MafiaAction.SABOTAGE = MafiaAction('Sa', 'Sabotage', 1)
-MafiaAction.AMBUSH = MafiaAction('Am', 'Ambush', 1)
-MafiaAction.DOUSE = MafiaAction('Do', 'Douse', 1)
-MafiaAction.UN_DOUSE = MafiaAction('UD', 'Un-Douse', 1)
-MafiaAction.DISPOSE = MafiaAction('Di', 'Dispose', 1)
-MafiaAction.REVEAL = MafiaAction('Re', 'Reveal', 0)
-MafiaAction.FOLLOW = MafiaAction('Fo', 'Follow', 1)
-MafiaAction.WATCH = MafiaAction('Wa', 'Watch', 1)
+MafiaAction.PROTECT = MafiaAction('Pr', 'Protect', [False])
+MafiaAction.DEFEND = MafiaAction('De', 'Defend', 1, [False])
+MafiaAction.BULLETPROOF_VEST = MafiaAction('BV', 'Bulletproof Vest', [])
+MafiaAction.CORRUPT = MafiaAction('Co', 'Corrupt', [False], is_direct_offense=True)
+MafiaAction.SLAY = MafiaAction('Sl', 'Slay', [True], is_direct_offense=True)
+MafiaAction.IGNITE = MafiaAction('Ig', 'Ignite', [])
+MafiaAction.SNIPE = MafiaAction('Sn', 'Snipe', [True], is_covert=True)
+MafiaAction.SABOTAGE = MafiaAction('Sa', 'Sabotage', [True])
+MafiaAction.AMBUSH = MafiaAction('Am', 'Ambush', [True])
+MafiaAction.DOUSE = MafiaAction('Do', 'Douse', [True])
+MafiaAction.UN_DOUSE = MafiaAction('UD', 'Un-Douse', [True])
+MafiaAction.DISPOSE = MafiaAction('Di', 'Dispose', [True])
+MafiaAction.REVEAL = MafiaAction('Re', 'Reveal', [])
+MafiaAction.FOLLOW = MafiaAction('Fo', 'Follow', [True])
+MafiaAction.WATCH = MafiaAction('Wa', 'Watch', [True])
 
 class MafiaRole(ChoiceEnumeration):
 
@@ -293,7 +297,7 @@ class MafiaPlayerNight(models.Model):
 
     switched_by_json = models.TextField(default='[]')
     protected_by_json = models.TextField(default='[]')
-    defended_by = models.TextField(default='[]')
+    defended_by_json = models.TextField(default='[]')
     other_targeted_by_json = models.TextField(default='[]')
 
     controlled_to_target = models.ForeignKey(User, null=True, related_name='controlled_to_target')
@@ -352,7 +356,7 @@ class MafiaPlayerNight(models.Model):
     @property
     def seduced(self):
         return (
-            self.seduced and 
+            self.attempted_seduced and
             not MafiaRole.get_instance(self.player.role).immune_to_seduction
         )
 
@@ -380,7 +384,6 @@ class MafiaPlayerNight(models.Model):
     def clear_switched_by(self):
         self.switched_by_json = '[]'
         self.switched_with = None
-
 
     def add_targeted_by(self, user):
         self.other_targeted_by_json = json.dumps(list(set(
@@ -418,7 +421,7 @@ class MafiaPlayerNight(models.Model):
                 json.loads(self.defended_by_json) +
                 json.loads(self.other_targeted_by_json)
             )
-        ] 
+        ]
 
 class MafiaError(Exception):
     pass
