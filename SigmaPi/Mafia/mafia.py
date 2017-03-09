@@ -230,7 +230,7 @@ def _process_player_nights(players, nights):
     for snipe_night in MafiaPlayerNight.objects.filter(action=MafiaAction.SNIPE.code):
         if _kill_cancelled(snipe_night, died_from_killing):
             continue
-        target_night = users_to_nights[switched[snipe_night.target0_after_control]]
+        target_night = users_to_nights[snipe_night.target0] # NOT SWITCHED OR CONTROLLED
         _kill_if_alive(
             snipe_night, target_night, MafiaNightStatus.TERMINATED,
             died_from_killing, users_to_nights

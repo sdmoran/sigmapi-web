@@ -99,7 +99,8 @@ class MafiaRole(ChoiceEnumeration):
     CODE_LENGTH = 2
 
     def __init__(self, code, name, faction, actions, apparant_name=None,
-                 night_immune=False, immune_to_seduction=False):
+                 night_immune=False, immune_to_seduction=False,
+                 min_in_game=0, max_in_game=float('inf')):
         super(MafiaRole, self).__init__(code, name)
         self.faction = faction
         self.actions = actions
@@ -108,6 +109,7 @@ class MafiaRole(ChoiceEnumeration):
 MafiaRole.MAYOR = MafiaRole(
     'VM', 'Mayor', MafiaFaction.VILLAGE,
     [MafiaAction.REVEAL],
+    min_in_game=1, max_in_game=1
 )
 MafiaRole.COP = MafiaRole(
     'VC', 'Cop', MafiaFaction.VILLAGE,
@@ -129,6 +131,7 @@ MafiaRole.DOCTOR = MafiaRole(
 MafiaRole.BUS_DRIVER = MafiaRole(
     'VB', 'Bus Driver', MafiaFaction.VILLAGE,
     [MafiaAction.SWITCH],
+    max_in_game=1,
 )
 MafiaRole.TRACKER = MafiaRole(
     'VT',  'Tracker', MafiaFaction.VILLAGE,
@@ -159,6 +162,7 @@ MafiaRole.BOMB = MafiaRole(
     'VB',  'Bomb', MafiaFaction.VILLAGE,
     [],
     immune_to_seduction=True,
+    max_in_game=1,
 )
 MafiaRole.BODYGUARD = MafiaRole(
     'VO',  'Bodyguard', MafiaFaction.VILLAGE,
@@ -171,10 +175,12 @@ MafiaRole.DETECTIVE = MafiaRole(
 MafiaRole.GODFATHER = MafiaRole(
     'MG', 'Godfather', MafiaFaction.MAFIA,
     [MafiaAction.SLAY],
+    min_in_game=1, max_in_game=1,
 )
 MafiaRole.LIMO_DRIVER = MafiaRole(
     'ML', 'Limo Driver', MafiaFaction.MAFIA,
     [MafiaAction.SWITCH],
+    max_in_game=1,
 )
 MafiaRole.STALKER = MafiaRole(
     'MS', 'Stalker', MafiaFaction.MAFIA,
@@ -212,6 +218,7 @@ MafiaRole.SNIPER = MafiaRole(
 MafiaRole.BASIC_MAFIA = MafiaRole(
     'MB', 'Basic Mafia', MafiaFaction.MAFIA,
     [],
+    max_in_game=0, # can only be included by corruption
 )
 MafiaRole.JESTER = MafiaRole(
     'RJ', 'Jester', MafiaFaction.ROGUE,
