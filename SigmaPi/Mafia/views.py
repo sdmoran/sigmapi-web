@@ -4,6 +4,8 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import MafiaGame
 
+import mafia
+
 @login_required
 def index(request):
     """
