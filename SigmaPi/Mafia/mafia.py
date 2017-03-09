@@ -126,10 +126,10 @@ def _kill_if_alive(killer_night, target_night, killed_status, killed_set, users_
         if target_night.action == MafiaAction.BULLETPROOF_VEST.code:
             target_night.action_effective = True
 
-def _process_player_nights(players, nights):
+def _process_player_nights(nights):
 
     # Collect a map from users to nights
-    users_to_nights = {player.user: nights.get(player=player) for player in players}
+    users_to_nights = {night.player.user: night for night in nights}
 
     # Do control, killing those that try to control on-guard players
     control_nights = nights.filter(action=MafiaAction.CONTROL.code)
@@ -164,8 +164,8 @@ def _process_player_nights(players, nights):
     # Repeat switching and seduction until we reach a stable state
     switched, seduced = None, None
     while True:
-        new_switched = _do_switching(players, nights, users_to_nights)
-        new_seduced = _do_seduction(players, nights, users_to_nights)
+        new_switched = _do_switching(nights, users_to_nights)
+        new_seduced = _do_seduction(nights, users_to_nights)
         stable = (new_switched == switched and new_seduced == seduced)
         switched = new_switched
         seduced = new_seduced
@@ -241,9 +241,8 @@ def _process_player_nights(players, nights):
     for ignite_night in MafiaPlayerNight.objects.filter(action=MafiaAction.IGNITE.code):
         if _kill_cancelled(ignite_night, died_from_killing):
             continue
-        for player in players:
-            night = users_to_nights[player.user]
-            if player.doused:
+        for night in nights:
+            if night.player.doused:
                 _kill_if_alive(
                     ignite_night, night, MafiaNightStatus.TERMINATED,
                     died_from_killing, users_to_nights
@@ -254,12 +253,11 @@ def _process_player_nights(players, nights):
     for ambush_night in MafiaPlayerNight.objects.filter(action=MafiaAction.AMBUSH.code):
         if _kill_cancelled(ambush_night, died_from_killing):
             continue
-        for player in players:
-            night = users_to_nights[player.user]
+        for night in nights:
             # The player dies in the ambush if:
             died_in_ambush = (
                 # They aren't the ambusher, and either (a), (b), or (c)
-                player.user != night.performer and (
+                night.player.user != night.performer and (
                     # (a) Their first target is ambushed
                     night.target0 == ambush_night.target0 or
                     # (b) Their second target is ambushed and their action wasn't Control
@@ -268,7 +266,7 @@ def _process_player_nights(players, nights):
                         night.action != MafiaAction.CONTROL.code
                     # (c) They're the ambushee and they didn't target anyone else
                     ) or (
-                        player.user == ambush_night.target0 and
+                        night.player.user == ambush_night.target0 and
                         night.target0 == None
                     )
                 )
@@ -329,11 +327,10 @@ def _process_player_nights(players, nights):
         remember_night.remembered = remember_night.target0_after_control
         remember_night.action_effective = True
 
-def _apply_player_nights(players, nights):
+def _apply_player_nights(nights):
     pass # TODO
 
 def perform_night(night):
-    players = MafiaPlayers.objects.filter(status=MafiaPlayerStatus.ALIVE)
     nights = MafiaPlayerNights.objects.filter(night=night)
-    _process_player_nights(players, nights)
-    _apply_player_nights(players, nights)
+    _process_player_nights(nights)
+    _apply_player_nights(nights)
