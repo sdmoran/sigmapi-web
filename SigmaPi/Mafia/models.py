@@ -54,7 +54,7 @@ class MafiaAction(ChoiceEnumeration):
     def __init__(self, code, name, targets_can_be_self,
                  apparant_name=None, targets_dead=False,
                  can_target_self=True, is_direct_offense=False,
-                 is_covert=False):
+                 is_lethal=False, is_covert=False):
         super(MafiaAction, self).__init__(code, name)
         self.targets_can_be_self = targets_can_be_self
         self.apparant_name = apparant_name or name
@@ -68,31 +68,31 @@ class MafiaAction(ChoiceEnumeration):
         return len(targets_can_be_self)
 
 MafiaAction.NO_ACTION = MafiaAction('NA', 'No Action', [])
-MafiaAction.SEDUCE = MafiaAction('Se', 'Seduce', [False])
-MafiaAction.REMEMBER = MafiaAction('Re', 'Remember', [False], targets_dead=True)
-MafiaAction.ON_GUARD = MafiaAction('OG', 'On Guard', [])
-MafiaAction.SWITCH = MafiaAction('Sw', 'Switch', [True, True])
 MafiaAction.CONTROL = MafiaAction('Co', 'Control', [False, True])
+MafiaAction.ON_GUARD = MafiaAction('OG', 'On Guard', [], is_lethal=True)
+MafiaAction.SEDUCE = MafiaAction('Se', 'Seduce', [False])
+MafiaAction.SWITCH = MafiaAction('Sw', 'Switch', [True, True])
 MafiaAction.FRAME = MafiaAction('Fr', 'Frame', 1)
 MafiaAction.INVESTIGATE = MafiaAction('In', 'Investigate', [False])
 MafiaAction.INSANE_INVESTIGATE = MafiaAction('II', 'Insane Investigate', [False], apparant_name='Investigate')
 MafiaAction.FORGETFUL_INVESTIGATE = MafiaAction('FI', 'Forgetful Investigate', [True])
 MafiaAction.SCRUTINIZE = MafiaAction('Sc', 'Scrutinize', 1)
 MafiaAction.PROTECT = MafiaAction('Pr', 'Protect', [False])
-MafiaAction.DEFEND = MafiaAction('De', 'Defend', 1, [False])
+MafiaAction.DEFEND = MafiaAction('De', 'Defend', 1, [False], is_lethal=True)
 MafiaAction.BULLETPROOF_VEST = MafiaAction('BV', 'Bulletproof Vest', [])
 MafiaAction.CORRUPT = MafiaAction('Co', 'Corrupt', [False], is_direct_offense=True)
-MafiaAction.SLAY = MafiaAction('Sl', 'Slay', [True], is_direct_offense=True)
-MafiaAction.IGNITE = MafiaAction('Ig', 'Ignite', [])
-MafiaAction.SNIPE = MafiaAction('Sn', 'Snipe', [True], is_covert=True)
-MafiaAction.SABOTAGE = MafiaAction('Sa', 'Sabotage', [True])
-MafiaAction.AMBUSH = MafiaAction('Am', 'Ambush', [True])
+MafiaAction.SLAY = MafiaAction('Sl', 'Slay', [True], is_direct_offense=True, is_lethal=True)
+MafiaAction.AMBUSH = MafiaAction('Am', 'Ambush', [True], is_lethal=True)
+MafiaAction.SNIPE = MafiaAction('Sn', 'Snipe', [True], is_lethal=True, is_covert=True)
+MafiaAction.IGNITE = MafiaAction('Ig', 'Ignite', [], is_lethal=True)
+MafiaAction.SABOTAGE = MafiaAction('Sa', 'Sabotage', [True], is_lethal=True)
 MafiaAction.DOUSE = MafiaAction('Do', 'Douse', [True])
 MafiaAction.UN_DOUSE = MafiaAction('UD', 'Un-Douse', [True])
 MafiaAction.DISPOSE = MafiaAction('Di', 'Dispose', [True])
 MafiaAction.REVEAL = MafiaAction('Re', 'Reveal', [])
 MafiaAction.FOLLOW = MafiaAction('Fo', 'Follow', [True])
 MafiaAction.WATCH = MafiaAction('Wa', 'Watch', [True])
+MafiaAction.REMEMBER = MafiaAction('Re', 'Remember', [False], targets_dead=True)
 
 class MafiaRole(ChoiceEnumeration):
 
@@ -292,8 +292,12 @@ MafiaNightStatus.ATTACKED = MafiaNightStatus('A', 'Attacked')
 MafiaNightStatus.TERMINATED = MafiaNightStatus('T', 'Terimated')
 
 class MafiaPlayerNight(models.Model):
+
+    # Together, unique to each player night
     player = models.ForeignKey(MafiaPlayer)
     night = models.PositiveSmallIntegerField()
+
+    # Filled in by user
     action = models.CharField(
         max_length=MafiaAction.CODE_LENGTH,
         choices=MafiaAction.get_choice_tuples(),
@@ -302,11 +306,11 @@ class MafiaPlayerNight(models.Model):
     target0 = models.ForeignKey(User, related_name='target0', null=True)
     target1 = models.ForeignKey(User, related_name='target1', null=True)
 
+    # Filled in during night processing
     switched_by_json = models.TextField(default='[]')
     protected_by_json = models.TextField(default='[]')
     defended_by_json = models.TextField(default='[]')
     other_targeted_by_json = models.TextField(default='[]')
-
     controlled_to_target = models.ForeignKey(User, null=True, related_name='controlled_to_target')
     switched_with = models.ForeignKey(User, null=True, related_name='switched_with')
     remembered = models.ForeignKey(User, null=True, related_name='remembered')
@@ -315,15 +319,14 @@ class MafiaPlayerNight(models.Model):
         choices=MafiaNightStatus.get_choice_tuples(),
         default=MafiaNightStatus.SAFE.code
     )
-
     attempted_seduced = models.BooleanField(default=False)
     framed = models.BooleanField(default=False)
     attempted_corrupted = models.BooleanField(default=False)
     doused = models.BooleanField(default=False)
     un_doused = models.BooleanField(default=False)
     disposed = models.BooleanField(default=False)
-
     action_effective = models.BooleanField(default=False)
+    report = models.TextField(default="")
 
     @property
     def target0_after_control(self):
@@ -429,6 +432,11 @@ class MafiaPlayerNight(models.Model):
                 json.loads(self.other_targeted_by_json)
             )
         ]
+
+    def add_report_line(self, line):
+        if self.report:
+            self.report += "\n"
+        self.report += line
 
 class MafiaError(Exception):
     pass
