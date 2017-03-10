@@ -299,7 +299,7 @@ class MafiaPlayer(models.Model):
 class MafiaNightStatus(ChoiceEnumeration):
     CODE_LENGTH = 1
 
-MafiaNightStatus.SAFE = MafiaNightStatus('N', 'Not Attacked')
+MafiaNightStatus.SAFE = MafiaNightStatus('S', 'Safe')
 MafiaNightStatus.ATTACKED = MafiaNightStatus('A', 'Attacked')
 MafiaNightStatus.TERMINATED = MafiaNightStatus('T', 'Terimated')
 
