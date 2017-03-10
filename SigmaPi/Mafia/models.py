@@ -3,14 +3,6 @@ from django.db import models
 from django.contrib.auth.models import User
 import json
 
-class MafiaGame(models.Model):
-    created = models.DateField()
-
-class MafiaFaction(object):
-    VILLAGE = 'V'
-    MAFIA = 'M'
-    ROGUE = 'R'
-
 class ChoiceEnumeration(object):
 
     def __init__(self, name, code):
@@ -46,6 +38,26 @@ class ChoiceEnumeration(object):
             (inst.code, inst.name)
             for inst in cls.get_instances()
         ]
+
+class MafiaGameTime(ChoiceEnumeration):
+    CODE_LENGTH = 1
+
+MafiaGameTime.DAWN = MafiaGameTime('A', 'Dawn')
+MafiaGameTime.DUSK = MafiaGameTime('U', 'Dusk')
+
+class MafiaGame(models.Model):
+    created = models.DateField()
+    day_number = models.PositiveSmallIntegerField(default=1)
+    time = models.CharField(
+        max_length=MafiaGameTime.CODE_LENGTH,
+        choices=MafiaGameTime.get_choice_tuples(),
+        default=MafiaGameTime.DUSK
+    )
+
+class MafiaFaction(object):
+    VILLAGE = 'V'
+    MAFIA = 'M'
+    ROGUE = 'R'
 
 class MafiaAction(ChoiceEnumeration):
 
@@ -295,7 +307,7 @@ class MafiaPlayerNight(models.Model):
 
     # Together, unique to each player night
     player = models.ForeignKey(MafiaPlayer)
-    night = models.PositiveSmallIntegerField()
+    night_number = models.PositiveSmallIntegerField()
 
     # Filled in by user
     action = models.CharField(

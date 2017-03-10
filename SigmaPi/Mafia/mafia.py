@@ -79,7 +79,7 @@ def _do_switching(nights, users_to_nights):
             _do_single_switch(s1, s1, s1t0, s1t1, users_to_nights)
 
     # Perform single switch
-    elif len(switch_nights) >= 1 and not switch_nights[0].seduced_or_died
+    elif len(switch_nights) >= 1 and not switch_nights[0].seduced_or_died:
         s = switch_nights[0].player.user
         _do_single_switch(
             s, s,
@@ -114,7 +114,7 @@ def _kill_if_alive(killer_night, target_night, killed_status, killed_set, users_
         return
     target_night.status = (
         MafiaNightStatus.TERMINATED
-        if MafiaNightStatus.TERMINATD.code in [target_night.status, killed_status]:
+        if MafiaNightStatus.TERMINATD.code in [target_night.status, killed_status]
         else MafiaNightStatus.ATTACKED
     )
     if target_night.died:
@@ -126,7 +126,7 @@ def _kill_if_alive(killer_night, target_night, killed_status, killed_set, users_
         if target_night.action == MafiaAction.BULLETPROOF_VEST.code:
             target_night.action_effective = True
 
-def _process_player_nights(nights, users_to_nights):
+def _process_actions(nights, users_to_nights):
 
     # Do control, killing those that try to control on-guard players
     control_nights = nights.filter(action=MafiaAction.CONTROL.code)
@@ -275,7 +275,7 @@ def _process_player_nights(nights, users_to_nights):
                     died_from_killing, users_to_nights
                 )
         break # Only need to do ignite once
-                )
+
 
     # Killing role: Bomb
     bomb_nights = MafiaPlayerNights.objects.filter(player__role=MafiaRole.BOMB.code)
@@ -339,7 +339,7 @@ def _list_users(users):
     elif num_users >= 2:
         return ', '.join(
             _get_name(user) for user in users[:-1]
-        ) + ', and ' _get_name(users[-1])
+        ) + ', and ' + _get_name(users[-1])
 
 def _investigate(investigator_night, target_night):
     target_role = MafiaRole.get_instance(target_night.role)
@@ -353,7 +353,7 @@ def _investigate(investigator_night, target_night):
         if investigator_night.action == MafiaAction.INSANE_INVESTIGATE.code
         else guilty
     )
-    return 'GUILTY' if guilty else 'INNOCENT'
+    return 'GUILTY' if appears_guilty else 'INNOCENT'
 
 def _scrutinize(target_night):
     role = MafiaRole.get_instance(target_night.role)
@@ -361,8 +361,6 @@ def _scrutinize(target_night):
 
 def _follow(target_night, users_to_nights):
     return '' # TODO
-    #target_tar
-    #return (
     #    _get_name(target_night.target0_after_control)
     #    if target_night.tar
 
@@ -521,14 +519,26 @@ def _generate_reports(nights, users_to_nights):
                 'You have remembered yourself as ' + _get_name(night.target0) + '. ' +
                 'You are now a ' + MafiaRole.get_instance(new_role).name + '!'
             )
+
     # TODO: received action reporting
 
-def _apply_player_nights(nights, users_to_nights):
+def _apply_action_results(nights, users_to_nights):
     pass # TODO
 
-def perform_night(night):
-    nights = MafiaPlayerNights.objects.filter(night=night)
-    users_to_nights = {night.player.user: night for night in nights}
-    _process_player_nights(nights, users_to_nights)
-    _generate_reports(nights, users_to_nights)
-    _apply_player_nights(nights, users_to_nights)
+def advance_game(game):
+
+    if game.time == MafiaGameTime.DAWN.code:
+        # TODO
+        game.time = MafiaGameTime.DUSK.code
+
+    elif game.time == MafiaGameTime.DUSK.code:
+        nights = MafiaPlayerNights.objects.filter(night_number=game.day_number)
+        users_to_nights = {night.player.user: night for night in nights}
+        _process_actions(nights, users_to_nights)
+        _generate_reports(nights, users_to_nights)
+        _apply_action_results(nights, users_to_nights)
+        game.day_number += 1
+        game.time = MafiaGameTime.DAWN.code
+
+    else:
+        raise ValueError("invalid value of game.time: " + `game.time`)
