@@ -39,20 +39,29 @@ class ChoiceEnumeration(object):
             for inst in cls.get_instances()
         ]
 
+class MafiaGameStatus(ChoiceEnumeration):
+    CODE_LENGTH = 1
+
 class MafiaGameTime(ChoiceEnumeration):
     CODE_LENGTH = 1
 
-MafiaGameTime.DAWN = MafiaGameTime('A', 'Dawn')
-MafiaGameTime.DUSK = MafiaGameTime('U', 'Dusk')
+MafiaGameTime.DAY = MafiaGameTime('A', 'Dawn')
+MafiaGameTime.NIGHT = MafiaGameTime('U', 'Dusk')
 
 class MafiaGame(models.Model):
     created = models.DateField()
-    day_number = models.PositiveSmallIntegerField(default=1)
+    created_by = models.ForeignKey(User)
+    day_number = models.PositiveSmallIntegerField(default=0)
     time = models.CharField(
         max_length=MafiaGameTime.CODE_LENGTH,
         choices=MafiaGameTime.get_choice_tuples(),
-        default=MafiaGameTime.DUSK
+        default=MafiaGameTime.DAY
     )
+    finished = models.BooleanField(default=False)
+
+class MafiaModerator(models.Model):
+    game = models.ForeignKey(MafiaGame)
+    user = models.ForeignKey(User)
 
 class MafiaFaction(object):
     VILLAGE = 'V'
@@ -278,22 +287,22 @@ MafiaPlayerStatus.DIED_AT_NIGHT = MafiaPlayerStatus('K', 'Died at Night')
 class MafiaPlayer(models.Model):
     game = models.ForeignKey(MafiaGame)
     user = models.ForeignKey(User)
-    previous_role = models.CharField(
-        max_length=MafiaRole.CODE_LENGTH,
-        choices=MafiaRole.get_choice_tuples(),
-        default=None
-    )
     role = models.CharField(
         max_length=MafiaRole.CODE_LENGTH,
         choices=MafiaRole.get_choice_tuples()
     )
-    times_action_used = models.SmallIntegerField(default=0)
-    doused = models.BooleanField(default=False)
+    previous_role = models.CharField(
+        max_length=MafiaRole.CODE_LENGTH,
+        choices=MafiaRole.get_choice_tuples(),
+        null=True
+    )
     status = models.CharField(
         max_length=MafiaPlayerStatus.CODE_LENGTH,
         choices=MafiaPlayerStatus.get_choice_tuples(),
         default=MafiaPlayerStatus.ALIVE.code
     )
+    times_action_used = models.SmallIntegerField(default=0)
+    doused = models.BooleanField(default=False)
     executioner_target = models.ForeignKey(User, null=True, related_name='executioner_target')
 
 class MafiaNightStatus(ChoiceEnumeration):
@@ -351,7 +360,7 @@ class MafiaNightResult(models.Model):
         return self.action.target0
 
     @property
-    def target0(self):
+    def target1(self):
         return self.action.target1
 
     @property
@@ -463,6 +472,9 @@ class MafiaNightResult(models.Model):
         if self.report:
             self.report += "\n"
         self.report += line
+
+    def contains_report_line(self, line):
+        return line in self.report.splitlines() 
 
 class MafiaError(Exception):
     pass

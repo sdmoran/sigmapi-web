@@ -23,7 +23,7 @@ def _do_overlapping_switch(switcher0, switcher1, target0, overlapped_target, tar
     _do_single_switch(switcher0, switcher1, target0, target1, users_to_results)
     _do_double_switch(switcher0, switcher1, overlapped_target, users_to_results)
 
-def _do_switching(results, users_to_results, actions_to_results):
+def _do_switching(actions, results, users_to_results, actions_to_results):
 
     # Clear previous calculations
     for result in results:
@@ -31,7 +31,7 @@ def _do_switching(results, users_to_results, actions_to_results):
 
     # Initialize switch map; collect switch action results
     switched = {result.player.user: result.player.user for result in results}
-    switch_actions = results.filter(action_type=MafiaActionType.SWITCH.code)
+    switch_actions = actions.filter(action_type=MafiaActionType.SWITCH.code)
     switch_results = [actions_to_results[switch_action] for switch_action in switch_actions]
 
     # Fail if more than two switches
@@ -152,7 +152,7 @@ def _process_actions(actions):
 
     # Kill players targeting on-guard players
     for result in results:
-        action_type = MafiaAction.get_instance(result.action_type)
+        action_type = MafiaActionType.get_instance(result.action_type)
         # If covert, cannot be killed by on-guard player; continue
         if action_type.is_covert:
             continue
@@ -280,7 +280,7 @@ def _process_actions(actions):
                 )
 
     # Killing action: Snipe
-    for snipe_action in MafiaPlayerNight.objects.filter(action_type=MafiaActionType.SNIPE.code):
+    for snipe_action in MafiaAction.objects.filter(action_type=MafiaActionType.SNIPE.code):
         snipe_result = actions_to_results[snipe_action]
         if _kill_cancelled(snipe_result, died_from_killing):
             continue
@@ -292,7 +292,7 @@ def _process_actions(actions):
         target_result.add_targeted_by(snipe_result.player.user)
 
     # Killing action: Ignite
-    for ignite_action in MafiaPlayerNight.objects.filter(action_type=MafiaActionType.IGNITE.code):
+    for ignite_action in MafiaAction.objects.filter(action_type=MafiaActionType.IGNITE.code):
         ignite_result = actions_to_results[ignite_result]
         if _kill_cancelled(ignite_result, died_from_killing):
             continue
@@ -325,7 +325,7 @@ def _process_actions(actions):
     # TODO
 
     # Mark doused results
-    for douse_action in MafiaPlayerNight.objects.filter(action_type=MafiaActionType.DOUSE.code):
+    for douse_action in MafiaAction.objects.filter(action_type=MafiaActionType.DOUSE.code):
         douse_result = actions_to_results[douse_action]
         if douse_result.seduced_or_died:
             continue
@@ -334,7 +334,7 @@ def _process_actions(actions):
         target_result.add_targeted_by(douse_result.player.user)
 
     # Mark un-doused results
-    for un_douse_action in MafiaActionType.objects.filter(action_type=MafiaActionType.UN_DOUSE.code):
+    for un_douse_action in MafiaAction.objects.filter(action_type=MafiaActionType.UN_DOUSE.code):
         un_douse_result = actions_to_results[un_douse_action]
         if un_douse_result.seduced_or_died:
             continue
@@ -343,7 +343,7 @@ def _process_actions(actions):
         target_result.add_targeted_by(un_douse_result.player.user)
 
     # Mark disposed player results
-    for dispose_action in MafiaPlayerNight.objects.filter(action_type=MafiaActionType.DISPOSE.code):
+    for dispose_action in MafiaAction.objects.filter(action_type=MafiaActionType.DISPOSE.code):
         dispose_result = actions_to_results[dispose_action]
         if dispose_result.seduced_or_died:
             continue
@@ -354,12 +354,14 @@ def _process_actions(actions):
             dispose_result.action_effective = True
 
     # Mark remembered player results
-    for remember_action in MafiaPlayerNights.objects.filter(action_type=MafiaActionType.REMEMBER.code):
+    for remember_action in MafiaAction.objects.filter(action_type=MafiaActionType.REMEMBER.code):
         remember_result = actions_to_results[remember_action]
         if remember_result.seduced_or_died:
             continue
         remember_result.remembered = remember_result.target0_after_control
         remember_result.action_effective = True
+
+    return results
 
 def _get_name(user):
     return user.first_name + ' ' + user.last_name
@@ -407,8 +409,8 @@ def _watch(watcher_result, target_result):
 def _generate_reports(results):
     users_to_results = {result.player.user: result for result in results}
     for result in results:
-        name0 = _get_name(result.target0)
-        name1 = _get_name(result.target1)
+        name0 = _get_name(result.target0) if result.target0 else None
+        name1 = _get_name(result.target1) if result.target1 else None
         if result.died:
             result.add_report_line('YOU DIED!')
             continue
@@ -557,26 +559,24 @@ def _generate_reports(results):
 
     # TODO: received action reporting
 
-def _calc_results(game, night_number):
-    MafiaNightResults.objects.filter(game=game, night_number=game.day_number).delete()
-    actions = MafiaActions.objects.filter(game=game, night_number=game.day_number)
+def _calc_results(game):
+    MafiaNightResult.objects.filter(action__performer__game=game, action__night_number=game.day_number).delete()
+    actions = MafiaAction.objects.filter(performer__game=game, night_number=game.day_number)
     try:
         results = _process_actions(actions)
         _generate_reports(results)
+        for result in results:
+            result.save()
         return results
     except MafiaError as e:
         print 'Mafia: Error while processing actions or generating reports: ' + e
         return None
-    finally:
-        # Yes, we save errored results. That way we can go in and debug them.
-        for result in results:
-            result.save()
 
 def _inner_apply_results(players, results):
     pass # TODO
 
-def _apply_results(game, night_number, results):
-    players = MafiaPlayers.objects.filter(game=game, status=MafiaPlayerStatus.ALIVE.code)
+def _apply_results(game, results):
+    players = MafiaPlayer.objects.filter(game=game, status=MafiaPlayerStatus.ALIVE.code)
     try:
         _inner_apply_results(players, results)
     except MafiaError as e:
@@ -588,20 +588,27 @@ def _apply_results(game, night_number, results):
 
 def advance_game(game):
 
-    if game.time == MafiaGameTime.DAWN.code:
+    if game.time == MafiaGameTime.DAY.code:
         # TODO
-        game.time = MafiaGameTime.DUSK.code
-        return False # False -> error, not implemented
+        game.time = MafiaGameTime.NIGHT.code
+        return True
 
-    elif game.time == MafiaGameTime.DUSK.code:
-        results = _calc_results(game, night_number)
-        if not results:
+    elif game.time == MafiaGameTime.NIGHT.code:
+        results = _calc_results(game)
+        if results is None:
             return False
-        if not _apply_results(game, night_number, results):
+        if not _apply_results(game, results):
             return False
         game.day_number += 1
-        game.time = MafiaGameTime.DAWN.code
+        game.time = MafiaGameTime.DAY.code
         return True
 
     else:
         raise ValueError("invalid value of game.time: " + `game.time`)
+
+def start_game(game):
+    if game.day_number == 0:
+        game.day_number = 1
+        game.time = MafiaGameTime.DAY.code
+    else:
+        raise MafiaError('start_game: day_number must == 0')
