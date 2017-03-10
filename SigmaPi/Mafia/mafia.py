@@ -1,6 +1,26 @@
 
 from .models import *
 
+def _clear_previous_results(game):
+    MafiaNightResult.objects.filter(
+        action__performer__game=game,
+        action__night_number=game.day_number
+    ).delete()
+
+def _get_players_and_actions(game):
+    players = MafiaPlayer.objects.filter(
+        game=game, status=MafiaPlayerStatus.ALIVE.code
+    )
+    actions = MafiaAction.objects.filter(
+        performer__game=game, night_number=game.day_number
+    )
+    performers = set(action.performer for action in actions)
+    if performers != set(players):
+        raise MafiaError(
+            'set of alive players doesn\'t match set of action performers'
+        )
+    return players, actions
+
 def _do_single_switch(switcher0, switcher1, target0, target1, switch_map, users_to_results):
     temp = switch_map[target0]
     switch_map[target0] = switch_map[target1]
@@ -559,32 +579,8 @@ def _generate_reports(results):
 
     # TODO: received action reporting
 
-def _calc_results(game):
-    MafiaNightResult.objects.filter(action__performer__game=game, action__night_number=game.day_number).delete()
-    actions = MafiaAction.objects.filter(performer__game=game, night_number=game.day_number)
-    try:
-        results = _process_actions(actions)
-        _generate_reports(results)
-        for result in results:
-            result.save()
-        return results
-    except MafiaError as e:
-        print 'Mafia: Error while processing actions or generating reports: ' + e
-        return None
-
-def _inner_apply_results(players, results):
+def _apply_results(players, results):
     pass # TODO
-
-def _apply_results(game, results):
-    players = MafiaPlayer.objects.filter(game=game, status=MafiaPlayerStatus.ALIVE.code)
-    try:
-        _inner_apply_results(players, results)
-    except MafiaError as e:
-        print 'Mafia: Error while applying results: ' + e
-        return False
-    for player in players:
-        player.save()
-    return True
 
 def advance_game(game):
 
@@ -594,10 +590,18 @@ def advance_game(game):
         return True
 
     elif game.time == MafiaGameTime.NIGHT.code:
-        results = _calc_results(game)
-        if results is None:
-            return False
-        if not _apply_results(game, results):
+        try:
+            _clear_previous_results(game)
+            players, actions = _get_players_and_actions(game)
+            results = _process_actions(actions)
+            _generate_reports(results)
+            for result in results:
+                result.save()
+            _apply_results(players, results)
+            for player in players:
+                player.save()
+        except MafiaError as e:
+            print 'Mafia: Error while processing night: ' + e.message
             return False
         game.day_number += 1
         game.time = MafiaGameTime.DAY.code
