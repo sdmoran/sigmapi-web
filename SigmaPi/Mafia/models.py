@@ -59,7 +59,7 @@ class MafiaFaction(object):
     MAFIA = 'M'
     ROGUE = 'R'
 
-class MafiaAction(ChoiceEnumeration):
+class MafiaActionType(ChoiceEnumeration):
 
     CODE_LENGTH = 2
 
@@ -67,7 +67,7 @@ class MafiaAction(ChoiceEnumeration):
                  apparant_name=None, targets_dead=False,
                  can_target_self=True, is_direct_offense=False,
                  is_lethal=False, is_covert=False):
-        super(MafiaAction, self).__init__(code, name)
+        super(MafiaActionType, self).__init__(code, name)
         self.targets_can_be_self = targets_can_be_self
         self.apparant_name = apparant_name or name
         self.targets_can_be_self = targets_can_be_self
@@ -79,92 +79,92 @@ class MafiaAction(ChoiceEnumeration):
     def num_targets(self):
         return len(targets_can_be_self)
 
-MafiaAction.NO_ACTION = MafiaAction('NA', 'No Action', [])
-MafiaAction.CONTROL = MafiaAction('Co', 'Control', [False, True])
-MafiaAction.ON_GUARD = MafiaAction('OG', 'On Guard', [], is_lethal=True)
-MafiaAction.SEDUCE = MafiaAction('Se', 'Seduce', [False])
-MafiaAction.SWITCH = MafiaAction('Sw', 'Switch', [True, True])
-MafiaAction.FRAME = MafiaAction('Fr', 'Frame', 1)
-MafiaAction.INVESTIGATE = MafiaAction('In', 'Investigate', [False])
-MafiaAction.INSANE_INVESTIGATE = MafiaAction('II', 'Insane Investigate', [False], apparant_name='Investigate')
-MafiaAction.FORGETFUL_INVESTIGATE = MafiaAction('FI', 'Forgetful Investigate', [True])
-MafiaAction.SCRUTINIZE = MafiaAction('Sc', 'Scrutinize', 1)
-MafiaAction.PROTECT = MafiaAction('Pr', 'Protect', [False])
-MafiaAction.DEFEND = MafiaAction('De', 'Defend', 1, [False], is_lethal=True)
-MafiaAction.BULLETPROOF_VEST = MafiaAction('BV', 'Bulletproof Vest', [])
-MafiaAction.CORRUPT = MafiaAction('Co', 'Corrupt', [False], is_direct_offense=True)
-MafiaAction.SLAY = MafiaAction('Sl', 'Slay', [True], is_direct_offense=True, is_lethal=True)
-MafiaAction.AMBUSH = MafiaAction('Am', 'Ambush', [True], is_lethal=True)
-MafiaAction.SNIPE = MafiaAction('Sn', 'Snipe', [True], is_lethal=True, is_covert=True)
-MafiaAction.IGNITE = MafiaAction('Ig', 'Ignite', [], is_lethal=True)
-MafiaAction.SABOTAGE = MafiaAction('Sa', 'Sabotage', [True], is_lethal=True)
-MafiaAction.DOUSE = MafiaAction('Do', 'Douse', [True])
-MafiaAction.UN_DOUSE = MafiaAction('UD', 'Un-Douse', [True])
-MafiaAction.DISPOSE = MafiaAction('Di', 'Dispose', [True])
-MafiaAction.REVEAL = MafiaAction('Re', 'Reveal', [])
-MafiaAction.FOLLOW = MafiaAction('Fo', 'Follow', [True])
-MafiaAction.WATCH = MafiaAction('Wa', 'Watch', [True])
-MafiaAction.REMEMBER = MafiaAction('Re', 'Remember', [False], targets_dead=True)
+MafiaActionType.NO_ACTION = MafiaActionType('NA', 'No Action', [])
+MafiaActionType.CONTROL = MafiaActionType('Co', 'Control', [False, True])
+MafiaActionType.ON_GUARD = MafiaActionType('OG', 'On Guard', [], is_lethal=True)
+MafiaActionType.SEDUCE = MafiaActionType('Se', 'Seduce', [False])
+MafiaActionType.SWITCH = MafiaActionType('Sw', 'Switch', [True, True])
+MafiaActionType.FRAME = MafiaActionType('Fr', 'Frame', 1)
+MafiaActionType.INVESTIGATE = MafiaActionType('In', 'Investigate', [False])
+MafiaActionType.INSANE_INVESTIGATE = MafiaActionType('II', 'Insane Investigate', [False], apparant_name='Investigate')
+MafiaActionType.FORGETFUL_INVESTIGATE = MafiaActionType('FI', 'Forgetful Investigate', [True])
+MafiaActionType.SCRUTINIZE = MafiaActionType('Sc', 'Scrutinize', 1)
+MafiaActionType.PROTECT = MafiaActionType('Pr', 'Protect', [False])
+MafiaActionType.DEFEND = MafiaActionType('De', 'Defend', 1, [False], is_lethal=True)
+MafiaActionType.BULLETPROOF_VEST = MafiaActionType('BV', 'Bulletproof Vest', [])
+MafiaActionType.CORRUPT = MafiaActionType('Co', 'Corrupt', [False], is_direct_offense=True)
+MafiaActionType.SLAY = MafiaActionType('Sl', 'Slay', [True], is_direct_offense=True, is_lethal=True)
+MafiaActionType.AMBUSH = MafiaActionType('Am', 'Ambush', [True], is_lethal=True)
+MafiaActionType.SNIPE = MafiaActionType('Sn', 'Snipe', [True], is_lethal=True, is_covert=True)
+MafiaActionType.IGNITE = MafiaActionType('Ig', 'Ignite', [], is_lethal=True)
+MafiaActionType.SABOTAGE = MafiaActionType('Sa', 'Sabotage', [True], is_lethal=True)
+MafiaActionType.DOUSE = MafiaActionType('Do', 'Douse', [True])
+MafiaActionType.UN_DOUSE = MafiaActionType('UD', 'Un-Douse', [True])
+MafiaActionType.DISPOSE = MafiaActionType('Di', 'Dispose', [True])
+MafiaActionType.REVEAL = MafiaActionType('Re', 'Reveal', [])
+MafiaActionType.FOLLOW = MafiaActionType('Fo', 'Follow', [True])
+MafiaActionType.WATCH = MafiaActionType('Wa', 'Watch', [True])
+MafiaActionType.REMEMBER = MafiaActionType('Re', 'Remember', [False], targets_dead=True)
 
 class MafiaRole(ChoiceEnumeration):
 
     CODE_LENGTH = 2
 
-    def __init__(self, code, name, faction, actions, apparant_name=None,
+    def __init__(self, code, name, faction, action_types, apparant_name=None,
                  night_immune=False, immune_to_seduction=False,
                  min_in_game=0, max_in_game=float('inf')):
         super(MafiaRole, self).__init__(code, name)
         self.faction = faction
-        self.actions = actions
+        self.action_types = action_types
         self.apparant_name = apparant_name or name
 
 MafiaRole.MAYOR = MafiaRole(
     'VM', 'Mayor', MafiaFaction.VILLAGE,
-    [MafiaAction.REVEAL],
+    [MafiaActionType.REVEAL],
     min_in_game=1, max_in_game=1
 )
 MafiaRole.COP = MafiaRole(
     'VC', 'Cop', MafiaFaction.VILLAGE,
-    [MafiaAction.INVESTIGATE],
+    [MafiaActionType.INVESTIGATE],
 )
 MafiaRole.INSANE_COP = MafiaRole(
     'VI', 'Insane Cop', MafiaFaction.VILLAGE,
-    [MafiaAction.INSANE_INVESTIGATE],
+    [MafiaActionType.INSANE_INVESTIGATE],
     apparant_name='Cop'
 )
 MafiaRole.FORGETFUL_COP = MafiaRole(
     'VF',  'Forgetful Cop',  MafiaFaction.VILLAGE,
-    [MafiaAction.FORGETFUL_INVESTIGATE],
+    [MafiaActionType.FORGETFUL_INVESTIGATE],
 )
 MafiaRole.DOCTOR = MafiaRole(
     'VD', 'Doctor', MafiaFaction.VILLAGE,
-    [MafiaAction.PROTECT],
+    [MafiaActionType.PROTECT],
 )
 MafiaRole.BUS_DRIVER = MafiaRole(
     'VB', 'Bus Driver', MafiaFaction.VILLAGE,
-    [MafiaAction.SWITCH],
+    [MafiaActionType.SWITCH],
     max_in_game=1,
 )
 MafiaRole.TRACKER = MafiaRole(
     'VT',  'Tracker', MafiaFaction.VILLAGE,
-    [MafiaAction.FOLLOW],
+    [MafiaActionType.FOLLOW],
 )
 MafiaRole.WATCHER = MafiaRole(
     'VW',  'Watcher', MafiaFaction.VILLAGE,
-    [MafiaAction.WATCH],
+    [MafiaActionType.WATCH],
 )
 MafiaRole.ESCORT = MafiaRole(
     'VE',  'Escort', MafiaFaction.VILLAGE,
-    [MafiaAction.SEDUCE],
+    [MafiaActionType.SEDUCE],
     immune_to_seduction=True,
 )
 MafiaRole.VIGILANTE = MafiaRole(
     'VG',  'Vigilante', MafiaFaction.VILLAGE,
-    [MafiaAction.SEDUCE],
+    [MafiaActionType.SEDUCE],
 )
 MafiaRole.VETERAN = MafiaRole(
     'VV',  'Veteran', MafiaFaction.VILLAGE,
-    [MafiaAction.ON_GUARD],
+    [MafiaActionType.ON_GUARD],
 )
 MafiaRole.MILLER = MafiaRole(
     'VL',  'Miller', MafiaFaction.VILLAGE,
@@ -178,54 +178,54 @@ MafiaRole.BOMB = MafiaRole(
 )
 MafiaRole.BODYGUARD = MafiaRole(
     'VO',  'Bodyguard', MafiaFaction.VILLAGE,
-    [MafiaAction.DEFEND],
+    [MafiaActionType.DEFEND],
 )
 MafiaRole.DETECTIVE = MafiaRole(
     'VE',  'Detective', MafiaFaction.VILLAGE,
-    [MafiaAction.SCRUTINIZE],
+    [MafiaActionType.SCRUTINIZE],
 )
 MafiaRole.GODFATHER = MafiaRole(
     'MG', 'Godfather', MafiaFaction.MAFIA,
-    [MafiaAction.SLAY],
+    [MafiaActionType.SLAY],
     min_in_game=1, max_in_game=1,
 )
 MafiaRole.LIMO_DRIVER = MafiaRole(
     'ML', 'Limo Driver', MafiaFaction.MAFIA,
-    [MafiaAction.SWITCH],
+    [MafiaActionType.SWITCH],
     max_in_game=1,
 )
 MafiaRole.STALKER = MafiaRole(
     'MS', 'Stalker', MafiaFaction.MAFIA,
-    [MafiaAction.FOLLOW],
+    [MafiaActionType.FOLLOW],
 )
 MafiaRole.LOOKOUT = MafiaRole(
     'MK', 'Lookout', MafiaFaction.MAFIA,
-    [MafiaAction.WATCH],
+    [MafiaActionType.WATCH],
 )
 MafiaRole.HOOKER = MafiaRole(
     'MH',  'Hooker', MafiaFaction.MAFIA,
-    [MafiaAction.SEDUCE],
+    [MafiaActionType.SEDUCE],
     immune_to_seduction=True,
 )
 MafiaRole.JANITOR = MafiaRole(
     'MJ', 'Janitor', MafiaFaction.MAFIA,
-    [MafiaAction.DISPOSE],
+    [MafiaActionType.DISPOSE],
 )
 MafiaRole.FRAMER = MafiaRole(
     'MF', 'Framer', MafiaFaction.MAFIA,
-    [MafiaAction.FRAME],
+    [MafiaActionType.FRAME],
 )
 MafiaRole.YAKUZA = MafiaRole(
     'MY', 'Yakuza', MafiaFaction.MAFIA,
-    [MafiaAction.CORRUPT],
+    [MafiaActionType.CORRUPT],
 )
 MafiaRole.SABOTEUR = MafiaRole(
     'MA', 'Saboteur', MafiaFaction.MAFIA,
-    [MafiaAction.SABOTAGE],
+    [MafiaActionType.SABOTAGE],
 )
 MafiaRole.SNIPER = MafiaRole(
     'MI', 'Sniper', MafiaFaction.MAFIA,
-    [MafiaAction.SNIPE],
+    [MafiaActionType.SNIPE],
 )
 MafiaRole.BASIC_MAFIA = MafiaRole(
     'MB', 'Basic Mafia', MafiaFaction.MAFIA,
@@ -238,30 +238,30 @@ MafiaRole.JESTER = MafiaRole(
 )
 MafiaRole.SERIAL_KILLER = MafiaRole(
     'RK', 'Serial Killer', MafiaFaction.ROGUE,
-    [MafiaAction.SLAY],
+    [MafiaActionType.SLAY],
     night_immune=True,
 )
 MafiaRole.MASS_MURDERER = MafiaRole(
     'RM', 'Mass Murderer', MafiaFaction.ROGUE,
-    [MafiaAction.AMBUSH],
+    [MafiaActionType.AMBUSH],
 )
 MafiaRole.ARSONIST = MafiaRole(
     'RA', 'Arsonist', MafiaFaction.ROGUE,
-    [MafiaAction.DOUSE, MafiaAction.UN_DOUSE, MafiaAction.IGNITE],
+    [MafiaActionType.DOUSE, MafiaActionType.UN_DOUSE, MafiaActionType.IGNITE],
     night_immune=True,
 )
 MafiaRole.WITCH = MafiaRole(
     'RW', 'Witch', MafiaFaction.ROGUE,
-    [MafiaAction.CONTROL],
+    [MafiaActionType.CONTROL],
     immune_to_seduction=True,
 )
 MafiaRole.AMNESIAC = MafiaRole(
     'RE', 'Amnesiac', MafiaFaction.ROGUE,
-    [MafiaAction.REMEMBER],
+    [MafiaActionType.REMEMBER],
 )
 MafiaRole.SURVIVOR = MafiaRole(
     'RS', 'Survivor', MafiaFaction.ROGUE,
-    [MafiaAction.BULLETPROOF_VEST],
+    [MafiaActionType.BULLETPROOF_VEST],
 )
 MafiaRole.EXECUTIONER = MafiaRole(
     'RX', 'Executioner', MafiaFaction.ROGUE,
@@ -303,22 +303,20 @@ MafiaNightStatus.SAFE = MafiaNightStatus('N', 'Not Attacked')
 MafiaNightStatus.ATTACKED = MafiaNightStatus('A', 'Attacked')
 MafiaNightStatus.TERMINATED = MafiaNightStatus('T', 'Terimated')
 
-class MafiaPlayerNight(models.Model):
-
-    # Together, unique to each player night
-    player = models.ForeignKey(MafiaPlayer)
+class MafiaAction(models.Model):
+    performer = models.ForeignKey(MafiaPlayer)
     night_number = models.PositiveSmallIntegerField()
-
-    # Filled in by user
-    action = models.CharField(
-        max_length=MafiaAction.CODE_LENGTH,
-        choices=MafiaAction.get_choice_tuples(),
-        default=MafiaAction.NO_ACTION.code
+    action_type = models.CharField(
+        max_length=MafiaActionType.CODE_LENGTH,
+        choices=MafiaActionType.get_choice_tuples(),
+        default=MafiaActionType.NO_ACTION.code
     )
     target0 = models.ForeignKey(User, related_name='target0', null=True)
     target1 = models.ForeignKey(User, related_name='target1', null=True)
 
-    # Filled in during night processing
+class MafiaNightResult(models.Model):
+    action = models.OneToOneField(MafiaAction)
+
     switched_by_json = models.TextField(default='[]')
     protected_by_json = models.TextField(default='[]')
     defended_by_json = models.TextField(default='[]')
@@ -339,6 +337,22 @@ class MafiaPlayerNight(models.Model):
     disposed = models.BooleanField(default=False)
     action_effective = models.BooleanField(default=False)
     report = models.TextField(default="")
+
+    @property
+    def player(self):
+        return self.action.performer
+
+    @property
+    def action_type(self):
+        return self.action.action_type
+
+    @property
+    def target0(self):
+        return self.action.target0
+
+    @property
+    def target0(self):
+        return self.action.target1
 
     @property
     def target0_after_control(self):
@@ -392,11 +406,11 @@ class MafiaPlayerNight(models.Model):
 
     @property
     def on_guard(self):
-        return self.action == MafiaAction.ON_GUARD.code
+        return self.action_type == MafiaActionType.ON_GUARD.code
 
     @property
     def bulletproof(self):
-        return self.action == MafiaAction.BULLETPROOF_VEST.code
+        return self.action_type == MafiaActionType.BULLETPROOF_VEST.code
 
     def add_switched_by(self, user):
         self.switched_by_json = json.dumps(list(set(
