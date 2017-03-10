@@ -5,4 +5,6 @@ admin.site.register(MafiaGame)
 admin.site.register(MafiaPlayer)
 admin.site.register(MafiaAction)
 admin.site.register(MafiaNightResult)
+admin.site.register(MafiaVote)
+admin.site.register(MafiaDayResult)
 
