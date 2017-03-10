@@ -14,7 +14,7 @@ class MafiaTestCase(TestCase):
         username = (FIRST_NAMES[index][0] + role.name.replace(' ', '')).lower()
         user = User.objects.create_user(username, username + '@test.com', '123456')
         user.first_name = FIRST_NAMES[index]
-        user.last_name = role.name 
+        user.last_name = role.name
         user.save()
         player = MafiaPlayer(
             game=self.game, user=user, role=role.code, executioner_target=executioner_target
@@ -38,17 +38,29 @@ class MafiaTestCase(TestCase):
             action_type=MafiaActionType.NO_ACTION.code
         )
         mayor_action.save()
+        mayor_vote = MafiaVote(
+            voter=self.mayor, day_number=2,
+            vote_type=MafiaVoteType.LYNCH.code,
+            vote=self.mayor.user
+        )
+        mayor_vote.save()
 
         start_game(self.game)
 
     def test_mafia(self):
-        
+
+        self.assertTrue(advance_game(self.game))
         self.assertTrue(advance_game(self.game))
         self.assertTrue(advance_game(self.game))
 
         self.assertEqual(self.game.day_number, 2)
-        self.assertEqual(self.game.time, MafiaGameTime.DAY.code)
+        self.assertEqual(self.game.time, MafiaGameTime.NIGHT.code)
         self.assertEqual(self.mayor.status, MafiaPlayerStatus.ALIVE.code)
 
         mayor_result = MafiaNightResult.objects.get(action__performer=self.mayor)
         self.assertTrue(mayor_result.contains_report_line('You did not perform an action.'))
+
+        day1_result = MafiaDayResult.objects.get(game=self.game, day_number=1)
+        self.assertEqual(day1_result.lynched, None)
+        day2_result = MafiaDayResult.objects.get(game=self.game, day_number=2)
+        self.assertEqual(day2_result.lynched, self.mayor.user)

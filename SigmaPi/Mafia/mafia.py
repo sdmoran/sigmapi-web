@@ -1,6 +1,67 @@
 
 from .models import *
 
+def _do_lynch(game):
+
+    # If first day, no lynch
+    if game.day_number == 1:
+        result = MafiaDayResult(game=game, day_number=1, lynched=None)
+        result.save()
+        return
+
+    # Collect players and votes, and make sure query sets match
+    players = MafiaPlayer.objects.filter(
+        game=game, status=MafiaPlayerStatus.ALIVE.code
+    )
+    votes = MafiaVote.objects.filter(
+        voter__game=game, day_number=game.day_number
+    )
+    voters = set(vote.voter for vote in votes)
+    if voters != set(players):
+        raise MafiaError(
+            'set of alive players doesn\'t match set of voters'
+        )
+
+    # Tally votes
+    vote_tallies = {player.user: 0 for player in players}
+    vote_tallies[None] = 0
+    for vote in votes:
+        voting_power = (
+            3 if (
+                vote.voter.role == MafiaRole.MAYOR.code and
+                vote.voter.times_action_used >= 1
+            ) else 1
+        )
+        if vote.vote_type == MafiaVoteType.ABSTAIN.code:
+            continue
+        elif vote.vote_type == MafiaVoteType.NO_LYNCH.code:
+            vote_tallies[None] += voting_power
+        elif vote.vote_type == MafiaVoteType.LYNCH.code:
+            vote_tallies[vote.vote] += voting_power
+        else:
+            raise MafiaError('illegal value of MafiaVote.vote_type: ' + `vote`)
+
+    # Calculate who to lynch
+    lynchee = None
+    max_votes = 0
+    for user, num_votes in vote_tallies.iteritems():
+        if num_votes > max_votes:
+            lynchee = user
+            max_votes = num_votes
+        elif num_votes == max_votes:
+            lynchee = None
+
+    # Perform lynch, create result
+    if lynchee:
+        lynche_player = players.get(user=lynchee)
+        lynche_player.status = MafiaPlayerStatus.LYNCHED.code
+    result = MafiaDayResult(
+        game=game, day_number=game.day_number, lynched=lynchee
+    )
+    result.save()
+
+    # TODO: Sabateur and Jester stuff
+
 def _clear_previous_results(game):
     MafiaNightResult.objects.filter(
         action__performer__game=game,
@@ -585,7 +646,7 @@ def _apply_results(players, results):
 def advance_game(game):
 
     if game.time == MafiaGameTime.DAY.code:
-        # TODO
+        _do_lynch(game)
         game.time = MafiaGameTime.NIGHT.code
         return True
 

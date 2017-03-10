@@ -5,9 +5,9 @@ import json
 
 class ChoiceEnumeration(object):
 
-    def __init__(self, name, code):
-        self.name = name
+    def __init__(self, code, name):
         self.code = code
+        self.name = name
 
     @classmethod
     def get_instances(cls):
@@ -45,8 +45,8 @@ class MafiaGameStatus(ChoiceEnumeration):
 class MafiaGameTime(ChoiceEnumeration):
     CODE_LENGTH = 1
 
-MafiaGameTime.DAY = MafiaGameTime('A', 'Dawn')
-MafiaGameTime.NIGHT = MafiaGameTime('U', 'Dusk')
+MafiaGameTime.DAY = MafiaGameTime('D', 'Day')
+MafiaGameTime.NIGHT = MafiaGameTime('N', 'Night')
 
 class MafiaGame(models.Model):
     created = models.DateField()
@@ -301,7 +301,7 @@ class MafiaPlayer(models.Model):
         choices=MafiaPlayerStatus.get_choice_tuples(),
         default=MafiaPlayerStatus.ALIVE.code
     )
-    times_action_used = models.SmallIntegerField(default=0)
+    times_action_used = models.PositiveSmallIntegerField(default=0)
     doused = models.BooleanField(default=False)
     executioner_target = models.ForeignKey(User, null=True, related_name='executioner_target')
 
@@ -474,7 +474,29 @@ class MafiaNightResult(models.Model):
         self.report += line
 
     def contains_report_line(self, line):
-        return line in self.report.splitlines() 
+        return line in self.report.splitlines()
+
+class MafiaVoteType(ChoiceEnumeration):
+    CODE_LENGTH = 1
+
+MafiaVoteType.ABSTAIN = MafiaVoteType('A', 'Abstain')
+MafiaVoteType.NO_LYNCH = MafiaVoteType('N', 'No Lynch')
+MafiaVoteType.LYNCH = MafiaVoteType('L', 'Lynch')
+
+class MafiaVote(models.Model):
+    voter = models.ForeignKey(MafiaPlayer)
+    day_number = models.PositiveSmallIntegerField()
+    vote_type = models.CharField(
+        max_length=MafiaVoteType.CODE_LENGTH,
+        choices=MafiaVoteType.get_choice_tuples(),
+        default=MafiaVoteType.ABSTAIN.code
+    )
+    vote = models.ForeignKey(User, null=True)
+
+class MafiaDayResult(models.Model):
+    game = models.ForeignKey(MafiaGame)
+    day_number = models.PositiveSmallIntegerField()
+    lynched = models.ForeignKey(User, null=True)
 
 class MafiaError(Exception):
     pass
