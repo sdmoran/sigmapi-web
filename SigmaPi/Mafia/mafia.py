@@ -353,7 +353,7 @@ def _investigate(investigator_night, target_night):
         if investigator_night.action == MafiaAction.INSANE_INVESTIGATE.code
         else guilty
     )
-    return apparently_guilty ? 'GUILTY' : 'INNOCENT'
+    return 'GUILTY' if guilty else 'INNOCENT'
 
 def _scrutinize(target_night):
     role = MafiaRole.get_instance(target_night.role)
