@@ -123,11 +123,24 @@ class MafiaRole(ChoiceEnumeration):
 
     def __init__(self, code, name, faction, action_types, apparant_name=None,
                  night_immune=False, immune_to_seduction=False,
+                 hidden_to_mafia=False,
                  min_in_game=0, max_in_game=float('inf')):
         super(MafiaRole, self).__init__(code, name)
+
         self.faction = faction
         self.action_types = action_types
         self.apparant_name = apparant_name or name
+        self.night_immune = night_immune
+        self.immune_to_seduction = immune_to_seduction
+
+        if self.faction != MafiaFaction.MAFIA and hidden_to_mafia:
+            raise ValueError('MafiaRole: faction!=mafia but hidden_to_mafia==True')
+        self.hidden_to_mafia = hidden_to_mafia
+
+        if min_in_game > max_in_game:
+            raise ValueError('MafiaRole: min_in_game > max_in_game')
+        self.min_in_game = min_in_game
+        self.max_in_game = max_in_game
 
 MafiaRole.MAYOR = MafiaRole(
     'VM', 'Mayor', MafiaFaction.VILLAGE,
@@ -233,10 +246,12 @@ MafiaRole.YAKUZA = MafiaRole(
 MafiaRole.SABOTEUR = MafiaRole(
     'MA', 'Saboteur', MafiaFaction.MAFIA,
     [MafiaActionType.SABOTAGE],
+    hidden_to_mafia=True,
 )
 MafiaRole.SNIPER = MafiaRole(
     'MI', 'Sniper', MafiaFaction.MAFIA,
     [MafiaActionType.SNIPE],
+    hidden_to_mafia=True,
 )
 MafiaRole.BASIC_MAFIA = MafiaRole(
     'MB', 'Basic Mafia', MafiaFaction.MAFIA,
@@ -333,25 +348,25 @@ MafiaPlayerNightStatus.TERMINATED = MafiaPlayerNightStatus('T', 'Terimated')
 class MafiaPlayerNightResult(models.Model):
     action = models.OneToOneField(MafiaAction)
 
+    controlled_to_target = models.ForeignKey(User, null=True, related_name='controlled_to_target')
     switched_by_json = models.TextField(default='[]')
+    switched_with = models.ForeignKey(User, null=True, related_name='switched_with')
+    attempted_seduced = models.BooleanField(default=False)
+    framed = models.BooleanField(default=False)
     protected_by_json = models.TextField(default='[]')
     defended_by_json = models.TextField(default='[]')
-    other_targeted_by_json = models.TextField(default='[]')
-    controlled_to_target = models.ForeignKey(User, null=True, related_name='controlled_to_target')
-    switched_with = models.ForeignKey(User, null=True, related_name='switched_with')
-    remembered = models.ForeignKey(User, null=True, related_name='remembered')
+    attempted_corrupted = models.BooleanField(default=False)
     status = models.CharField(
         max_length=MafiaPlayerNightStatus.CODE_LENGTH,
         choices=MafiaPlayerNightStatus.get_choice_tuples(),
         default=MafiaPlayerNightStatus.SAFE.code
     )
-    attempted_seduced = models.BooleanField(default=False)
-    framed = models.BooleanField(default=False)
-    attempted_corrupted = models.BooleanField(default=False)
     doused = models.BooleanField(default=False)
     un_doused = models.BooleanField(default=False)
     disposed = models.BooleanField(default=False)
+    remembered = models.ForeignKey(User, null=True, related_name='remembered')
     action_effective = models.BooleanField(default=False)
+    other_targeted_by_json = models.TextField(default='[]')
     report = models.TextField(default='')
 
     @property
@@ -428,7 +443,7 @@ class MafiaPlayerNightResult(models.Model):
     def bulletproof(self):
         return self.action_type == MafiaActionType.BULLETPROOF_VEST.code
 
-    def add_switched_by(self, user):
+    def add_switched_by(self):
         self.switched_by_json = json.dumps(list(set(
             json.loads(self.switched_by_json) + [user.username]
         )))
@@ -437,17 +452,22 @@ class MafiaPlayerNightResult(models.Model):
         self.switched_by_json = '[]'
         self.switched_with = None
 
-    def add_targeted_by(self, user):
-        self.other_targeted_by_json = json.dumps(list(set(
-            json.loads(self.other_targeted_by_json) + [user.username]
-        )))
+    def get_switched_by(self):
+        return [
+            User.get(username=username)
+            for username in json.loads(self.switched_by_json)
+        ]
+
+    @property
+    def times_switched(self):
+        return len(json.loads(self.switched_by_json))
 
     def add_protected_by(self, user):
         self.protected_by_json = json.dumps(list(set(
             json.loads(self.protected_by_json) + [user.username]
         )))
 
-    def get_protected_by(self, user):
+    def get_protected_by(self):
         return [
             User.get(username=username)
             for username in json.loads(self.protected_by_json)
@@ -463,6 +483,11 @@ class MafiaPlayerNightResult(models.Model):
             User.get(username=username)
             for username in json.loads(self.defended_by_json)
         ]
+
+    def add_targeted_by(self, user):
+        self.other_targeted_by_json = json.dumps(list(set(
+            json.loads(self.other_targeted_by_json) + [user.username]
+        )))
 
     def get_targeted_by(self):
         return [

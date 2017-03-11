@@ -135,7 +135,7 @@ def _clear_previous_night_results(game):
         action__night_number=game.day_number
     ).delete()
 
-def _get_players_and_actions(game):
+def _get_actions(game):
     players = MafiaPlayer.objects.filter(
         game=game, status=MafiaPlayerStatus.ALIVE.code
     )
@@ -147,7 +147,7 @@ def _get_players_and_actions(game):
         raise MafiaError(
             'set of alive players doesn\'t match set of action performers'
         )
-    return players, actions
+    return actions
 
 def _do_single_switch(switcher0, switcher1, target0, target1, switch_map, users_to_results):
     temp = switch_map[target0]
@@ -554,14 +554,43 @@ def _watch(watcher_result, target_result):
     #    set(target_night.get_targeted_by()) - set([follower_night.player.user])
     #))
 
+def _get_mafia_names(other_than, results):
+    res = ''
+    for result in results:
+        role = MafiaRole.get_instance(result.player.role)
+        shown = (not results.died) and (
+            (result.corrupted and result != other_than) or
+            (role.faction == MafiaFaction.MAFIA and not role.hidden_to_mafia)
+        )
+        if not shown:
+            continue
+        if not res:
+            res += ', '
+        res += _get_name(result.player.user)
+        if role == MafiaRole.GODFATHER:
+            res += ' (Godfather)'
+    return res
+
 def _generate_reports(results):
     users_to_results = {result.player.user: result for result in results}
+
     for result in results:
-        name0 = _get_name(result.target0) if result.target0 else None
-        name1 = _get_name(result.target1) if result.target1 else None
+        name0 = _get_name(result.target0) if result.target0_after_control else None
+        name1 = _get_name(result.target1) if result.target1_after_control else None
+
+        # If died, report death, and only report that
         if result.died:
             result.add_report_line('YOU DIED!')
             continue
+
+        # Report controlling
+        if result.controlled_to_target:
+            result.add_report_line(
+                'You were controlled to target ' +
+                _get_name(result.controlled_to_target)
+            )
+
+        # Report action
         if result.action_type == MafiaActionType.NO_ACTION.code:
             result.add_report_line(
                 'You did not perform an action.'
@@ -705,9 +734,47 @@ def _generate_reports(results):
                 'You are now a ' + MafiaRole.get_instance(new_role).name + '!'
             )
 
-    # TODO: received action reporting
+        # Report switching
+        times_switched = result.times_switched
+        if times_switched == 1:
+            result.add_report_line('You were switched.')
+        elif times_switched == 2:
+            result.add_report_line('You were switched twice.')
+        elif times_switched >= 3:
+            raise MafiaError(result.player.username + ' switched more than twice')
 
-def _apply_results(players, results):
+        # Report corruption
+        if result.corrupted:
+            other_mafia_names = _get_mafia_names(result, results)
+            result.add_report_line(
+                'You have been corrupted! You are now a basic Mafia member. ' +
+                'You now win and lose with the rest of the Mafia. ' + (
+                    (
+                        'The other Mafia living members that you know of are: ' +
+                        other_mafia_names + '.'
+                    ) if other_mafia_names
+                    else 'You do not know of any other living Mafia members.'
+                )
+
+            )
+
+        # Report if attacked
+        if result.status == MafiaPlayerNightStatus.ATTACKED.code:
+            result.add_report_line('You were attacked but survived.')
+
+        # Report seduction
+        if result.attempted_seduced and not result.seduced:
+            result.add_report_line('Someone attempted to seduce you.')
+
+        # Report dousing
+        if result.doused:
+            result.add_report_line('You were doused.')
+        if result.un_doused:
+            result.add_report_line('You were un-doused.')
+
+
+
+def _apply_results(results):
     pass # TODO
 
 def get_default_night_description(results):
@@ -723,14 +790,14 @@ def end_night(game):
         return False
     try:
         _clear_previous_night_results(game)
-        players, actions = _get_players_and_actions(game)
+        actions = _get_actions(game)
         results = _process_actions(actions)
         _generate_reports(results)
         for result in results:
             result.save()
-        _apply_results(players, results)
-        for player in players:
-            player.save()
+        _apply_results(results)
+        for result in results:
+            result.player.save()
         result = MafiaNightResult(game=game, night_number=game.day_number)
         result.description = get_default_night_description(results)
     except MafiaError as e:
