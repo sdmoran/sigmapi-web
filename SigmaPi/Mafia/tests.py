@@ -2,7 +2,7 @@
 import datetime
 from django.test import TestCase
 from django.contrib.auth.models import User
-from mafia import start_game, advance_game
+from mafia import *
 from .models import *
 
 class MafiaTestCase(TestCase):
@@ -33,31 +33,27 @@ class MafiaTestCase(TestCase):
         self.mod.save()
         self.mayor = self.create_player(MafiaRole.MAYOR, 0)
 
-        mayor_action = MafiaAction(
-            performer=self.mayor, night_number=1,
-            action_type=MafiaActionType.NO_ACTION.code
-        )
-        mayor_action.save()
-        mayor_vote = MafiaVote(
-            voter=self.mayor, day_number=2,
-            vote_type=MafiaVoteType.LYNCH.code,
-            vote=self.mayor.user
-        )
-        mayor_vote.save()
-
-        start_game(self.game)
-
     def test_mafia(self):
 
-        self.assertTrue(advance_game(self.game))
-        self.assertTrue(advance_game(self.game))
-        self.assertTrue(advance_game(self.game))
+        self.assertTrue(begin_game(self.game))
+        self.assertTrue(end_day(self.game))
+        self.assertTrue(begin_night(self.game))
+        self.assertTrue(end_night(self.game))
+        self.assertTrue(begin_day(self.game))
 
+        mayor_vote = MafiaVote.objects.get(voter=self.mayor, day_number=2)
+        mayor_vote.vote_type = MafiaVoteType.LYNCH.code
+        mayor_vote.vote = self.mayor.user
+        mayor_vote.save()
+
+        self.assertTrue(end_day(self.game))
+
+        self.mayor.refresh_from_db()
         self.assertEqual(self.game.day_number, 2)
-        self.assertEqual(self.game.time, MafiaGameTime.NIGHT.code)
-        self.assertEqual(self.mayor.status, MafiaPlayerStatus.ALIVE.code)
+        self.assertEqual(self.game.time, MafiaGameTime.DUSK.code)
+        self.assertEqual(self.mayor.status, MafiaPlayerStatus.LYNCHED.code)
 
-        mayor_result = MafiaNightResult.objects.get(action__performer=self.mayor)
+        mayor_result = MafiaPlayerNightResult.objects.get(action__performer=self.mayor)
         self.assertTrue(mayor_result.contains_report_line('You did not perform an action.'))
 
         day1_result = MafiaDayResult.objects.get(game=self.game, day_number=1)

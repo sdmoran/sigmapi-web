@@ -1,13 +1,40 @@
 
 from .models import *
 
-def _do_lynch(game):
+def _check_role_requirements(game):
+    pass # TODO
 
-    # If first day, no lynch
-    if game.day_number == 1:
-        result = MafiaDayResult(game=game, day_number=1, lynched=None)
-        result.save()
-        return
+def begin_game(game):
+    if game.day_number != 0:
+        print 'Mafia: Bad function call: begin_game when game.day_number != 0'
+        return False
+    try:
+        _check_role_requirements(game)
+    except MafiaError as e:
+        print 'Mafia: Error while checking role requirements: ' + e.message
+        return False
+    game.day_number = 1
+    game.time = MafiaGameTime.DAY.code
+    game.save()
+    return True
+
+def begin_day(game):
+    if game.day_number < 2:
+        print 'Mafia: Bad function call: begin_day when game.day_number < 0'
+        return False
+    if game.time != MafiaGameTime.DAWN.code:
+        print 'Mafia: Bad function call: begin_day when not dawn'
+        return False
+    players = MafiaPlayer.objects.filter(
+        game=game, status=MafiaPlayerStatus.ALIVE.code
+    )
+    for player in players:
+        MafiaVote(voter=player, day_number=game.day_number).save()
+    game.time = MafiaGameTime.DAY.code
+    game.save()
+    return True
+
+def _do_lynch(game):
 
     # Collect players and votes, and make sure query sets match
     players = MafiaPlayer.objects.filter(
@@ -40,6 +67,7 @@ def _do_lynch(game):
             vote_tallies[vote.vote] += voting_power
         else:
             raise MafiaError('illegal value of MafiaVote.vote_type: ' + `vote`)
+    print vote_tallies
 
     # Calculate who to lynch
     lynchee = None
@@ -55,15 +83,54 @@ def _do_lynch(game):
     if lynchee:
         lynche_player = players.get(user=lynchee)
         lynche_player.status = MafiaPlayerStatus.LYNCHED.code
+        lynche_player.save()
     result = MafiaDayResult(
         game=game, day_number=game.day_number, lynched=lynchee
     )
-    result.save()
 
     # TODO: Sabateur and Jester stuff
+    return result
 
-def _clear_previous_results(game):
-    MafiaNightResult.objects.filter(
+def get_default_day_description(result):
+    return 'default day description not implemented'
+    # TODO
+
+def end_day(game):
+    if game.day_number < 1:
+        print 'Mafia: Bad function call: end_day when game.day_number < 1'
+        return False
+    if game.time != MafiaGameTime.DAY.code:
+        print 'Mafia: Bad function call: end_day when not day'
+        return False
+    result = (
+        MafiaDayResult(game=game, day_number=1, lynched=None)
+        if game.day_number == 1
+        else _do_lynch(game)
+    )
+    result.description = get_default_day_description(result)
+    result.save()
+    game.time = MafiaGameTime.DUSK.code
+    game.save()
+    return True
+
+def begin_night(game):
+    if game.day_number < 1:
+        print 'Mafia: Bad function call: begin_night when game.day_number < 1'
+        return False
+    if game.time != MafiaGameTime.DUSK.code:
+        print 'Mafia: Bad function call: begin_night when not dusk'
+        return False
+    players = MafiaPlayer.objects.filter(
+        game=game, status=MafiaPlayerStatus.ALIVE.code
+    )
+    for player in players:
+        MafiaAction(performer=player, night_number=game.day_number).save()
+    game.time = MafiaGameTime.NIGHT.code
+    game.save()
+    return True
+
+def _clear_previous_night_results(game):
+    MafiaPlayerNightResult.objects.filter(
         action__performer__game=game,
         action__night_number=game.day_number
     ).delete()
@@ -196,9 +263,9 @@ def _kill_if_alive(killer_result, target_result, killed_status, killed_set, user
         killer_result.action_effective = True
         return
     target_result.status = (
-        MafiaNightStatus.TERMINATED
-        if MafiaNightStatus.TERMINATD.code in [target_result.status, killed_status]
-        else MafiaNightStatus.ATTACKED
+        MafiaPlayerNightStatus.TERMINATED
+        if MafiaPlayerNightStatus.TERMINATD.code in [target_result.status, killed_status]
+        else MafiaPlayerNightStatus.ATTACKED
     )
     if target_result.died:
         killer_result.action_effective = True
@@ -212,7 +279,7 @@ def _kill_if_alive(killer_result, target_result, killed_status, killed_set, user
 def _process_actions(actions):
 
     # Generate results and map from users to results
-    results = [MafiaNightResult(action=action) for action in actions]
+    results = [MafiaPlayerNightResult(action=action) for action in actions]
     actions_to_results = {result.action: result for result in results}
     users_to_results = {result.player.user: result for result in results}
 
@@ -225,7 +292,7 @@ def _process_actions(actions):
         t0_result = users_to_results[control_result.target0]
         # If target0 on guard, terminate controller
         if t0_result.on_guard:
-            control_result.attacked_status = MafiaNightStatus.TERMINATED.code
+            control_result.attacked_status = MafiaPlayerNightStatus.TERMINATED.code
             t0_result.action_effective = True
         # Else, control target0 to target target1
         else:
@@ -242,18 +309,18 @@ def _process_actions(actions):
             t1_result = users_to_results[result.target1_after_control.user]
             # If so, terminate performer
             if t1_result.on_guard:
-                result.attacked_status = MafiaNightStatus.TERMINATED.code
+                result.attacked_status = MafiaPlayerNightStatus.TERMINATED.code
                 t1_result.action_effective = True
         # If one or more targets, check if target0 is on guard
         if action_type.num_targets >= 1:
             t0_result = users_to_results[result.target1_after_control.user]
             # If so, terminate performer
             if t0_result.on_guard:
-                result.attacked_status = MafiaNightStatus.TERMINATED.code
+                result.attacked_status = MafiaPlayerNightStatus.TERMINATED.code
                 t0_result.action_effective = True
         # If action was direct offense, mark on-guard player as attacked
         if action_type.is_direct_offense:
-            t0_result.attacked_status = MafiaNightStatus.ATTACKED.code
+            t0_result.attacked_status = MafiaPlayerNightStatus.ATTACKED.code
 
     # Repeat switching and seduction until we reach a stable state
     switched, seduced = None, None
@@ -299,8 +366,8 @@ def _process_actions(actions):
         action_type = MafiaActionType.get_instance(result.action_type)
         if action_type.is_direct_offense and not action_type.is_covert:
             for defender in target_result.get_defended_by():
-                result.status = MafiaNightStatus.TERMINATED
-                users_to_results[defender].status = MafiaNightStatus.TERMINATED.code
+                result.status = MafiaPlayerNightStatus.TERMINATED
+                users_to_results[defender].status = MafiaPlayerNightStatus.TERMINATED.code
                 users_to_results[defender].action_effective = True
 
     # Mark corrupted player results; kill corrupter if successful
@@ -312,7 +379,7 @@ def _process_actions(actions):
         target_result.attempted_corrupted = True
         target_result.add_targeted_by(corrupt_result.player.user)
         if target_result.corrupted:
-            corrupt_result.status = MafiaNightStatus.TERMINATED.code
+            corrupt_result.status = MafiaPlayerNightStatus.TERMINATED.code
 
     # Perform all remaining killing actions and roles with same priority
     died_from_killing = set()
@@ -324,7 +391,7 @@ def _process_actions(actions):
             continue
         target_result = users_to_results[switched[slay_result.target0_after_control]]
         _kill_if_alive(
-            slay_result, target_result, MafiaNightStatus.ATTACKED,
+            slay_result, target_result, MafiaPlayerNightStatus.ATTACKED,
             died_from_killing, users_to_results
         )
         target_result.add_targeted_by(slay_result.player.user)
@@ -356,7 +423,7 @@ def _process_actions(actions):
             )
             if died_in_ambush:
                 _kill_if_alive(
-                    ambush_result, result, MafiaNightStatus.ATTACKED,
+                    ambush_result, result, MafiaPlayerNightStatus.ATTACKED,
                     died_from_killing, users_to_results
                 )
 
@@ -367,7 +434,7 @@ def _process_actions(actions):
             continue
         target_result = users_to_results[snipe_result.target0] # NOT SWITCHED OR CONTROLLED
         _kill_if_alive(
-            snipe_result, target_result, MafiaNightStatus.TERMINATED,
+            snipe_result, target_result, MafiaPlayerNightStatus.TERMINATED,
             died_from_killing, users_to_results
         )
         target_result.add_targeted_by(snipe_result.player.user)
@@ -380,7 +447,7 @@ def _process_actions(actions):
         for result in results:
             if result.player.doused:
                 _kill_if_alive(
-                    ignite_result, result, MafiaNightStatus.TERMINATED,
+                    ignite_result, result, MafiaPlayerNightStatus.TERMINATED,
                     died_from_killing, users_to_results
                 )
         break # Only need to do ignite once
@@ -395,7 +462,7 @@ def _process_actions(actions):
             is_direct_offense = MafiaActionType.get_instance(result.action_type).is_direct_offense
             if is_direct_offense:
                 _kill_if_alive(
-                    bomb_results[0], result, MafiaNightStatus.TERMINATED,
+                    bomb_results[0], result, MafiaPlayerNightStatus.TERMINATED,
                     died_from_killing, users_to_results
                 )
 
@@ -550,28 +617,28 @@ def _generate_reports(results):
             )
         elif result.action_type == MafiaActionType.PROTECT.code:
             protect_target = users_to_results[result.target0]
-            if protect_target.status == MafiaNightStatus.SAFE.code:
+            if protect_target.status == MafiaPlayerNightStatus.SAFE.code:
                 result.add_report_line(
                     'You protected ' + name + ', but they were not attacked.'
                 )
-            elif protect_target.status == MafiaNightStatus.ATTACKED.code:
+            elif protect_target.status == MafiaPlayerNightStatus.ATTACKED.code:
                 result.add_report_line(
                     'You successfully protected ' + name0 +
                     ' from an attack.'
                 )
-            elif protect_target.status == MafiaNightStatus.TERMINATED.code:
+            elif protect_target.status == MafiaPlayerNightStatus.TERMINATED.code:
                 result.add_report_line(
                     'You protected ' + name0 + ', but they died anyway.'
                 )
         elif result.action_type == MafiaActionType.DEFEND.code:
             defend_target = users_to_results[result.target0]
-            if defend_target.status == MafiaNightStatus.SAFE.code:
+            if defend_target.status == MafiaPlayerNightStatus.SAFE.code:
                 result.add_report_line(
                     'You defended ' + name + ', but they were not attacked.'
                 )
-            elif defend_target.status == MafiaNightStatus.ATTACKED.code:
+            elif defend_target.status == MafiaPlayerNightStatus.ATTACKED.code:
                 raise MafiaError("defended target was attacked but defender is alive")
-            elif defend_target.status == MafiaNightStatus.TERMINATED.code:
+            elif defend_target.status == MafiaPlayerNightStatus.TERMINATED.code:
                 result.add_report_line(
                     'You defended ' + name0 + ', but they died anyway.'
                 )
@@ -588,7 +655,7 @@ def _generate_reports(results):
                 )
         elif result.action_type == MafiaActionType.SLAY.code:
             slay_target = users_to_results[result.target0]
-            if slay_target.status == MafiaNightStatus.SAFE:
+            if slay_target.status == MafiaPlayerNightStatus.SAFE:
                 result.add_report_line(
                     'You attempted to slay ' + name + ', but they survived.'
                 )
@@ -643,33 +710,35 @@ def _generate_reports(results):
 def _apply_results(players, results):
     pass # TODO
 
-def advance_game(game):
+def get_default_night_description(results):
+    return 'default night description not implemented'
+    # TODO
 
-    if game.time == MafiaGameTime.DAY.code:
-        _do_lynch(game)
-        game.time = MafiaGameTime.NIGHT.code
-        return True
-
-    elif game.time == MafiaGameTime.NIGHT.code:
-        try:
-            _clear_previous_results(game)
-            players, actions = _get_players_and_actions(game)
-            results = _process_actions(actions)
-            _generate_reports(results)
-            for result in results:
-                result.save()
-            _apply_results(players, results)
-            for player in players:
-                player.save()
-        except MafiaError as e:
-            print 'Mafia: Error while processing night: ' + e.message
-            return False
-        game.day_number += 1
-        game.time = MafiaGameTime.DAY.code
-        return True
-
-    else:
-        raise ValueError("invalid value of game.time: " + `game.time`)
+def end_night(game):
+    if game.day_number < 1:
+        print 'Mafia: Bad function call: end_night when game.day_number < 1'
+        return False
+    if game.time != MafiaGameTime.NIGHT.code:
+        print 'Mafia: Bad function call: end_night when not night'
+        return False
+    try:
+        _clear_previous_night_results(game)
+        players, actions = _get_players_and_actions(game)
+        results = _process_actions(actions)
+        _generate_reports(results)
+        for result in results:
+            result.save()
+        _apply_results(players, results)
+        for player in players:
+            player.save()
+        result = MafiaNightResult(game=game, night_number=game.day_number)
+        result.description = get_default_night_description(results)
+    except MafiaError as e:
+        print 'Mafia: Error while processing night: ' + e.message
+        return False
+    game.day_number += 1
+    game.time = MafiaGameTime.DAWN.code
+    return True
 
 def start_game(game):
     if game.day_number == 0:

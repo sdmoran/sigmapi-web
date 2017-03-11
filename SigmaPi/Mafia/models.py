@@ -45,7 +45,9 @@ class MafiaGameStatus(ChoiceEnumeration):
 class MafiaGameTime(ChoiceEnumeration):
     CODE_LENGTH = 1
 
+MafiaGameTime.DAWN = MafiaGameTime('A', 'Dawn')
 MafiaGameTime.DAY = MafiaGameTime('D', 'Day')
+MafiaGameTime.DUSK = MafiaGameTime('U', 'Dusk')
 MafiaGameTime.NIGHT = MafiaGameTime('N', 'Night')
 
 class MafiaGame(models.Model):
@@ -55,7 +57,7 @@ class MafiaGame(models.Model):
     time = models.CharField(
         max_length=MafiaGameTime.CODE_LENGTH,
         choices=MafiaGameTime.get_choice_tuples(),
-        default=MafiaGameTime.DAY
+        default=MafiaGameTime.DUSK
     )
     finished = models.BooleanField(default=False)
 
@@ -305,12 +307,10 @@ class MafiaPlayer(models.Model):
     doused = models.BooleanField(default=False)
     executioner_target = models.ForeignKey(User, null=True, related_name='executioner_target')
 
-class MafiaNightStatus(ChoiceEnumeration):
-    CODE_LENGTH = 1
-
-MafiaNightStatus.SAFE = MafiaNightStatus('S', 'Safe')
-MafiaNightStatus.ATTACKED = MafiaNightStatus('A', 'Attacked')
-MafiaNightStatus.TERMINATED = MafiaNightStatus('T', 'Terimated')
+class MafiaNightResult(models.Model):
+    game = models.ForeignKey(MafiaGame)
+    night_number = models.PositiveSmallIntegerField()
+    description = models.TextField(default='')
 
 class MafiaAction(models.Model):
     performer = models.ForeignKey(MafiaPlayer)
@@ -323,7 +323,14 @@ class MafiaAction(models.Model):
     target0 = models.ForeignKey(User, related_name='target0', null=True)
     target1 = models.ForeignKey(User, related_name='target1', null=True)
 
-class MafiaNightResult(models.Model):
+class MafiaPlayerNightStatus(ChoiceEnumeration):
+    CODE_LENGTH = 1
+
+MafiaPlayerNightStatus.SAFE = MafiaPlayerNightStatus('S', 'Safe')
+MafiaPlayerNightStatus.ATTACKED = MafiaPlayerNightStatus('A', 'Attacked')
+MafiaPlayerNightStatus.TERMINATED = MafiaPlayerNightStatus('T', 'Terimated')
+
+class MafiaPlayerNightResult(models.Model):
     action = models.OneToOneField(MafiaAction)
 
     switched_by_json = models.TextField(default='[]')
@@ -334,9 +341,9 @@ class MafiaNightResult(models.Model):
     switched_with = models.ForeignKey(User, null=True, related_name='switched_with')
     remembered = models.ForeignKey(User, null=True, related_name='remembered')
     status = models.CharField(
-        max_length=MafiaNightStatus.CODE_LENGTH,
-        choices=MafiaNightStatus.get_choice_tuples(),
-        default=MafiaNightStatus.SAFE.code
+        max_length=MafiaPlayerNightStatus.CODE_LENGTH,
+        choices=MafiaPlayerNightStatus.get_choice_tuples(),
+        default=MafiaPlayerNightStatus.SAFE.code
     )
     attempted_seduced = models.BooleanField(default=False)
     framed = models.BooleanField(default=False)
@@ -345,7 +352,7 @@ class MafiaNightResult(models.Model):
     un_doused = models.BooleanField(default=False)
     disposed = models.BooleanField(default=False)
     action_effective = models.BooleanField(default=False)
-    report = models.TextField(default="")
+    report = models.TextField(default='')
 
     @property
     def player(self):
@@ -388,8 +395,8 @@ class MafiaNightResult(models.Model):
     @property
     def died(self):
         return (
-            self.status == MafiaNightStatus.TERMINATED or (
-                self.status == MafiaNightStatus.ATTACKED.code and
+            self.status == MafiaPlayerNightStatus.TERMINATED or (
+                self.status == MafiaPlayerNightStatus.ATTACKED.code and
                 not self._resisted
             )
         )
@@ -470,7 +477,7 @@ class MafiaNightResult(models.Model):
 
     def add_report_line(self, line):
         if self.report:
-            self.report += "\n"
+            self.report += '\n'
         self.report += line
 
     def contains_report_line(self, line):
@@ -492,11 +499,13 @@ class MafiaVote(models.Model):
         default=MafiaVoteType.ABSTAIN.code
     )
     vote = models.ForeignKey(User, null=True)
+    comment = models.TextField(default='')
 
 class MafiaDayResult(models.Model):
     game = models.ForeignKey(MafiaGame)
     day_number = models.PositiveSmallIntegerField()
     lynched = models.ForeignKey(User, null=True)
+    description = models.TextField(default="")
 
 class MafiaError(Exception):
     pass
