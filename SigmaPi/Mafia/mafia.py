@@ -56,7 +56,7 @@ def _do_lynch(game):
         voting_power = (
             3 if (
                 vote.voter.role == MafiaRole.MAYOR.code and
-                vote.voter.times_action_used >= 1
+                vote.voter.revealed_as_mayor
             ) else 1
         )
         if vote.vote_type == MafiaVoteType.ABSTAIN.code:
@@ -541,7 +541,7 @@ def _investigate(investigator_result, target_result):
 
 def _scrutinize(target_result):
     role = MafiaRole.get_instance(target_result.player.role)
-    return len(0 for at in role.action_types if at.is_lethal) >= 1
+    return len(0 for at, uses in role.action_types if at.is_lethal) >= 1
 
 def _follow(target_result, users_to_results):
     return '' # TODO
@@ -595,19 +595,26 @@ def _generate_reports(results):
             result.add_report_line(
                 'You did not perform an action.'
             )
+            # Report seduction (but no action)
             if result.seduced:
                 result.add_report_line(
                     'You were seduced.'
                 )
+
+        # Report seduction causing to forget action
         elif result.seduced:
             result.add_report_line(
                 'You were seduced and forgot to perform your action.'
             )
+
+        # Report doing controlling
         elif result.action_type == MafiaActionType.CONTROL.code:
             result.add_report_line(
                 'You controlled ' + name0 +
                 ' to target ' + name1 + '.'
             )
+
+        # Report going on guard
         elif result.action_type == MafiaActionType.ON_GUARD.code:
             result.add_report_line(
                 'You went on guard' + (
@@ -615,19 +622,27 @@ def _generate_reports(results):
                     else '.'
                 )
             )
+
+        # Report doing seduction
         elif result.action_type == MafiaActionType.SEDUCE.code:
             result.add_report_line(
                 'You may have seduced ' + name0 + '.'
             )
+
+        # Report doing switch
         elif result.action_type == MafiaActionType.SWITCH.code:
             result.add_report_line(
                 'You switched ' + name0 + ' and ' +
                 _get_name(result.target1) + '.'
             )
+
+        # Report doing framing
         elif result.action_type == MafiaActionType.FRAME.code:
             result.add_report_line(
                 'You framed ' + name0 + '.'
             )
+
+        # Report doing investigation
         elif result.action_type in [MafiaActionType.INVESTIGATE.code, MafiaActionType.INSANE_INVESTIGATE.code]:
             result.add_report_line(
                 'You investigated ' + name0 +
@@ -637,6 +652,8 @@ def _generate_reports(results):
                     users_to_results[users_to_results[result.target0].switched_with]
                 ) + '.'
             )
+
+        # Report doing scrutinizing
         elif result.action_type == MafiaActionType.SCRUTINIZE.code:
             result.add_report_line(
                 'You scrutinized ' + name0 +
@@ -644,6 +661,8 @@ def _generate_reports(results):
                 _scrutinize(users_to_results[users_to_results[result.target0].switched_with]) +
                 '.'
             )
+
+        # Report doing protection, and whether target was attacked and if they died
         elif result.action_type == MafiaActionType.PROTECT.code:
             protect_target = users_to_results[result.target0]
             if protect_target.status == MafiaPlayerNightStatus.SAFE.code:
@@ -659,6 +678,8 @@ def _generate_reports(results):
                 result.add_report_line(
                     'You protected ' + name0 + ', but they died anyway.'
                 )
+
+        # Report doing defense, and whether target died
         elif result.action_type == MafiaActionType.DEFEND.code:
             defend_target = users_to_results[result.target0]
             if defend_target.status == MafiaPlayerNightStatus.SAFE.code:
@@ -671,8 +692,12 @@ def _generate_reports(results):
                 result.add_report_line(
                     'You defended ' + name0 + ', but they died anyway.'
                 )
+
+        # Report doing bulletproof vest
         elif result.action_type == MafiaActionType.BULLETPROOF_VEST.code:
             result.add_report_line("You used bulletproof vest.")
+
+        # Report failed corruption
         elif result.action_type == MafiaActionType.CORRUPT.code:
             corrupt_target = users_to_results[result.target0]
             if corrupt_target.corrupted:
@@ -682,6 +707,8 @@ def _generate_reports(results):
                     'You attempted to corrupt ' + name0 +
                     ', but they resisted or were protected.'
                 )
+
+        # Report doing slaying
         elif result.action_type == MafiaActionType.SLAY.code:
             slay_target = users_to_results[result.target0]
             if slay_target.status == MafiaPlayerNightStatus.SAFE:
@@ -690,6 +717,8 @@ def _generate_reports(results):
                 )
             else:
                 result.add_report_line('You slayed ' + name + '.')
+
+        # Report doing ambushing
         elif result.action_type == MafiaActionType.AMBUSH:
             result.add_report_line(
                 'You ambushed ' + name + (
@@ -698,16 +727,30 @@ def _generate_reports(results):
                     else ', but did not kill anyone.'
                 )
             )
+
+        # Report doing sniping
         elif result.action_type == MafiaActionType.SNIPE.code:
             result.add_report_line('You sniped ' + name + '.')
+
+        # Report doing ignition
         elif result.action_type == MafiaActionType.IGNITE.code:
-            result.add_report_line('You ignited.')
+            result.add_report_line(
+                'You ignited all doused players, killing them.'
+                if result.action_effective
+                else 'You ignited, but no players were doused.'
+            )
+
+        # Report doing sabotage
         elif result.action_type == MafiaActionType.SABOTAGE:
             pass # TODO
+
+        # Report doing dousing/un-dousing
         elif result.action_type == MafiaActionType.DOUSE.code:
             result.add_report_line('You doused ' + name +'.')
         elif result.action_type == MafiaActionType.UN_DOUSE.code:
             result.add_report_line('You un-doused ' + name +'.')
+
+        # Report doing disposal, and whether target died
         elif result.action_type == MafiaActionType.DISPOSE.code:
             role_name = MafiaRole.get_instance(users_to_results[result.target0].role).name
             result.add_report_line(
@@ -715,18 +758,26 @@ def _generate_reports(results):
                 if result.action_effective
                 else 'You attempted to dispose ' + name  + ', but they did not die.'
             )
+
+        # Report doing reveal
         elif result.action_type == MafiaActionType.REVEAL.code:
             result.add_report_line('You revealed youself as Mayor.')
+
+        # Report doing following and results
         elif result.action_type == MafiaActionType.FOLLOW.code:
             result.add_report_line(
                 'You followed ' + name + ', and determined that they targeted ' +
                 _follow(users_to_results[result.target]) + '.'
             )
+
+        # Report doing watching and results
         elif result.action_type == MafiaActionType.WATCH.code:
             result.add_report_line(
                 'You watched ' + name + ', and determined that they were targeted by ' +
                 _watch(users_to_results[result.target]) + '.'
             )
+
+        # Report remembering another orle
         elif result.action_type == MafiaActionType.REMEMBER.code:
             new_role = MafiaPlayer.objects.get(user=result.target0).role
             result.add_report_line(
@@ -772,10 +823,36 @@ def _generate_reports(results):
         if result.un_doused:
             result.add_report_line('You were un-doused.')
 
-
+        # Report miller being a miller (for kicks, this isn't important)
+        if result.player.role == MafiaRole.MILLER.code:
+            result.add_report_line('You milled some grain.')
 
 def _apply_results(results):
-    pass # TODO
+    users_to_results = {result.player.user: result for result in results}
+    for result in results:
+        p = result.player
+
+        # Mark player as dead if they died
+        if result.died:
+            p.status = MafiaPlayerStatus.DIED_AT_NIGHT
+            continue
+
+        # Update action used counters
+        p.mark_night_passed()
+        if not (result.action_type == MafiaActionType.NO_ACTION or result.seduced):
+            p.mark_action_used(result.action_type)
+
+        # Convert player to basic mafia if corrupted
+        if result.corrupted:
+            p.older_role = p.old_role
+            p.old_role = p.role
+            p.role = MafiaRole.BASIC_MAFIA.code
+
+        # Convert player if remembered
+        elif result.remembered:
+            p.older_role = p.role
+            p.old_role = p.role
+            p.role = users_to_results[result.remembered].player.role
 
 def get_default_night_description(results):
     return 'default night description not implemented'
@@ -806,10 +883,3 @@ def end_night(game):
     game.day_number += 1
     game.time = MafiaGameTime.DAWN.code
     return True
-
-def start_game(game):
-    if game.day_number == 0:
-        game.day_number = 1
-        game.time = MafiaGameTime.DAY.code
-    else:
-        raise MafiaError('start_game: day_number must == 0')

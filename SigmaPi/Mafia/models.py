@@ -1,6 +1,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from collections import defaultdict
 import json
 
 class ChoiceEnumeration(object):
@@ -121,14 +122,14 @@ class MafiaRole(ChoiceEnumeration):
 
     CODE_LENGTH = 2
 
-    def __init__(self, code, name, faction, action_types, apparant_name=None,
+    def __init__(self, code, name, faction, action_types_and_uses, apparant_name=None,
                  night_immune=False, immune_to_seduction=False,
                  hidden_to_mafia=False,
                  min_in_game=0, max_in_game=float('inf')):
         super(MafiaRole, self).__init__(code, name)
 
         self.faction = faction
-        self.action_types = action_types
+        self.action_types_and_uses = action_types_and_uses
         self.apparant_name = apparant_name or name
         self.night_immune = night_immune
         self.immune_to_seduction = immune_to_seduction
@@ -142,53 +143,56 @@ class MafiaRole(ChoiceEnumeration):
         self.min_in_game = min_in_game
         self.max_in_game = max_in_game
 
+MAFIA_UNLIMITED_USES = 0
+MAFIA_EVERY_OTHER_NIGHT = -1
+
 MafiaRole.MAYOR = MafiaRole(
     'VM', 'Mayor', MafiaFaction.VILLAGE,
-    [MafiaActionType.REVEAL],
+    [(MafiaActionType.REVEAL, 1)],
     min_in_game=1, max_in_game=1
 )
 MafiaRole.COP = MafiaRole(
     'VC', 'Cop', MafiaFaction.VILLAGE,
-    [MafiaActionType.INVESTIGATE],
+    [(MafiaActionType.INVESTIGATE, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.INSANE_COP = MafiaRole(
     'VI', 'Insane Cop', MafiaFaction.VILLAGE,
-    [MafiaActionType.INSANE_INVESTIGATE],
+    [(MafiaActionType.INSANE_INVESTIGATE, MAFIA_UNLIMITED_USES)],
     apparant_name='Cop'
 )
 MafiaRole.FORGETFUL_COP = MafiaRole(
     'VF',  'Forgetful Cop',  MafiaFaction.VILLAGE,
-    [MafiaActionType.FORGETFUL_INVESTIGATE],
+    [(MafiaActionType.FORGETFUL_INVESTIGATE, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.DOCTOR = MafiaRole(
     'VD', 'Doctor', MafiaFaction.VILLAGE,
-    [MafiaActionType.PROTECT],
+    [(MafiaActionType.PROTECT, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.BUS_DRIVER = MafiaRole(
     'VB', 'Bus Driver', MafiaFaction.VILLAGE,
-    [MafiaActionType.SWITCH],
+    [(MafiaActionType.SWITCH, MAFIA_UNLIMITED_USES)],
     max_in_game=1,
 )
 MafiaRole.TRACKER = MafiaRole(
     'VT',  'Tracker', MafiaFaction.VILLAGE,
-    [MafiaActionType.FOLLOW],
+    [(MafiaActionType.FOLLOW, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.WATCHER = MafiaRole(
     'VW',  'Watcher', MafiaFaction.VILLAGE,
-    [MafiaActionType.WATCH],
+    [(MafiaActionType.WATCH, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.ESCORT = MafiaRole(
     'VE',  'Escort', MafiaFaction.VILLAGE,
-    [MafiaActionType.SEDUCE],
+    [(MafiaActionType.SEDUCE, MAFIA_UNLIMITED_USES)],
     immune_to_seduction=True,
 )
 MafiaRole.VIGILANTE = MafiaRole(
     'VG',  'Vigilante', MafiaFaction.VILLAGE,
-    [MafiaActionType.SEDUCE],
+    [(MafiaActionType.SEDUCE, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.VETERAN = MafiaRole(
     'VV',  'Veteran', MafiaFaction.VILLAGE,
-    [MafiaActionType.ON_GUARD],
+    [(MafiaActionType.ON_GUARD, 3)],
 )
 MafiaRole.MILLER = MafiaRole(
     'VL',  'Miller', MafiaFaction.VILLAGE,
@@ -202,55 +206,55 @@ MafiaRole.BOMB = MafiaRole(
 )
 MafiaRole.BODYGUARD = MafiaRole(
     'VO',  'Bodyguard', MafiaFaction.VILLAGE,
-    [MafiaActionType.DEFEND],
+    [(MafiaActionType.DEFEND, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.DETECTIVE = MafiaRole(
     'VE',  'Detective', MafiaFaction.VILLAGE,
-    [MafiaActionType.SCRUTINIZE],
+    [(MafiaActionType.SCRUTINIZE, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.GODFATHER = MafiaRole(
     'MG', 'Godfather', MafiaFaction.MAFIA,
-    [MafiaActionType.SLAY],
+    [(MafiaActionType.SLAY, MAFIA_UNLIMITED_USES)],
     min_in_game=1, max_in_game=1,
 )
 MafiaRole.LIMO_DRIVER = MafiaRole(
     'ML', 'Limo Driver', MafiaFaction.MAFIA,
-    [MafiaActionType.SWITCH],
+    [(MafiaActionType.SWITCH, MAFIA_UNLIMITED_USES)],
     max_in_game=1,
 )
 MafiaRole.STALKER = MafiaRole(
     'MS', 'Stalker', MafiaFaction.MAFIA,
-    [MafiaActionType.FOLLOW],
+    [(MafiaActionType.FOLLOW, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.LOOKOUT = MafiaRole(
     'MK', 'Lookout', MafiaFaction.MAFIA,
-    [MafiaActionType.WATCH],
+    [(MafiaActionType.WATCH, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.HOOKER = MafiaRole(
     'MH',  'Hooker', MafiaFaction.MAFIA,
-    [MafiaActionType.SEDUCE],
+    [(MafiaActionType.SEDUCE, MAFIA_UNLIMITED_USES)],
     immune_to_seduction=True,
 )
 MafiaRole.JANITOR = MafiaRole(
     'MJ', 'Janitor', MafiaFaction.MAFIA,
-    [MafiaActionType.DISPOSE],
+    [(MafiaActionType.DISPOSE, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.FRAMER = MafiaRole(
     'MF', 'Framer', MafiaFaction.MAFIA,
-    [MafiaActionType.FRAME],
+    [(MafiaActionType.FRAME, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.YAKUZA = MafiaRole(
     'MY', 'Yakuza', MafiaFaction.MAFIA,
-    [MafiaActionType.CORRUPT],
+    [(MafiaActionType.CORRUPT, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.SABOTEUR = MafiaRole(
     'MA', 'Saboteur', MafiaFaction.MAFIA,
-    [MafiaActionType.SABOTAGE],
+    [(MafiaActionType.SABOTAGE, MAFIA_UNLIMITED_USES)],
     hidden_to_mafia=True,
 )
 MafiaRole.SNIPER = MafiaRole(
     'MI', 'Sniper', MafiaFaction.MAFIA,
-    [MafiaActionType.SNIPE],
+    [(MafiaActionType.SNIPE, 1)],
     hidden_to_mafia=True,
 )
 MafiaRole.BASIC_MAFIA = MafiaRole(
@@ -264,30 +268,34 @@ MafiaRole.JESTER = MafiaRole(
 )
 MafiaRole.SERIAL_KILLER = MafiaRole(
     'RK', 'Serial Killer', MafiaFaction.ROGUE,
-    [MafiaActionType.SLAY],
+    [(MafiaActionType.SLAY, MAFIA_UNLIMITED_USES)],
     night_immune=True,
 )
 MafiaRole.MASS_MURDERER = MafiaRole(
     'RM', 'Mass Murderer', MafiaFaction.ROGUE,
-    [MafiaActionType.AMBUSH],
+    [(MafiaActionType.AMBUSH, MAFIA_EVERY_OTHER_NIGHT)],
 )
 MafiaRole.ARSONIST = MafiaRole(
     'RA', 'Arsonist', MafiaFaction.ROGUE,
-    [MafiaActionType.DOUSE, MafiaActionType.UN_DOUSE, MafiaActionType.IGNITE],
+    [
+        (MafiaActionType.DOUSE, MAFIA_UNLIMITED_USES),
+        (MafiaActionType.UN_DOUSE, MAFIA_UNLIMITED_USES),
+        (MafiaActionType.IGNITE, MAFIA_UNLIMITED_USES)
+    ],
     night_immune=True,
 )
 MafiaRole.WITCH = MafiaRole(
     'RW', 'Witch', MafiaFaction.ROGUE,
-    [MafiaActionType.CONTROL],
+    [(MafiaActionType.CONTROL, MAFIA_UNLIMITED_USES)],
     immune_to_seduction=True,
 )
 MafiaRole.AMNESIAC = MafiaRole(
     'RE', 'Amnesiac', MafiaFaction.ROGUE,
-    [MafiaActionType.REMEMBER],
+    [(MafiaActionType.REMEMBER, 1)],
 )
 MafiaRole.SURVIVOR = MafiaRole(
     'RS', 'Survivor', MafiaFaction.ROGUE,
-    [MafiaActionType.BULLETPROOF_VEST],
+    [(MafiaActionType.BULLETPROOF_VEST, 3)],
 )
 MafiaRole.EXECUTIONER = MafiaRole(
     'RX', 'Executioner', MafiaFaction.ROGUE,
@@ -308,7 +316,12 @@ class MafiaPlayer(models.Model):
         max_length=MafiaRole.CODE_LENGTH,
         choices=MafiaRole.get_choice_tuples()
     )
-    previous_role = models.CharField(
+    old_role = models.CharField(
+        max_length=MafiaRole.CODE_LENGTH,
+        choices=MafiaRole.get_choice_tuples(),
+        null=True
+    )
+    older_role = models.CharField(
         max_length=MafiaRole.CODE_LENGTH,
         choices=MafiaRole.get_choice_tuples(),
         null=True
@@ -318,9 +331,28 @@ class MafiaPlayer(models.Model):
         choices=MafiaPlayerStatus.get_choice_tuples(),
         default=MafiaPlayerStatus.ALIVE.code
     )
-    times_action_used = models.PositiveSmallIntegerField(default=0)
+    actions_used_json = models.TextField(default='{}')
     doused = models.BooleanField(default=False)
     executioner_target = models.ForeignKey(User, null=True, related_name='executioner_target')
+
+    def get_actions_used(self):
+        return defaultdict(
+            (lambda: (0, False)),
+            json.loads(self.actions_used_json)
+        )
+
+    def mark_action_used(self, action_type_code):
+        used = self.get_actions_used()
+        used[action_type_code] = (used[action_type_code][0] + 1, True)
+        self.actions_used_json = json.dumps(used)
+
+    def mark_night_passed(self):
+        used = self.get_actions_used()
+        json.dumps({at: (use[0], False) for at, use in used.iteritems()})
+
+    @property
+    def revealed_as_mayor(self):
+        return self.get_actions_used()[MafiaActionType.REVEAL.code][0] >= 1
 
 class MafiaNightResult(models.Model):
     game = models.ForeignKey(MafiaGame)
