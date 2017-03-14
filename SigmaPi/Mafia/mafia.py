@@ -527,26 +527,25 @@ def _list_users(users):
 
 def _investigate(investigator_result, target_result):
     target_role = MafiaRole.get_instance(target_result.role)
-    guilty = (
-        (target_role.faction == MafiaFaction.MAFIA and target_role != MafiaRole.GODFATHER) or
-        (target_role == MafiaRole.MILLER) or
-        target_result.framed
+    guilty = target_result.framed or (
+        target_role.faction == MafiaFaction.MAFIA
+        if target_role.apparent_guilt == MafiaApparentGuilt.FACTION_BASED
+        else target_role.apparent_guilt == MafiaApparentGuilt.GUILTY
     )
-    appears_guilty = (
-        not guilty
-        if investigator_result.action_type == MafiaActionType.INSANE_INVESTIGATE.code
-        else guilty
-    )
-    return 'GUILTY' if appears_guilty else 'INNOCENT'
+    if investigator_result.action_type == MafiaActionType.INSANE_INVESTIGATE.code:
+        guilty = not guilty
+    return 'GUILTY' if guilty else 'INNOCENT'
 
 def _scrutinize(target_result):
     role = MafiaRole.get_instance(target_result.player.role)
     return len(0 for at, uses in role.action_types if at.is_lethal) >= 1
 
 def _follow(target_result, users_to_results):
-    return '' # TODO
-    #    _get_name(target_night.target0_after_control)
-    #    if target_night.tar
+    return (
+        _get_name(target_night.target0_after_control) 
+        if target_night.target0_after_control
+        else 'nobody'
+    )
 
 def _watch(watcher_result, target_result):
     return '' # TODO
@@ -649,7 +648,7 @@ def _generate_reports(results):
                 ', and concluded that they are ' +
                 _investigate(
                     result,
-                    users_to_results[users_to_results[result.target0].switched_with]
+                    users_to_results[users_to_results[result.target0].switched_with_or_self]
                 ) + '.'
             )
 
@@ -658,7 +657,7 @@ def _generate_reports(results):
             result.add_report_line(
                 'You scrutinized ' + name0 +
                 ', and concluded that they are ' +
-                _scrutinize(users_to_results[users_to_results[result.target0].switched_with]) +
+                _scrutinize(users_to_results[users_to_results[result.target0].switched_with_or_self]) +
                 '.'
             )
 
@@ -767,7 +766,8 @@ def _generate_reports(results):
         elif result.action_type == MafiaActionType.FOLLOW.code:
             result.add_report_line(
                 'You followed ' + name + ', and determined that they targeted ' +
-                _follow(users_to_results[result.target]) + '.'
+                _follow(users_to_results[users_to_results[result.target0].switched_with_or_self]) + 
+                '.'
             )
 
         # Report doing watching and results
