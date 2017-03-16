@@ -12,7 +12,7 @@ These steps will walk you through deploying the site on your local machine for t
   Clone the repository.
 
   ```
-  $ git clone git@github.com:austintrose/sigmapi-web.git
+  $ git clone https://github.com/kdmccormick/sigmapi-web.git
 
   ...
 
