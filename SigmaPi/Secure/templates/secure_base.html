@@ -95,11 +95,12 @@
       				<span class="caret"></span>
       			</a>
       			<ul class="dropdown-menu" role="menu">
+							{% if user.is_staff %}
+                <li><a href="/admin/">Admin Panel</a>
+							{% else %}
 		            <li><a href="{% url 'UserInfo.views.edit_user' user.username %}">Edit Profile</a></li>
 		            <li><a href="{% url 'UserInfo.views.change_password' %}">Change Password</a></li>
-		            {% if user.is_staff %}
-		            <li><a href="/admin/">Admin</a>
-		            {% endif %}
+              {% endif %}
 		            <li class="divider"></li>
 		            <li><a href="/logout/">Logout</a></li>
 		        </ul>

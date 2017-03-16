@@ -25,6 +25,7 @@
 		</thead>
 		<tbody>
 			{% for user in all_users %}
+			{% if not user.is_staff %}
 			<tr>
 				<td>{{ user.first_name }}</td>
 				<td>{{ user.last_name }}</td>
@@ -36,6 +37,7 @@
 					<a href="{% url 'UserInfo.views.reset_password' user.username %}">Reset</a>
 				</td>
 			</tr>
+			{% endif %}
 			{% endfor %}
 		</tbody>
 	</table>
