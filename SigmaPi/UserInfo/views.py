@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.template.defaultfilters import stringfilter, register
 from django.utils.html import strip_tags
 
 from UserInfo import utils
@@ -231,3 +232,12 @@ def change_password(request):
 	context['form'] = PasswordChangeForm(user=request.user)
 
 	return render(request, 'secure/reset_password.html', context)
+
+
+@register.filter
+@stringfilter
+def profile_image(url):
+	if len(url) == 0:
+		return "/static/img/user-placeholder.png"
+	else:
+		return "/content/" + url

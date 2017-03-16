@@ -14,7 +14,7 @@
 				<div class="user-panel">
 					<h3>Sage - {{ sage.first_name }} {{ sage.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/{{ sage.userinfo.picture }}">
+						<img src="{{ sage.userinfo.picture|profile_image }}">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
@@ -54,7 +54,7 @@
 				<div class="user-panel">
 					<h3>2nd Counselor - {{ second.first_name }} {{ second.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/{{ second.userinfo.picture }}">
+						<img src="{{ second.userinfo.picture|profile_image }}">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
@@ -94,7 +94,7 @@
 				<div class="user-panel">
 					<h3>3rd Counselor - {{ third.first_name }} {{ third.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/{{ third.userinfo.picture }}">
+						<img src="{{ third.userinfo.picture|profile_image }}">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
@@ -134,7 +134,7 @@
 				<div class="user-panel">
 					<h3>4th Counselor - {{ fourth.first_name }} {{ fourth.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/{{ fourth.userinfo.picture }}">
+						<img src="{{ fourth.userinfo.picture|profile_image }}">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
@@ -174,7 +174,7 @@
 				<div class="user-panel">
 					<h3>1st Counselor - {{ first.first_name }} {{ first.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/{{ first.userinfo.picture }}">
+						<img src="{{ first.userinfo.picture|profile_image }}">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
@@ -214,7 +214,7 @@
 				<div class="user-panel">
 					<h3>Herald - {{ herald.first_name }} {{ herald.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/{{ herald.userinfo.picture }}">
+						<img src="{{ herald.userinfo.picture|profile_image }}">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
@@ -257,7 +257,7 @@
 				<div class="user-panel">
 					<h3>{{ user.first_name }} {{ user.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/{{ user.userinfo.picture }}">
+						<img src="{{ user.userinfo.picture|profile_image }}">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
@@ -298,7 +298,7 @@
 				<div class="user-panel">
 					<h3>{{ user.first_name }} {{ user.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/{{ user.userinfo.picture }}">
+						<img src="{{ user.userinfo.picture|profile_image }}">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
@@ -339,7 +339,7 @@
 				<div class="user-panel">
 					<h3>{{ user.first_name }} {{ user.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/{{ user.userinfo.picture }}">
+						<img src="{{ user.userinfo.picture|profile_image }}">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
@@ -381,7 +381,7 @@
 				<div class="user-panel">
 					<h3>{{ user.first_name }} {{ user.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/{{ user.userinfo.picture }}">
+						<img src="{{ user.userinfo.picture|profile_image }}">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
