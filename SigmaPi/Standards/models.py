@@ -223,6 +223,7 @@ class Summons(models.Model):
 		verbose_name = "Summons"
 		verbose_name_plural = "Summonses"
 
+
 class SummonsHistoryRecord(models.Model):
 	"""
 		Model for a summons history record.
@@ -234,5 +235,15 @@ class SummonsHistoryRecord(models.Model):
 	date = models.DateField()
 	hasBone = models.BooleanField(default=False)
 	boneID = models.PositiveIntegerField()
+
+	def __unicode__(self):
+		return self.summoner.last_name + ", " + self.summoner.first_name + " summoned " + self.summonee.last_name + ", " + self.summonee.first_name
+
+	def __str__(self):
+		return self.summoner.last_name + ", " + self.summoner.first_name + " summoned " + self.summonee.last_name + ", " + self.summonee.first_name
+
+	class Meta:
+		verbose_name = "Summons History Record"
+		verbose_name_plural = "Summons History Records"
 
 
