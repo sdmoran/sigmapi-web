@@ -1,5 +1,5 @@
 from django.contrib import admin
-from Standards.models import Summons, SummonsRequest, SummonsHistoryRecord
+from Standards.models import Summons, SummonsRequest, SummonsHistoryRecord, Bone, BoneChangeRecord
 
 # Register models to appear in the Django Admin DB Site
 admin.site.register(Summons)
