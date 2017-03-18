@@ -6,6 +6,7 @@
 .idea/
 
 venv/
+build/
 
 database
 SigmaPi/database

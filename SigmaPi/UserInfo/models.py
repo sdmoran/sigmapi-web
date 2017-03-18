@@ -34,7 +34,7 @@ class UserInfo(models.Model):
 		Complements the built in User models
 	"""
 	user = models.OneToOneField(User)
-	picture = models.FileField(upload_to=filepath, null=True)
+	picture = models.FileField(upload_to=filepath, null=True, blank=True)
 	phoneNumber = models.CharField(default="", max_length=100, blank=True)
 	graduationYear = models.PositiveIntegerField(default=2020)
 	major = models.CharField(max_length=100, blank=True)
