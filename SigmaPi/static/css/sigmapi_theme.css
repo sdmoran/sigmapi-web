@@ -75,7 +75,7 @@ a:hover
   {
     background-image: none;
   }
-};
+}
 
 #banner-wrapper
 {
@@ -523,3 +523,4 @@ ul.news > li > iframe
       margin-left: 0px;
     }
 }
+
