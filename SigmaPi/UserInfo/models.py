@@ -69,7 +69,10 @@ class EditUserInfoForm(ModelForm):
 	activities = forms.CharField(widget=forms.Textarea, required=False)
 	interests = forms.CharField(widget=forms.Textarea, required=False)
 	favoriteMemory = forms.CharField(widget=forms.Textarea, required=False)
-	pledgeClass = forms.ModelChoiceField(queryset=PledgeClass.objects.all(), widget=forms.Select)
+	pledgeClass = forms.ModelChoiceField(
+		queryset=PledgeClass.objects.all(), widget=forms.Select,
+		empty_label=None
+	)
 
 	class Meta:
 		model = UserInfo
