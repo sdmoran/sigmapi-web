@@ -1,6 +1,6 @@
 {% extends "secure/standards_base.html" %}
 
-{% block title %}Sigma Pi Secure - Manage Bones {% endblock %}
+{% block title %}Sigma Pi Secure - Manage Summons {% endblock %}
 
 {% block module_includes %}
 {% load static %}
@@ -62,7 +62,7 @@
 	 					<td>{{ summons.approver.first_name }} {{ summons.approver.last_name }}</td>
 	 					<td>
 	 						<a class="btn btn-success btn-sm approve-summons" id="{{ summons.pk }}">
-	 						Archive
+	 						Approve
 	 						</a>
 	 					</td>
 	 					<td>
