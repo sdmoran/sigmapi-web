@@ -107,6 +107,7 @@ class PartyGuest(models.Model):
 	class Meta:
 		verbose_name_plural = "Party Guests"
 		verbose_name = "Party Guest"
+		permissions = (("can_destroy_any_party_guest", "Can Remove Any Party Guest"),)
 
 	def toJSON(self):
 		data = {}

@@ -111,10 +111,11 @@ PartyModule.Guest.prototype.compareTo = function(otherGuest)
   * Constructor
   * Takes in string ID of the list this guest list is controlling.
   */
-PartyModule.GuestList = function(userID, partyMode, listID, guestSignedInCallback, guestSignedOutCallback, listCountChangedCallback)
+PartyModule.GuestList = function(userID, partyMode, canDestroyAnyGuest, listID, guestSignedInCallback, guestSignedOutCallback, listCountChangedCallback)
 {
 	this.userID = userID;
 	this.partyMode = partyMode;
+	this.canDestroyAnyGuest = canDestroyAnyGuest;
 	this.listID = listID;
 
 	this.userGuestCount = 0;
@@ -274,9 +275,11 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 
 		var removeButton = clonedTemplate.find(".status.remove-guest");
 
+		console.log(this.canDestroyAnyGuest);
 		// Remove the remove button if user does not have permission to remove this guest
-		if (this.userID != guest.addedByID)
+		if (this.userID != guest.addedByID && !this.canDestroyAnyGuest)
 		{
+			console.log(':(')
 			removeButton.remove();
 		}
 		else // Otherwise, make it remove when clicked
@@ -472,8 +475,10 @@ PartyModule.PartyList.prototype.initialize = function()
 	    url: "init/",
 	}).done(function( data ) {
 
+		console.log(data);
 		thisOuter.userID = data.userID;
 		thisOuter.partyMode = data.partymode;
+		thisOuter.canDestroyAnyGuest = data.canDestroyAnyGuest;
 
 		thisOuter.finishInitialization();
 
@@ -488,12 +493,12 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 	var outerThis = this;
 
 	// Initialize guest lists
-	this.maleList = new PartyModule.GuestList(this.userID, this.partyMode, "M",
+	this.maleList = new PartyModule.GuestList(this.userID, this.partyMode, this.canDestroyAnyGuest, "M",
 		function() { outerThis.updateCount("M", 1); },
 		function() { outerThis.updateCount("M", -1); },
 		function() { outerThis.updateListCounts() });
 
-	this.femaleList = new PartyModule.GuestList(this.userID, this.partyMode, "F",
+	this.femaleList = new PartyModule.GuestList(this.userID, this.partyMode, this.canDestroyAnyGuest, "F",
 		function() { outerThis.updateCount("F", 1); },
 		function() { outerThis.updateCount("F", -1); },
 		function() { outerThis.updateListCounts() });
