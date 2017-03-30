@@ -3,3 +3,4 @@ argparse==1.2.1
 beautifulsoup4==4.3.2
 requests==2.0.1
 django-sendfile==0.3.4
+editdistance==0.3.1

@@ -549,7 +549,7 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 
 		if (name.length > 0)
 		{
-			outerThis.addGuest(name, "M");
+			outerThis.addGuest(name, "M", false);
 		}
 	});
 
@@ -566,7 +566,7 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 
 		if (name.length > 0)
 		{
-			outerThis.addGuest(name, "F");
+			outerThis.addGuest(name, "F", false);
 		}
 	});
 
@@ -576,6 +576,18 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 			$("#add-female-btn").click();
 		}
 	});
+
+	$("#bl_override").click(function () {
+	    if ($('input[name="add"]:checked').val() == "true")
+	    {
+	        outerThis.addGuest($("#attempted-add").text(), $("#attempted-add-gender").text(), true);
+        }
+    });
+
+	$("#blacklist_warn").on("hide.bs.modal", function (){
+	    //no matter what we want to reset the default confirmation value when the modal hides
+	    document.getElementById("nForce").checked = true;
+    });
 
 	$("#search-btn").click(function() {
 		outerThis.filterList($("#search-box").val());
@@ -592,7 +604,7 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 /**
  * Add a guest to the party list
  */
-PartyModule.PartyList.prototype.addGuest = function(guestName, gender)
+PartyModule.PartyList.prototype.addGuest = function(guestName, gender, force)
 {
 	var thisOuter = this;
 
@@ -602,13 +614,26 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender)
 	    data: {
 	    	"name": guestName,
 	    	"gender": gender,
+			"force": force
 	    }
 	}).done(function( data ) {
+		var addedGuest = new PartyModule.Guest(data.id, data.name, data.addedByName, data.addedByID, data.signedIn);
 
-		var addedGuest = new PartyModule.Guest(data.id, data.name,
-			data.addedByName, data.addedByID, data.signedIn);
+		if (data.maybe_blacklisted) {
+			$('#bl_name').text(data.blacklist_name);
+			$('#bl_details').text(data.blacklist_details);
+			$('#attempted-add').text(data.attempted_name);
+			$('#attempted-add-gender').text(data.attempted_gender);
+			$('#blacklist_warn').modal('show');
+			PartyModule.displayError("Potential blacklisted guest!")
+		}
 
-		if (gender === "M")
+		/*
+			PartyList.api.create does not return with data.maybe_blacklisted
+			if the person is not on the blacklist, or the create was called with force = true
+		 */
+
+		else if (gender === "M")
 		{
 			thisOuter.maleList.addGuest(addedGuest);
 			PartyModule.displayMessage("Guest added.");
@@ -618,7 +643,6 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender)
 			thisOuter.femaleList.addGuest(addedGuest);
 			PartyModule.displayMessage("Guest added.");
 		}
-
 
 	}).fail(function( jqXHR, textStatus, errorThrown ) {
 		// If failed, we alert the user

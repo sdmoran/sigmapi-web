@@ -16,27 +16,53 @@
 		</li>
 
 		{% if perms.PartyList.manage_parties %}
-		{% if '/manage' in request.path %}
+
+		{% if '/manage' in request.path and 'blacklist' not in request.path %}
 		<li class="active">
 		{% elif '/edit' in request.path %}
 		<li class="active">
 		{% else %}
 		<li>
 		{% endif %}
+
 			<a href="{% url 'PartyList.views.manage_parties' %}">
 				Manage Parties
 			</a>
 		</li>
+
 		{% if '/add' in request.path %}
 		<li class="active">
 		{% else %}
 		<li>
 		{% endif %}
+
 			<a href="{% url 'PartyList.views.add_party' %}">
 				Add Party
 			</a>
 		</li>
+
 		{% endif %}
+
+		{% if '/blacklist' in request.path and 'manage' not in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'PartyList.views.view_blacklist' %}">View Blacklist</a>
+		</li>
+
+		{% if perms.PartyList.manage_blacklist %}
+		{% if '/blacklist/manage' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'PartyList.views.manage_blacklist' %}">Manage Blacklist</a>
+		</li>
+		{% endif %}
+
+
+
 	</ul>
 </div>
 {% endblock %}

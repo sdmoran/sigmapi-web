@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from PartyList.models import Guest, PartyGuest, Party
+from PartyList.models import Guest, PartyGuest, Party, BlacklistedGuest
 from django import forms
 
 class GuestForm(ModelForm):
@@ -27,6 +27,18 @@ class PartyForm(ModelForm):
 	def __init__(self,*args, **kwargs):
 		super(PartyForm,self).__init__(*args, **kwargs)
 		#do extra stuff here if necessary
+
+class BlacklistForm(ModelForm):
+	name = forms.CharField(max_length=100, label='Full Name')
+	details = forms.CharField(max_length=1000, label='Details', required=False)
+
+	class Meta:
+		model = BlacklistedGuest
+		fields = ['name','details']
+
+	def __init__(self,*args, **kwargs):
+		super(BlacklistForm,self).__init__(*args, **kwargs)
+
 
 class EditPartyInfoForm(ModelForm):
 	"""

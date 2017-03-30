@@ -1,0 +1,68 @@
+{% extends "party_base.html" %}
+
+{% block title %}Sigma Pi Secure - Blacklist{% endblock %}
+
+{% block content %}
+<h3>Manage Party Blacklist</h3>
+
+{% if blacklist %}
+<div class="table-responsive">
+	<table class="table blacklist-table">
+		<thead>
+			<tr>
+				<th class="two wide">Name</th>
+				<th class="two wide">Details</th>
+				<th class="one wide">Delete</th>
+
+			</tr>
+		</thead>
+		<tbody>
+		{% for person in blacklist %}
+			<tr>
+				<td>{{ person.name }}</td>
+				<td>{{ person.details }}</td>
+				<td>
+					<form method="POST" action="{% url 'PartyList.views.remove_blacklisting' person.id %}">
+						{% csrf_token %}
+						<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
+					</form>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+{% else %}
+<p>
+	Blacklist empty.
+</p>
+
+{% endif %}
+
+<hr class="hr">
+
+<h3>Add to Blacklist</h3>
+
+<form method="post" action="{% url 'PartyList.views.manage_blacklist' %}">
+	{% csrf_token %}
+	{% if message %}
+	<div class="alert alert-info">
+		{{ message }}
+	</div>
+	{% endif %}
+	<div class="form-group">
+		{{ form.name.label_tag }}
+		{{ form.name }}
+		<em>Make this similar to their name as it appears in the party guest list.</em>
+	</div>
+	<div class="form-group">
+		{{ form.details.label_tag }}
+		{{ form.details }}
+		<em>Distinguishing details, in case someone has the same name. Physical features, class year, greek affiliation, etc.</em>
+	</div>
+	<button type="submit" class="btn btn-primary pull-right">Add to blacklist</button>
+</form>
+
+
+{% endblock %}
