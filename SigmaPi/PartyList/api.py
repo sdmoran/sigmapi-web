@@ -19,6 +19,9 @@ import csv
 def userCanEdit(user=None,pg=None):
 	"""return true if the given user can edit the party guest making this function
 	allows us to add more cases in which a type of user can edit a guest"""
+	if user.has_perm('PartyList.can_destroy_any_party_guest'):
+		return True
+
 	if pg.addedBy == user:
 		return True
 
@@ -255,5 +258,6 @@ def initPulse(request, party):
 	response = {}
 	response['partymode'] = requested_party.isPartyMode()
 	response['userID'] = request.user.id
+	response['canDestroyAnyGuest'] = request.user.has_perm('PartyList.can_destroy_any_party_guest')
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
