@@ -14,7 +14,7 @@
 				<div class="user-panel">
 					<h3>Sage - {{ sage.first_name }} {{ sage.last_name }}</h3>
 					<div class="panel-body">
-						<img src="/content/users/cchammer/CHRISTOPHER%20HAMMER_7DlR69t.jpg">
+						<img src="http://s.hswstatic.com/gif/hammer-1.jpg">
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
@@ -381,7 +381,11 @@
 				<div class="user-panel">
 					<h3>{{ user.first_name }} {{ user.last_name }}</h3>
 					<div class="panel-body">
+						{% if user.last_name == "Rueda" %}
+						<img src="/content/users/jmanaya/JEROME%20ANAYA.jpg">
+						{% else %}
 						<img src="/content/users/rjrueda/ROGER%20RUEDA.jpg">
+						{% endif %}
 						<div class="content">
 							<div class="nameval">
 								<div class="name">Class:</div>
