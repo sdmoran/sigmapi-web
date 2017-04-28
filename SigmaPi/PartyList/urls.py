@@ -16,6 +16,7 @@ urlpatterns = patterns('',
 	url(r'^view/(?P<party>[\d]+)/guests/poll/$', 'PartyList.api.poll'),
 	url(r'^view/(?P<party>[\d]+)/guests/export/$', 'PartyList.api.export_list'),
 	url(r'^view/(?P<party>[\d]+)/guests/count/$', 'PartyList.api.updateCount'),
+	url(r'^view/(?P<party>[\d]+)/guests/count/delta/$', 'PartyList.api.updateManualDelta'),
 	url(r'^view/(?P<party>[\d]+)/guests/count/poll/$', 'PartyList.api.pollCount'),
 	url(r'^view/(?P<party>[\d]+)/guests/init/$', 'PartyList.api.initPulse'),
 )

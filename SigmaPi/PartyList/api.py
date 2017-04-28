@@ -95,12 +95,47 @@ def updateCount(request, party):
 			return HttpResponse('Error: Invalid gender or count parameters. Contact webmaster.', status=500)
 
 		if gender == 'M':
-			partyObj.guycount = PartyGuest.objects.filter(party_id=party, signedIn=True, guest__gender='M').count()
+			partyObj.guycount = PartyGuest.objects.filter(party_id=party, signedIn=True, guest__gender='M').count() + \
+				partyObj.guy_delta
 		elif gender == 'F':
-			partyObj.girlcount = PartyGuest.objects.filter(party_id=party, signedIn=True, guest__gender='F').count()
+			partyObj.girlcount = PartyGuest.objects.filter(party_id=party, signedIn=True, guest__gender='F').count() + \
+				partyObj.girl_delta
 		else:
 			return HttpResponse('Error: Invalid gender parameter. Contact webmaster.', status=500)
 
+
+		partyObj.save()
+
+		response = {}
+		response['guycount'] = partyObj.guycount
+		response['girlcount'] = partyObj.girlcount
+
+		return HttpResponse(json.dumps(response), content_type="application/json")
+	else:
+		return HttpResponse('Endpoint supports POST method only.', status=405)
+
+@login_required
+@csrf_exempt
+def updateManualDelta(request, party):
+	"""
+	Called when the + or - buttons are pressed.  Manually updates deltas.
+	"""
+	if request.method == 'POST':
+		partyObj = Party.objects.get(pk=party)
+		try:
+			gender = request.POST.get('gender')
+			delta = int(request.POST.get('delta'))
+		except:
+			return HttpResponse('Error: Invalid gender or count parameters. Contact webmaster.', status=500)
+
+		if gender == 'M':
+			partyObj.guy_delta += delta
+			partyObj.guycount += delta
+		elif gender == 'F':
+			partyObj.girl_delta += delta
+			partyObj.girlcount += delta
+		else:
+			return HttpResponse('Error: Invalid gender parameter. Contact webmaster.', status=500)
 
 		partyObj.save()
 
