@@ -665,7 +665,7 @@ PartyModule.PartyList.prototype.updateCount = function(gender, delta)
 
 	$.ajax({
 		type: "POST",
-	    url: "count/",
+	    url: "count/delta/",
 	    data: {
 	    	"delta": delta,
 	    	"gender": gender,

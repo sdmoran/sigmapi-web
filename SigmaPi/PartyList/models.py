@@ -27,6 +27,8 @@ class Party(models.Model):
 	date = models.DateField()
 	guycount = models.IntegerField(default=0)
 	girlcount = models.IntegerField(default=0)
+	guy_delta = models.IntegerField(default=0)
+	girl_delta = models.IntegerField(default=0)
 
 	jobs = models.FileField(upload_to=partyjobspath, blank=True, null=True)
 
