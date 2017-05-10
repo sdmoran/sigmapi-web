@@ -1,9 +1,9 @@
 {% extends "mafia_base.html" %}
 
-{% block title %}Sigma Pi Secure - Play Mafia Games {% endblock %}
+{% block title %}Sigma Pi Secure - Spectate Mafia Games {% endblock %}
 
 {% block content %}
-<h3>Your Mafia games</h3>
+<h3>Mafia games to spectate</h3>
 
 {% if game_infos %}
 <div class="table-responsive">
@@ -14,7 +14,7 @@
                 <th class="two wide">Date Created</th>
                 <th class="two wide">Moderator</th>
                 <th class="two wide">Status</th>
-                <th class="two wide">Play</th>
+                <th class="two wide">Spectate</th>
             </tr>
         </thead>
         <tbody>
@@ -25,8 +25,8 @@
                 <td>{{ gi.creator_name }}</td>
                 <td>{{ gi.status }}</td>
                 <td>
-                    <a href="{% url 'Mafia.views.play_game' gi.pk %}">
-                        Play
+                    <a href="{% url 'Mafia.views.spectate_game' gi.pk %}">
+                        Spectate
                     </a>
                 </td>
             </tr>
@@ -35,7 +35,7 @@
     </table>
 </div>
 {% else %}
-<p>There are no games you are playing or have played.</p>
+<p>No games are currently being played or have been played.</p>
 {% endif %}
 
 {% endblock %}

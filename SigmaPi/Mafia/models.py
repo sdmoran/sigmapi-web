@@ -75,7 +75,7 @@ class MafiaGame(models.Model):
             return 'Inviting'
         else:
             time_name = MafiaGameTime.get_instance(self.time).name
-            return name + ' ' + `self.day_number`
+            return time_name + ' ' + `self.day_number`
         
 class MafiaFaction(object):
     VILLAGE = 'V'
