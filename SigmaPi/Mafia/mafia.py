@@ -1,8 +1,10 @@
 
 from .models import *
 
-def _check_role_requirements(game):
-    pass # TODO
+
+##############################################
+# Beginning game
+##############################################
 
 def begin_game(game):
     if game.day_number != 0:
@@ -18,6 +20,14 @@ def begin_game(game):
     game.save()
     return True
 
+def _check_role_requirements(game):
+    pass # TODO
+
+
+##############################################
+# Beginning day
+##############################################
+
 def begin_day(game):
     if game.day_number < 2:
         print 'Mafia: Bad function call: begin_day when game.day_number < 0'
@@ -31,6 +41,29 @@ def begin_day(game):
     for player in players:
         MafiaVote(voter=player, day_number=game.day_number).save()
     game.time = MafiaGameTime.DAY.code
+    game.save()
+    return True
+
+
+##############################################
+# Ending day
+##############################################
+
+def end_day(game):
+    if game.day_number < 1:
+        print 'Mafia: Bad function call: end_day when game.day_number < 1'
+        return False
+    if game.time != MafiaGameTime.DAY.code:
+        print 'Mafia: Bad function call: end_day when not day'
+        return False
+    result = (
+        MafiaDayResult(game=game, day_number=1, lynched=None)
+        if game.day_number == 1
+        else _do_lynch(game)
+    )
+    result.description = get_default_day_description(result)
+    result.save()
+    game.time = MafiaGameTime.DUSK.code
     game.save()
     return True
 
@@ -95,23 +128,10 @@ def get_default_day_description(result):
     return 'default day description not implemented'
     # TODO
 
-def end_day(game):
-    if game.day_number < 1:
-        print 'Mafia: Bad function call: end_day when game.day_number < 1'
-        return False
-    if game.time != MafiaGameTime.DAY.code:
-        print 'Mafia: Bad function call: end_day when not day'
-        return False
-    result = (
-        MafiaDayResult(game=game, day_number=1, lynched=None)
-        if game.day_number == 1
-        else _do_lynch(game)
-    )
-    result.description = get_default_day_description(result)
-    result.save()
-    game.time = MafiaGameTime.DUSK.code
-    game.save()
-    return True
+
+##############################################
+# Beginning night
+##############################################
 
 def begin_night(game):
     if game.day_number < 1:
@@ -127,6 +147,37 @@ def begin_night(game):
         MafiaAction(performer=player, night_number=game.day_number).save()
     game.time = MafiaGameTime.NIGHT.code
     game.save()
+    return True
+
+
+##############################################
+# Ending night
+##############################################
+
+def end_night(game):
+    if game.day_number < 1:
+        print 'Mafia: Bad function call: end_night when game.day_number < 1'
+        return False
+    if game.time != MafiaGameTime.NIGHT.code:
+        print 'Mafia: Bad function call: end_night when not night'
+        return False
+    try:
+        _clear_previous_night_results(game)
+        actions = _get_actions(game)
+        results = _process_actions(actions)
+        _generate_reports(results)
+        for result in results:
+            result.save()
+        _apply_results(results)
+        for result in results:
+            result.player.save()
+        result = MafiaNightResult(game=game, night_number=game.day_number)
+        result.description = get_default_night_description(results)
+    except MafiaError as e:
+        print 'Mafia: Error while processing night: ' + e.message
+        return False
+    game.day_number += 1
+    game.time = MafiaGameTime.DAWN.code
     return True
 
 def _clear_previous_night_results(game):
@@ -148,133 +199,6 @@ def _get_actions(game):
             'set of alive players doesn\'t match set of action performers'
         )
     return actions
-
-def _do_single_switch(switcher0, switcher1, target0, target1, switch_map, users_to_results):
-    temp = switch_map[target0]
-    switch_map[target0] = switch_map[target1]
-    switch_map[target1] = temp
-    users_to_results[target0].switched_with = target1
-    users_to_results[target1].switched_with = target0
-    users_to_results[target0].add_switched_by(switcher0)
-    users_to_results[target1].add_switched_by(switcher1)
-    switcher0.action_effective = True
-    switcher1.action_effective = True
-
-def _do_double_switch(switcher0, switcher1, target, users_to_results):
-    users_to_results[target].switched_with = target
-    users_to_results[target].add_switched_by(switcher0)
-    users_to_results[target].add_switched_by(switcher1)
-    switcher0.action_effective = True
-    switcher1.action_effective = True
-
-def _do_overlapping_switch(switcher0, switcher1, target0, overlapped_target, target1, users_to_results):
-    _do_single_switch(switcher0, switcher1, target0, target1, users_to_results)
-    _do_double_switch(switcher0, switcher1, overlapped_target, users_to_results)
-
-def _do_switching(actions, results, users_to_results, actions_to_results):
-
-    # Clear previous calculations
-    for result in results:
-        result.clear_switched_by()
-
-    # Initialize switch map; collect switch action results
-    switched = {result.player.user: result.player.user for result in results}
-    switch_actions = actions.filter(action_type=MafiaActionType.SWITCH.code)
-    switch_results = [actions_to_results[switch_action] for switch_action in switch_actions]
-
-    # Fail if more than two switches
-    if len(switch_results) > 2:
-        raise MafiaError('more than two switch actions in single night')
-
-    # Perform two switches
-    if len(switch_results) >= 2:
-
-        # Assign helper variables for switchers and targets
-        s0 = switch_results[0].player.user
-        s1 = switch_results[1].player.user
-        s0t0 = switch_results[0].target0_after_control
-        s0t1 = switch_results[0].target1_after_control
-        s1t0 = switch_results[1].target0_after_control
-        s1t1 = switch_results[1].target1_after_control
-
-        # If both seduced_or_died, do nothing
-        if switch_results[0].seduced_or_died and switch_results[1].seduced_or_died:
-            pass
-
-        # If one seduced_or_died, do the other
-        elif switch_results[0].seduced_or_died:
-            _do_single_switch(s1, s1, s1t0, s1t1, users_to_results)
-        elif switch_results[1].seduced_or_died:
-            _do_single_switch(s0, s0, s0t0, s0t1, users_to_results)
-
-        # Switches with the same two players
-        elif (s0t0 == s1t0 and s0t1 == s1t1) or (s0t0 == s1t1 and s0t1 == s1t0):
-            _do_double_switch(s0, s1, s0t0, users_to_results)
-            _do_double_switch(s0, s1, s0t1, users_to_results)
-
-        # Switches where one players is in both
-        elif s0t0 == s1t0:
-            _do_overlapping_switch(s0, s1, s0t1, s0t0, s1t1, users_to_results)
-        elif s0t0 == s1t1:
-            _do_overlapping_switch(s0, s1, s0t1, s0t0, s1t0, users_to_results)
-        elif s0t1 == s1t0:
-            _do_overlapping_switch(s0, s1, s0t0, s0t1, s1t1, users_to_results)
-        elif s0t1 == s1t1:
-            _do_overlapping_switch(s0, s1, s0t0, s0t1, s1t0, users_to_results)
-
-        # Independent switches
-        else:
-            _do_single_switch(s0, s0, s0t0, s0t1, users_to_results)
-            _do_single_switch(s1, s1, s1t0, s1t1, users_to_results)
-
-    # Perform single switch
-    elif len(switch_results) >= 1 and not switch_results[0].seduced_or_died:
-        s = switch_results[0].player.user
-        _do_single_switch(
-            s, s,
-            switch_results[0].target0_after_control,
-            switch_results[0].target1_after_control,
-            users_to_results
-        )
-
-    # Return switch map
-    return switched
-
-def _do_seduction(actions, results, users_to_results, actions_to_results):
-    seduce_map = {results.player.user: False for results in results}
-    for seduce_action in actions.filter(action_type=MafiaActionType.SEDUCE.code):
-        seduce_result = actions_to_results[seduce_action]
-        if seduce_result.seduced_or_died:
-            continue
-        target_result = users_to_results[seduce_result.target0]
-        target_result.attempted_seduced = True
-        target_result.add_targeted_by(seduce_result.player.user)
-        seduce_result.action_effective = True
-    return seduce_map
-
-def _kill_cancelled(killer_result, killed_set):
-    return (
-        (not killer_result.seduced) or
-        (killer_result.died and not killer_result.player.user in killed_set)
-    )
-
-def _kill_if_alive(killer_result, target_result, killed_status, killed_set, users_to_results):
-    if target_result.died and target_result.player.user not in killed_set:
-        killer_result.action_effective = True
-        return
-    target_result.status = (
-        MafiaPlayerNightStatus.TERMINATED
-        if MafiaPlayerNightStatus.TERMINATD.code in [target_result.status, killed_status]
-        else MafiaPlayerNightStatus.ATTACKED
-    )
-    if target_result.died:
-        killer_result.action_effective = True
-        killed_set.add(target_result.user)
-    else:
-        for protector in target_result.get_protected_by():
-            users_to_results[protector].action_effective = True
-        if target_result.action_type == MafiaActionType.BULLETPROOF_VEST.code:
-            target_result.action_effective = True
 
 def _process_actions(actions):
 
@@ -510,6 +434,133 @@ def _process_actions(actions):
         remember_result.action_effective = True
 
     return results
+
+def _do_switching(actions, results, users_to_results, actions_to_results):
+
+    # Clear previous calculations
+    for result in results:
+        result.clear_switched_by()
+
+    # Initialize switch map; collect switch action results
+    switched = {result.player.user: result.player.user for result in results}
+    switch_actions = actions.filter(action_type=MafiaActionType.SWITCH.code)
+    switch_results = [actions_to_results[switch_action] for switch_action in switch_actions]
+
+    # Fail if more than two switches
+    if len(switch_results) > 2:
+        raise MafiaError('more than two switch actions in single night')
+
+    # Perform two switches
+    if len(switch_results) >= 2:
+
+        # Assign helper variables for switchers and targets
+        s0 = switch_results[0].player.user
+        s1 = switch_results[1].player.user
+        s0t0 = switch_results[0].target0_after_control
+        s0t1 = switch_results[0].target1_after_control
+        s1t0 = switch_results[1].target0_after_control
+        s1t1 = switch_results[1].target1_after_control
+
+        # If both seduced_or_died, do nothing
+        if switch_results[0].seduced_or_died and switch_results[1].seduced_or_died:
+            pass
+
+        # If one seduced_or_died, do the other
+        elif switch_results[0].seduced_or_died:
+            _do_single_switch(s1, s1, s1t0, s1t1, users_to_results)
+        elif switch_results[1].seduced_or_died:
+            _do_single_switch(s0, s0, s0t0, s0t1, users_to_results)
+
+        # Switches with the same two players
+        elif (s0t0 == s1t0 and s0t1 == s1t1) or (s0t0 == s1t1 and s0t1 == s1t0):
+            _do_double_switch(s0, s1, s0t0, users_to_results)
+            _do_double_switch(s0, s1, s0t1, users_to_results)
+
+        # Switches where one players is in both
+        elif s0t0 == s1t0:
+            _do_overlapping_switch(s0, s1, s0t1, s0t0, s1t1, users_to_results)
+        elif s0t0 == s1t1:
+            _do_overlapping_switch(s0, s1, s0t1, s0t0, s1t0, users_to_results)
+        elif s0t1 == s1t0:
+            _do_overlapping_switch(s0, s1, s0t0, s0t1, s1t1, users_to_results)
+        elif s0t1 == s1t1:
+            _do_overlapping_switch(s0, s1, s0t0, s0t1, s1t0, users_to_results)
+
+        # Independent switches
+        else:
+            _do_single_switch(s0, s0, s0t0, s0t1, users_to_results)
+            _do_single_switch(s1, s1, s1t0, s1t1, users_to_results)
+
+    # Perform single switch
+    elif len(switch_results) >= 1 and not switch_results[0].seduced_or_died:
+        s = switch_results[0].player.user
+        _do_single_switch(
+            s, s,
+            switch_results[0].target0_after_control,
+            switch_results[0].target1_after_control,
+            users_to_results
+        )
+
+    # Return switch map
+    return switched
+
+def _do_overlapping_switch(switcher0, switcher1, target0, overlapped_target, target1, users_to_results):
+    _do_single_switch(switcher0, switcher1, target0, target1, users_to_results)
+    _do_double_switch(switcher0, switcher1, overlapped_target, users_to_results)
+
+def _do_single_switch(switcher0, switcher1, target0, target1, switch_map, users_to_results):
+    temp = switch_map[target0]
+    switch_map[target0] = switch_map[target1]
+    switch_map[target1] = temp
+    users_to_results[target0].switched_with = target1
+    users_to_results[target1].switched_with = target0
+    users_to_results[target0].add_switched_by(switcher0)
+    users_to_results[target1].add_switched_by(switcher1)
+    switcher0.action_effective = True
+    switcher1.action_effective = True
+
+def _do_double_switch(switcher0, switcher1, target, users_to_results):
+    users_to_results[target].switched_with = target
+    users_to_results[target].add_switched_by(switcher0)
+    users_to_results[target].add_switched_by(switcher1)
+    switcher0.action_effective = True
+    switcher1.action_effective = True
+
+def _do_seduction(actions, results, users_to_results, actions_to_results):
+    seduce_map = {results.player.user: False for results in results}
+    for seduce_action in actions.filter(action_type=MafiaActionType.SEDUCE.code):
+        seduce_result = actions_to_results[seduce_action]
+        if seduce_result.seduced_or_died:
+            continue
+        target_result = users_to_results[seduce_result.target0]
+        target_result.attempted_seduced = True
+        target_result.add_targeted_by(seduce_result.player.user)
+        seduce_result.action_effective = True
+    return seduce_map
+
+def _kill_cancelled(killer_result, killed_set):
+    return (
+        (not killer_result.seduced) or
+        (killer_result.died and not killer_result.player.user in killed_set)
+    )
+
+def _kill_if_alive(killer_result, target_result, killed_status, killed_set, users_to_results):
+    if target_result.died and target_result.player.user not in killed_set:
+        killer_result.action_effective = True
+        return
+    target_result.status = (
+        MafiaPlayerNightStatus.TERMINATED
+        if MafiaPlayerNightStatus.TERMINATD.code in [target_result.status, killed_status]
+        else MafiaPlayerNightStatus.ATTACKED
+    )
+    if target_result.died:
+        killer_result.action_effective = True
+        killed_set.add(target_result.user)
+    else:
+        for protector in target_result.get_protected_by():
+            users_to_results[protector].action_effective = True
+        if target_result.action_type == MafiaActionType.BULLETPROOF_VEST.code:
+            target_result.action_effective = True
 
 def _get_name(user):
     return user.first_name + ' ' + user.last_name
@@ -857,29 +908,3 @@ def _apply_results(results):
 def get_default_night_description(results):
     return 'default night description not implemented'
     # TODO
-
-def end_night(game):
-    if game.day_number < 1:
-        print 'Mafia: Bad function call: end_night when game.day_number < 1'
-        return False
-    if game.time != MafiaGameTime.NIGHT.code:
-        print 'Mafia: Bad function call: end_night when not night'
-        return False
-    try:
-        _clear_previous_night_results(game)
-        actions = _get_actions(game)
-        results = _process_actions(actions)
-        _generate_reports(results)
-        for result in results:
-            result.save()
-        _apply_results(results)
-        for result in results:
-            result.player.save()
-        result = MafiaNightResult(game=game, night_number=game.day_number)
-        result.description = get_default_night_description(results)
-    except MafiaError as e:
-        print 'Mafia: Error while processing night: ' + e.message
-        return False
-    game.day_number += 1
-    game.time = MafiaGameTime.DAWN.code
-    return True

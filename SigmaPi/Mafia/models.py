@@ -227,7 +227,7 @@ MafiaRole.BASIC_VILLAGER = MafiaRole(
 MafiaRole.GODFATHER = MafiaRole(
     'MG', 'Godfather', MafiaFaction.MAFIA,
     [(MafiaActionType.SLAY, MAFIA_UNLIMITED_USES)],
-    apparent_gult=MafiaApparentGuilt.INNOCENT,
+    apparent_guilt=MafiaApparentGuilt.INNOCENT,
     min_in_game=1, max_in_game=1,
 )
 MafiaRole.LIMO_DRIVER = MafiaRole(
