@@ -1,0 +1,49 @@
+{% extends "secure_base.html" %}
+
+{% block module_nav %}
+<div class="sub-nav">
+    <ul class="nav nav-pills">
+
+        {% if '/play' in request.path %}
+        <li class="active">
+        {% else %}
+        <li>
+        {% endif %}
+            <a href="{% url 'Mafia.views.play' %}">
+                Play
+            </a>
+        </li>
+
+        {% if '/join' in request.path %}
+        <li class="active">
+        {% else %}
+        <li>
+        {% endif %}
+            <a href="{% url 'Mafia.views.join' %}">
+                Join
+            </a>
+        </li>
+        
+        {% if '/spectate' in request.path %}
+        <li class="active">
+        {% else %}
+        <li>
+        {% endif %}
+            <a href="{% url 'Mafia.views.spectate' %}">
+                Spectate
+            </a>
+        </li>
+        
+        {% if '/moderate' in request.path %}
+        <li class="active">
+        {% else %}
+        <li>
+        {% endif %}
+            <a href="{% url 'Mafia.views.moderate' %}">
+                Moderate
+            </a>
+        </li>
+
+    </ul>
+</div>
+{% endblock %}

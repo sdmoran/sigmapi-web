@@ -52,20 +52,31 @@ MafiaGameTime.DUSK = MafiaGameTime('U', 'Dusk')
 MafiaGameTime.NIGHT = MafiaGameTime('N', 'Night')
 
 class MafiaGame(models.Model):
+    name = models.CharField(max_length=50, default='Untitled Mafia Game')
     created = models.DateField()
-    created_by = models.ForeignKey(User)
+    creator = models.ForeignKey(User)
     day_number = models.PositiveSmallIntegerField(default=0)
     time = models.CharField(
         max_length=MafiaGameTime.CODE_LENGTH,
         choices=MafiaGameTime.get_choice_tuples(),
-        default=MafiaGameTime.DUSK
+        default=MafiaGameTime.DUSK.code
     )
-    finished = models.BooleanField(default=False)
+    is_finished = models.BooleanField(default=False)
 
-class MafiaModerator(models.Model):
-    game = models.ForeignKey(MafiaGame)
-    user = models.ForeignKey(User)
+    @property
+    def is_inviting(self):
+        return self.day_number == 0
 
+    @property
+    def status_string(self):
+        if self.is_finished:
+            return 'Complete'
+        elif self.is_inviting:
+            return 'Inviting'
+        else:
+            time_name = MafiaGameTime.get_instance(self.time).name
+            return name + ' ' + `self.day_number`
+        
 class MafiaFaction(object):
     VILLAGE = 'V'
     MAFIA = 'M'
@@ -327,17 +338,18 @@ class MafiaPlayer(models.Model):
     user = models.ForeignKey(User)
     role = models.CharField(
         max_length=MafiaRole.CODE_LENGTH,
-        choices=MafiaRole.get_choice_tuples()
+        choices=MafiaRole.get_choice_tuples(),
+        null=True, blank=True,
     )
     old_role = models.CharField(
         max_length=MafiaRole.CODE_LENGTH,
         choices=MafiaRole.get_choice_tuples(),
-        null=True
+        null=True, blank=True,
     )
     older_role = models.CharField(
         max_length=MafiaRole.CODE_LENGTH,
         choices=MafiaRole.get_choice_tuples(),
-        null=True
+        null=True, blank=True,
     )
     status = models.CharField(
         max_length=MafiaPlayerStatus.CODE_LENGTH,

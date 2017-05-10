@@ -1,0 +1,50 @@
+{% extends "mafia_base.html" %}
+
+{% block title %}Sigma Pi Secure - Join Mafia Games {% endblock %}
+
+{% block content %}
+<h3>Mafia games inviting players</h3>
+
+{% if game_infos %}
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="four wide">Name</th>
+                <th class="two wide">Date Created</th>
+                <th class="two wide">Moderator</th>
+                <th class="two wide">Status</th>
+                <th class="two wide">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for gi in game_infos %}
+            <tr>
+                <td>{{ gi.name }}</td>
+                <td>{{ gi.created }}</td>
+                <td>{{ gi.creator_name }}</td>
+                {% if gi.joined %}
+                <td>Joined</td>
+                <td>
+                    <a href="{% url 'Mafia.views.leave_game' gi.pk %}">
+                        Leave
+                    </a>
+                </td>
+                {% else %}
+                <td>Not Joined</td>
+                <td>
+                    <a href="{% url 'Mafia.views.join_game' gi.pk %}">
+                        Join
+                    </a>
+                </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p>There are currently no games to join.</p>
+{% endif %}
+
+{% endblock %}
