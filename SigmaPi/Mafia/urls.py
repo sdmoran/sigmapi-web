@@ -12,4 +12,5 @@ urlpatterns = patterns('',
     url(r'^spectate/(?P<game_id>[\d]+)/$', 'Mafia.views.spectate_game'),
     url(r'^moderate/$', 'Mafia.views.moderate'),
     url(r'^moderate/(?P<game_id>[\d]+)/$', 'Mafia.views.moderate_game'),
+    url(r'^add/$', 'Mafia.views.add_game'),
 )

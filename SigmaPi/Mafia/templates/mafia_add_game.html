@@ -1,0 +1,15 @@
+{% extends "mafia_base.html" %}
+
+{% block title %}Sigma Pi Secure - Add New Mafia Game {% endblock %}
+
+{% block content %}
+
+<h3>Create new Mafia game</h3>
+
+ <form action="{% url 'Mafia.views.add_game'%}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" class="save btn btn-default" value="Create"/>
+</form>
+
+{% endblock %}

@@ -1,14 +1,17 @@
 
+from datetime import datetime
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from .models import MafiaGame, MafiaPlayer
+from .forms import MafiaAddGameForm
 
 import mafia
 
 @login_required
 def index(request):
-    return redirect('Mafia.views.join')
+    return redirect('Mafia.views.play')
 
 @login_required
 def play(request):
@@ -109,9 +112,23 @@ def moderate_game(request, game_id):
     game = _id_to_game(game_id)
     raise Http404('Not implemented.')
 
+@login_required
+def add_game(request, **kwargs):
+    if request.method == 'POST':
+        form = MafiaAddGameForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            game = MafiaGame(name=name, created=datetime.now(), creator=request.user)
+            game.save()
+            return redirect('Mafia.views.moderate')
+        else:
+            return render(request, 'mafia_add_game.html', {'form': form})
+    else:
+        form = MafiaAddGameForm()
+        return render(request, 'mafia_add_game.html', {'form': form})
+
 def _id_to_game(game_id):
     try:
         return MafiaGame.objects.get(pk=game_id)
     except MafiaGame.DoesNotExist:
         raise Http404('Invalid game ID: ' + game_id2)
-

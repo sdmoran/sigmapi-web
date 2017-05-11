@@ -44,6 +44,16 @@
             </a>
         </li>
 
+        {% if '/add' in request.path %}
+        <li class="active">
+        {% else %}
+        <li>
+        {% endif %}
+            <a href="{% url 'Mafia.views.add_game' %}">
+                Create Game
+            </a>
+        </li>
+
     </ul>
 </div>
 {% endblock %}

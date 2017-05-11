@@ -51,8 +51,13 @@ MafiaGameTime.DAY = MafiaGameTime('D', 'Day')
 MafiaGameTime.DUSK = MafiaGameTime('U', 'Dusk')
 MafiaGameTime.NIGHT = MafiaGameTime('N', 'Night')
 
+MAFIA_GAME_NAME_MAX_LENGTH = 50
+
 class MafiaGame(models.Model):
-    name = models.CharField(max_length=50, default='Untitled Mafia Game')
+    name = models.CharField(
+        max_length=MAFIA_GAME_NAME_MAX_LENGTH,
+        default='Unnamed Mafia Game'
+    )
     created = models.DateField()
     creator = models.ForeignKey(User)
     day_number = models.PositiveSmallIntegerField(default=0)
