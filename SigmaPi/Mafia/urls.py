@@ -12,5 +12,8 @@ urlpatterns = patterns('',
     url(r'^spectate/(?P<game_id>[\d]+)/$', 'Mafia.views.spectate_game'),
     url(r'^moderate/$', 'Mafia.views.moderate'),
     url(r'^moderate/(?P<game_id>[\d]+)/$', 'Mafia.views.moderate_game'),
+    url(r'^moderate/(?P<game_id>[\d]+)/add/$', 'Mafia.views.add_user_to_game'),
+    url(r'^moderate/(?P<game_id>[\d]+)/add/(?P<username>.+)/$', 'Mafia.views.add_user_to_game'),
+    url(r'^moderate/(?P<game_id>[\d]+)/remove/(?P<username>.+)/$', 'Mafia.views.remove_user_from_game'),
     url(r'^add/$', 'Mafia.views.add_game'),
 )

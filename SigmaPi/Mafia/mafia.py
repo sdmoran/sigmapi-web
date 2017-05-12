@@ -2,52 +2,39 @@
 from .models import *
 
 
-def _report_user_error(s):
-    print 'Mafia: ' + s
-
 ##############################################
 # Beginning game
 ##############################################
 
 def begin_game(game):
     if game.day_number != 0:
-        _report_user_error('Bad function call: begin_game when game.day_number != 0')
-        return False
-    try:
-        _check_role_requirements(game)
-    except MafiaError as e:
-        _report_user_error('Error while checking role requirements: ' + e.message)
-        return False
+        raise MafiaUserError('Cannot beging game: game is already begun')
+    _check_role_requirements(game)
     game.day_number = 1
     game.time = MafiaGameTime.DAY.code
     game.save()
-    return True
 
-def add_player(game, user):
-    if not game.is_inviting:
-        _report_user_error('Bad function call: add_player when not inviting')
-        return False
+def add_user(game, user):
+    if not game.is_accepting:
+        raise MafiaUserError('Cannot add user: game is not accepting')
     try:
         MafiaPlayer.objects.get(game=game, user=user)
-        return True # Player already added
+        # If we reach here, player is already added
     except MafiaPlayer.DoesNotExist:
-        pass
-    MafiaPlayer(game=game, user=user).save()
-    return True
+        MafiaPlayer(game=game, user=user).save()
 
-def remove_player(game, user):
-    if not game.is_inviting:
-        _report_user_error('Bad function call: remove_player when not inviting')
-        return False
+def remove_user(game, user):
+    if not game.is_accepting:
+        raise MafiaUserError('Cannot remove user: game is not accepting')
     try:
         p = MafiaPlayer.objects.get(game=game, user=user)
         p.delete()
     except MafiaPlayer.DoesNotExist:
-        return True # Player already removed (or never added)
-    return True
+        pass # Player already removed (or never added)
 
 def _check_role_requirements(game):
     pass # TODO (remember to check for NULL roles)
+
 
 
 ##############################################
@@ -56,11 +43,9 @@ def _check_role_requirements(game):
 
 def begin_day(game):
     if game.day_number < 2:
-        _report_user_error('Bad function call: begin_day when game.day_number < 0')
-        return False
+        raise MafiaUserError('Cannot begin day: day number < 2')
     if game.time != MafiaGameTime.DAWN.code:
-        _report_user_error('Bad function call: begin_day when not dawn')
-        return False
+        raise MafiaUserError('Cannot begin day: it is not dawn')
     players = MafiaPlayer.objects.filter(
         game=game, status=MafiaPlayerStatus.ALIVE.code
     )
@@ -68,7 +53,6 @@ def begin_day(game):
         MafiaVote(voter=player, day_number=game.day_number).save()
     game.time = MafiaGameTime.DAY.code
     game.save()
-    return True
 
 
 ##############################################
@@ -77,11 +61,9 @@ def begin_day(game):
 
 def end_day(game):
     if game.day_number < 1:
-        _report_user_error('Bad function call: end_day when game.day_number < 1')
-        return False
+        raise MafiaUserError('Cannot end day: game has not begun')
     if game.time != MafiaGameTime.DAY.code:
-        _report_user_error('Bad function call: end_day when not day')
-        return False
+        raise MafiaUserError('Cannot end day; it is not day')
     result = (
         MafiaDayResult(game=game, day_number=1, lynched=None)
         if game.day_number == 1
@@ -91,7 +73,6 @@ def end_day(game):
     result.save()
     game.time = MafiaGameTime.DUSK.code
     game.save()
-    return True
 
 def _do_lynch(game):
 
@@ -160,11 +141,9 @@ def get_default_day_description(result):
 
 def begin_night(game):
     if game.day_number < 1:
-        _report_user_error('Bad function call: begin_night when game.day_number < 1')
-        return False
+        raise MafiaUserError('Cannot begin night: game has not begun')
     if game.time != MafiaGameTime.DUSK.code:
-        _report_user_error('Bad function call: begin_night when not dusk')
-        return False
+        raise MafiaUserError('Cannot begin night: it is not dusk')
     players = MafiaPlayer.objects.filter(
         game=game, status=MafiaPlayerStatus.ALIVE.code
     )
@@ -172,7 +151,6 @@ def begin_night(game):
         MafiaAction(performer=player, night_number=game.day_number).save()
     game.time = MafiaGameTime.NIGHT.code
     game.save()
-    return True
 
 
 ##############################################
@@ -181,29 +159,22 @@ def begin_night(game):
 
 def end_night(game):
     if game.day_number < 1:
-        _report_user_error('Bad function call: end_night when game.day_number < 1')
-        return False
+        raise MafiaUserError('Cannot end night; game has not begun')
     if game.time != MafiaGameTime.NIGHT.code:
-        _report_user_error('Bad function call: end_night when not night')
-        return False
-    try:
-        _clear_stale_night_results(game)
-        actions = _get_actions(game)
-        results = _process_actions(actions)
-        _generate_reports(results)
-        for result in results:
-            result.save()
-        _apply_results(results)
-        for result in results:
-            result.player.save()
-        result = MafiaNightResult(game=game, night_number=game.day_number)
-        result.description = get_default_night_description(results)
-    except MafiaError as e:
-        _report_user_error('Error while processing night: ' + e.message)
-        return False
+        raise MafiaUserError('Cannot end night: it is not night')
+    _clear_stale_night_results(game)
+    actions = _get_actions(game)
+    results = _process_actions(actions)
+    _generate_reports(results)
+    for result in results:
+        result.save()
+    _apply_results(results)
+    for result in results:
+        result.player.save()
+    result = MafiaNightResult(game=game, night_number=game.day_number)
+    result.description = get_default_night_description(results)
     game.day_number += 1
     game.time = MafiaGameTime.DAWN.code
-    return True
 
 def _clear_stale_night_results(game):
     MafiaPlayerNightResult.objects.filter(

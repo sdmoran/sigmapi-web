@@ -1,0 +1,46 @@
+{% extends "mafia_base.html" %}
+
+{% block title %}Sigma Pi Secure - Moderate Game {% endblock %}
+
+{% block content %}
+
+<h3>Manage Players for <em>{{ game.name }}</em></h3>
+
+<h4>Add player </h4>
+
+ <form action="{% url 'Mafia.views.add_user_to_game' game.pk %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ add_user_form }}
+    <input type="submit" class="save btn btn-default" value="Add Player"/>
+</form>
+
+<h4>Currently signed up</h4>
+
+{% if signed_up_users %}
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="ten wide">Name</th>
+                <th class="two wide">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for name, username in signed_up_users %}
+            <tr>
+                <td>{{ name }}</td>
+                <td>
+                    <a href="{% url 'Mafia.views.remove_user_from_game' game.pk username %}">
+                        Remove
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p>No players are currently signed up for this game</p>
+{% endif %}
+
+{% endblock %}

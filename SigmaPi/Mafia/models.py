@@ -69,15 +69,15 @@ class MafiaGame(models.Model):
     is_finished = models.BooleanField(default=False)
 
     @property
-    def is_inviting(self):
+    def is_accepting(self):
         return self.day_number == 0
 
     @property
     def status_string(self):
         if self.is_finished:
             return 'Complete'
-        elif self.is_inviting:
-            return 'Inviting'
+        elif self.is_accepting:
+            return 'Accepting Players'
         else:
             time_name = MafiaGameTime.get_instance(self.time).name
             return time_name + ' ' + `self.day_number`
@@ -599,4 +599,7 @@ class MafiaDayResult(models.Model):
     description = models.TextField(default="")
 
 class MafiaError(Exception):
+    pass
+
+class MafiaUserError(Exception):
     pass
