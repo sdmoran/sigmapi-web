@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from mafia import *
 from .models import *
+from .enums import *
 
 class MafiaTestCase(TestCase):
 
@@ -27,26 +28,25 @@ class MafiaTestCase(TestCase):
         self.u_mod.first_name = 'Joe'
         self.u_mod.last_name = 'Moderator'
 
-        self.game = MafiaGame(created=datetime.datetime.now(), created_by=self.u_mod)
+        self.game = MafiaGame(created=datetime.datetime.now(), creator=self.u_mod)
         self.game.save()
-        self.mod = MafiaModerator(game=self.game, user=self.u_mod)
-        self.mod.save()
         self.mayor = self.create_player(MafiaRole.MAYOR, 0)
 
     def test_mafia(self):
 
-        self.assertTrue(begin_game(self.game))
-        self.assertTrue(end_day(self.game))
-        self.assertTrue(begin_night(self.game))
-        self.assertTrue(end_night(self.game))
-        self.assertTrue(begin_day(self.game))
-
-        mayor_vote = MafiaVote.objects.get(voter=self.mayor, day_number=2)
-        mayor_vote.vote_type = MafiaVoteType.LYNCH.code
-        mayor_vote.vote = self.mayor.user
-        mayor_vote.save()
-
-        self.assertTrue(end_day(self.game))
+        try:
+            begin_game(self.game)
+            end_day(self.game)
+            begin_night(self.game)
+            end_night(self.game)
+            begin_day(self.game)
+            mayor_vote = MafiaVote.objects.get(voter=self.mayor, day_number=2)
+            mayor_vote.vote_type = MafiaVoteType.LYNCH.code
+            mayor_vote.vote = self.mayor.user
+            mayor_vote.save()
+            end_day(self.game)
+        except (MafiaError, MafiaUserError) as e:
+            self.fail("error occured: " + `e`)
 
         self.mayor.refresh_from_db()
         self.assertEqual(self.game.day_number, 2)
