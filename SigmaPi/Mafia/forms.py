@@ -25,4 +25,6 @@ class MafiaAddUserToGameForm(BootstrapForm):
             usernames = [p.user.username for p in players]
             self.fields['user'].queryset = User.objects.exclude(
                 username__in=usernames
+            ).exclude(
+                username=game.creator.username
             )

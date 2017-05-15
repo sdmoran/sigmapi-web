@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, HttpResponseServerError
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -37,7 +38,7 @@ def play(request):
                 'creator_name': g.creator.get_full_name(),
                 'status': g.status_string,
             })
-    return render(request, 'mafia_home_play.html', {'game_infos': game_infos})
+    return render(request, 'mafia_play.html', {'game_infos': game_infos})
 
 @login_required
 def play_game(request, game_id):
@@ -65,7 +66,7 @@ def join(request):
             'creator_name': g.creator.get_full_name(),
             'joined': joined,
         })
-    return render(request, 'mafia_home_join.html', {'game_infos': game_infos})
+    return render(request, 'mafia_join.html', {'game_infos': game_infos})
 
 @login_required
 def join_game(request, game_id):
@@ -104,7 +105,7 @@ def spectate(request):
         }
         for g in running_games
     ]
-    return render(request, 'mafia_home_spectate.html', {'game_infos': game_infos})
+    return render(request, 'mafia_spectate.html', {'game_infos': game_infos})
 
 @login_required
 def spectate_game(request, game_id):
@@ -129,11 +130,12 @@ def moderate(request):
         }
         for g in games
     ]
-    return render(request, 'mafia_home_moderate.html', {'game_infos': game_infos})
+    return render(request, 'mafia_moderate.html', {'game_infos': game_infos})
 
 @login_required
 def moderate_game(request, game_id):
     game = _id_to_game(game_id)
+    _check_creator(request, game)
     if game.is_accepting:
         players = MafiaPlayer.objects.filter(game=game)
         signed_up_users = [
@@ -141,7 +143,7 @@ def moderate_game(request, game_id):
             for p in players
         ]
         add_user_form = MafiaAddUserToGameForm(game)
-        return render(request, 'mafia_moderate_accepting_game.html', {
+        return render(request, 'mafia_moderate_game_accepting.html', {
             'game': game,
             'signed_up_users': signed_up_users,
             'add_user_form': add_user_form,
@@ -167,6 +169,7 @@ def add_game(request):
 @login_required
 def add_user_to_game(request, game_id, username=None):
     game = _id_to_game(game_id)
+    _check_creator(request, game)
     if request.method == 'POST':
         form = MafiaAddUserToGameForm(None, request.POST)
         if form.is_valid():
@@ -190,6 +193,7 @@ def add_user_to_game(request, game_id, username=None):
 @login_required
 def remove_user_from_game(request, game_id, username):
     game = _id_to_game(game_id)
+    _check_creator(request, game)
     user = _username_to_user(username)
     return _do_and_redirect(
         fn=mafia.remove_user,
@@ -236,3 +240,7 @@ def _not_implemented():
         <h1>501: Not implemented</h1>
         <h3>Please contact the webmaster</h3>
     ''', status=501)
+
+def _check_creator(request, game):
+    if game.creator != request.user:
+        raise PermissionDenied()

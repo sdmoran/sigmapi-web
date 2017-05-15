@@ -18,6 +18,8 @@ def begin_game(game):
 def add_user(game, user):
     if not game.is_accepting:
         raise MafiaUserError('Cannot add user: game is not accepting')
+    if user == game.creator:
+        raise MafiaUserError('Cannot add user: is game creator')
     try:
         MafiaPlayer.objects.get(game=game, user=user)
         # If we reach here, player is already added
