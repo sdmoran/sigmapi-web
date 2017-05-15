@@ -1,6 +1,9 @@
 
+from collections import defaultdict
+
 from .enums import *
 from .models import *
+from .errors import *
 
 
 ##############################################
@@ -10,7 +13,10 @@ from .models import *
 def begin_game(game):
     if game.day_number != 0:
         raise MafiaUserError('Cannot beging game: game is already begun')
-    _check_role_requirements(game)
+    if check_faction_counts(game) != []:
+        raise MafiaUserError('Cannot begin game: faction counts invalid')
+    if check_role_counts(game) != []:
+        raise MafiaUserError('Cannot begin game: role count(s) invalid')
     game.day_number = 1
     game.time = MafiaGameTime.DAY.code
     game.save()
@@ -26,6 +32,16 @@ def add_user(game, user):
     except MafiaPlayer.DoesNotExist:
         MafiaPlayer(game=game, user=user).save()
 
+def assign_role(game, user, role_code):
+    if not game.is_accepting:
+        raise MafiaUserError('Cannot assign role: game is not accepting')
+    try:
+        player = MafiaPlayer.objects.get(game=game, user=user)
+    except MafiaPlayer.DoesNotExist:
+        raise MafiaUserError('Cannot assign role: user is not in game')
+    player.role = role_code
+    player.save()
+
 def remove_user(game, user):
     if not game.is_accepting:
         raise MafiaUserError('Cannot remove user: game is not accepting')
@@ -35,9 +51,47 @@ def remove_user(game, user):
     except MafiaPlayer.DoesNotExist:
         pass # Player already removed (or never added)
 
-def _check_role_requirements(game):
-    pass # TODO (remember to check for NULL roles)
+def check_faction_counts(game):
+    faction_counts = defaultdict(lambda: 0)
+    for player in MafiaPlayer.objects.filter(game=game):
+        if player.role:
+            faction_counts[MafiaRole.get_instance(player.role).faction] += 1
+    errors = []
+    if faction_counts[MafiaFaction.MAFIA] < 1:
+        errors.append('Total number of Mafia members must be at least 1')
+    if faction_counts[MafiaFaction.VILLAGE] < faction_counts[MafiaFaction.MAFIA]:
+        errors.append(
+            'Total number of Villagers must be greater than or equal to number of Mafia'
+        )
+    elif faction_counts[MafiaFaction.VILLAGE] < 1:
+        errors.append('Total number of Villagers must be at least 1')
+    return errors
 
+def check_role_counts(game):
+    role_counts = defaultdict(lambda: 0)
+    assigned_error_occured = False
+    errors = []
+    for player in MafiaPlayer.objects.filter(game=game):
+        if player.role is None:
+            if not assigned_error_occured:
+                assigned_error_occured = True
+                errors.append('All players must be assigned a role')
+        else:
+            role_counts[player.role] += 1
+    for role in MafiaRole.get_instances():
+        count = role_counts[role.code]
+        if not (role.min_in_game <= count <= role.max_in_game):
+            base_error = 'Number of ' + role.name + 's in game must be '
+            if role.min_in_game == role.max_in_game:
+                error = base_error + 'exactly ' + `role.min_in_game`
+            elif role.max_in_game == float('inf'):
+                error = base_error + 'at least ' + `role.min_in_game`
+            elif role.min_in_game == 0:
+                error = base_error + 'at most ' + `role.max_in_game`
+            else:
+                error = 'between ' + `role.min_in_game` + ' and ' + `role.max_in_game`
+            errors.append(error)
+    return errors
 
 
 ##############################################

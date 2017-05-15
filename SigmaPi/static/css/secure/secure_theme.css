@@ -43,6 +43,10 @@
   border-bottom: 1px rgb(124, 43, 131) solid;
 }
 
+.spaced-above {
+  margin-top: 30px;
+}
+
 /**
  * Footer Navigation styling
  */
@@ -201,6 +205,23 @@ input[type="file"]
 
     width: auto;
   }
+}
+
+/**
+ * Dynamic status div
+ */
+.dynamic-status {
+  border: 1px black solid;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 15px;
+  background: #ff9e9e;
+  border-radius: 20px;
+}
+
+.dynamic-status p {
+  margin: 0;
+  padding: 0;
 }
 
 /**

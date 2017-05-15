@@ -4,7 +4,7 @@
 <div class="sub-nav">
     <ul class="nav nav-pills">
 
-        {% if '/play' in request.path %}
+        {% if '/mafia/play' in request.path %}
         <li class="active">
         {% else %}
         <li>
@@ -14,7 +14,7 @@
             </a>
         </li>
 
-        {% if '/join' in request.path %}
+        {% if '/mafia/join' in request.path %}
         <li class="active">
         {% else %}
         <li>
@@ -24,7 +24,7 @@
             </a>
         </li>
         
-        {% if '/spectate' in request.path %}
+        {% if '/mafia/spectate' in request.path %}
         <li class="active">
         {% else %}
         <li>
@@ -34,7 +34,7 @@
             </a>
         </li>
         
-        {% if '/moderate' in request.path %}
+        {% if '/mafia/moderate' in request.path %}
         <li class="active">
         {% else %}
         <li>
@@ -44,7 +44,7 @@
             </a>
         </li>
 
-        {% if '/add' in request.path %}
+        {% if '/mafia/add' in request.path %}
         <li class="active">
         {% else %}
         <li>

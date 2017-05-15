@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 
 class ChoiceEnumeration(object):
 
@@ -35,6 +36,16 @@ class ChoiceEnumeration(object):
             for inst in cls.get_instances()
         ]
 
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return self.__class__.__name__ + '(\'' + self.code + \
+            '\', \'' + self.name + '\')'
+
+    def __unicode__(self):
+        return unicode(str(self))
+
 class MafiaGameStatus(ChoiceEnumeration):
     CODE_LENGTH = 1
 
@@ -47,9 +58,9 @@ MafiaGameTime.DUSK = MafiaGameTime('U', 'Dusk')
 MafiaGameTime.NIGHT = MafiaGameTime('N', 'Night')
 
 class MafiaFaction(object):
-    VILLAGE = 'V'
-    MAFIA = 'M'
-    ROGUE = 'R'
+    VILLAGE = 'Village'
+    MAFIA = 'Mafia'
+    ROGUE = 'Rogue'
 
 class MafiaActionType(ChoiceEnumeration):
 

@@ -290,8 +290,3 @@ class MafiaDayResult(models.Model):
     lynched = models.ForeignKey(User, null=True)
     description = models.TextField(default="")
 
-class MafiaError(Exception):
-    pass
-
-class MafiaUserError(Exception):
-    pass

@@ -26,16 +26,22 @@
                 {% if gi.joined %}
                 <td>Joined</td>
                 <td>
-                    <a href="{% url 'Mafia.views.leave_game' gi.pk %}">
-                        Leave
-                    </a>
+                     <form action="{% url 'Mafia.views.leave_game' gi.pk %}"
+                           method="post"
+                           enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="submit" class="save btn btn-default" value="Leave" />
+                    </form>
                 </td>
                 {% else %}
                 <td>Not Joined</td>
                 <td>
-                    <a href="{% url 'Mafia.views.join_game' gi.pk %}">
-                        Join
-                    </a>
+                     <form action="{% url 'Mafia.views.join_game' gi.pk %}"
+                           method="post"
+                           enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="submit" class="save btn btn-default" value="Join" />
+                    </form>
                 </td>
                 {% endif %}
             </tr>

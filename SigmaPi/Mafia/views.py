@@ -7,10 +7,11 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from .models import MafiaGame, MafiaPlayer
-from .forms import MafiaAddGameForm, MafiaAddUserToGameForm
 
 import mafia
+from .models import *
+from .forms import *
+from .errors import *
 
 @login_required
 def index(request):
@@ -52,7 +53,13 @@ def play_game(request, game_id):
 
 @login_required
 def join(request):
-    accepting_games = MafiaGame.objects.filter(day_number=0).order_by('created')
+    accepting_games = MafiaGame.objects.filter(
+        day_number=0
+    ).order_by(
+        'created'
+    ).exclude(
+        creator=request.user
+    )
     accepting_games.reverse()
     game_infos = []
     for g in accepting_games:
@@ -70,6 +77,8 @@ def join(request):
 
 @login_required
 def join_game(request, game_id):
+    if request.method != 'POST':
+        return _expected_post()
     game = _id_to_game(game_id)
     return _do_and_redirect(
         fn=mafia.add_user,
@@ -79,6 +88,8 @@ def join_game(request, game_id):
 
 @login_required
 def leave_game(request, game_id):
+    if request.method != 'POST':
+        return _expected_post()
     game = _id_to_game(game_id)
     return _do_and_redirect(
         fn=mafia.remove_user,
@@ -137,16 +148,27 @@ def moderate_game(request, game_id):
     game = _id_to_game(game_id)
     _check_creator(request, game)
     if game.is_accepting:
-        players = MafiaPlayer.objects.filter(game=game)
+        players = MafiaPlayer.objects.filter(game=game).order_by('user__first_name')
         signed_up_users = [
-            (p.user.get_full_name(), p.user.username)
+            (
+                p.user.get_full_name(),
+                MafiaRole.get_instance(p.role).faction if p.role else '',
+                p.role if p.role else '',
+                p.user.username
+            )
             for p in players
         ]
         add_user_form = MafiaAddUserToGameForm(game)
+        role_errors = mafia.check_role_counts(game) + mafia.check_faction_counts(game)
+        roles = [('', '(Unassigned)')] + [
+            (role.code, role.name) for role in MafiaRole.get_instances()
+        ]
         return render(request, 'mafia_moderate_game_accepting.html', {
             'game': game,
             'signed_up_users': signed_up_users,
             'add_user_form': add_user_form,
+            'roles': roles,
+            'role_errors': role_errors,
         })
     else:
         return _not_implemented()
@@ -174,24 +196,24 @@ def add_user_to_game(request, game_id, username=None):
         form = MafiaAddUserToGameForm(None, request.POST)
         if form.is_valid():
             user = form.cleaned_data['user']
+            return _do_and_redirect(
+                fn=mafia.add_user,
+                fn_args=(game, user),
+                redirect_to='Mafia.views.moderate_game',
+                game_id=game_id,
+            )
         else:
-            return redirect('Mafia.views.moderate_game', args=(game_id,))
-    elif username:
-        user = _username_to_user(username)
+            return redirect(reverse('Mafia.views.moderate_game', args=(game_id,)))
+    
     else:
-        return HttpResponse('''
-            <h1>400: Bad Request</h1>
-            <h3>Expected username either in URL or in POST data</h3>
-        ''', status=400)
-    return _do_and_redirect(
-        fn=mafia.add_user,
-        fn_args=(game, user),
-        redirect_to='Mafia.views.moderate_game',
-        game_id=game_id,
-    )
+        return _expected_post()
 
 @login_required
-def remove_user_from_game(request, game_id, username):
+def remove_user_from_game(request, game_id):
+    try:
+        (username,) = _get_post_data(request, 'username')
+    except BadPostRequestError as e:
+        return _bad_request(e)
     game = _id_to_game(game_id)
     _check_creator(request, game)
     user = _username_to_user(username)
@@ -202,10 +224,42 @@ def remove_user_from_game(request, game_id, username):
         game_id=game_id,
     )
 
+@login_required
+def assign_role(request, game_id):
+    try:
+        (username, role_code) = _get_post_data(request, 'username', 'role_code')
+    except BadPostRequestError as e:
+        return _bad_request(e)
+    game = _id_to_game(game_id)
+    _check_creator(request, game)
+    user = _username_to_user(username)
+    return _do_and_redirect(
+        fn=mafia.assign_role,
+        fn_args=(game, user, role_code),
+        redirect_to='Mafia.views.moderate_game',
+        game_id=game_id,
+    )
+
 
 ##############################################
 # Utilities
 ##############################################
+
+class BadPostRequestError(Exception):
+    pass
+
+def _get_post_data(request, *keys):
+    if request.method != 'POST':
+        raise BadPostRequestError('Endpoint only accepts POST requests')
+    result = []
+    for key in keys:
+        if key not in request.POST:
+            raise BadPostRequestError('POST data missing key: ' + key)
+        result.append(request.POST[key])
+    return tuple(result)
+
+def _expected_post():
+    return _bad_request('Endpoint only accepts POST requests')
 
 def _id_to_game(game_id):
     try:
@@ -228,7 +282,13 @@ def _do_and_redirect(fn, fn_args, redirect_to, **redirect_kwargs):
         return _server_error(e)
     return redirect(reverse(redirect_to, kwargs=redirect_kwargs))
 
-def _server_error(error):
+def _bad_request(err):
+    return HttpResponse(
+        '<h1>400: Bad Request</h1><p>' + err.message + '</p>',
+        status=400
+    )
+
+def _server_error(err):
     print 'INTERNAL MAFIA ERROR: ' + `err`
     return HttpResponseServerError('''
         <h1>500: Internal server error</h1>

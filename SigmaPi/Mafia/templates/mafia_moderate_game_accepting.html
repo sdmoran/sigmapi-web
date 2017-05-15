@@ -4,43 +4,82 @@
 
 {% block content %}
 
-<h3>Manage Players for <em>{{ game.name }}</em></h3>
+<h3>Set up <em>{{ game.name }}</em></h3>
 
-<h4>Add player </h4>
+<div class="spaced-above">
+    <h4>Add players</h4>
 
- <form action="{% url 'Mafia.views.add_user_to_game' game.pk %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ add_user_form }}
-    <input type="submit" class="save btn btn-default" value="Add Player"/>
-</form>
-
-<h4>Currently signed up</h4>
-
-{% if signed_up_users %}
-<div class="table-responsive">
-    <table class="table">
-        <thead>
-            <tr>
-                <th class="ten wide">Name</th>
-                <th class="two wide">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for name, username in signed_up_users %}
-            <tr>
-                <td>{{ name }}</td>
-                <td>
-                    <a href="{% url 'Mafia.views.remove_user_from_game' game.pk username %}">
-                        Remove
-                    </a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+     <form action="{% url 'Mafia.views.add_user_to_game' game.pk %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ add_user_form }}
+        <input type="submit" class="save btn btn-default" value="Add Player"/>
+    </form>
 </div>
-{% else %}
-<p>No players are currently signed up for this game</p>
-{% endif %}
+
+<div class="spaced-above">
+    <h4>Currently signed up</h4>
+
+    {% if signed_up_users %}
+    {% if role_errors %}
+    <div class="dynamic-status">
+        {% for role_error in role_errors %}
+            <p>{{ role_error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="four wide">Name</th>
+                    <th class="two wide">Faction</th>
+                    <th class="four wide">Role</th>
+                    <th class="two wide">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for name, faction_name, user_role_code, username in signed_up_users %}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{ faction_name }}</td>
+                    <td>
+                         <form action="{% url 'Mafia.views.assign_role' game.pk %}"
+                               method="post"
+                               enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="username" value="{{ username }}"/>
+                            <select name="role_code" value="{{ user_role_code }}" onchange="this.form.submit()">
+                                {% for role_code, role_name in roles %}
+                                    {% if role_code == user_role_code %}
+                                    <option selected value="{{ role_code }}">{{ role_name }}</option>
+                                    {% else %}
+                                    <option value="{{ role_code }}">{{ role_name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <noscript>
+                                <input type="submit" class="save btn btn-default" value="Change"/>
+                            </noscript>
+                        </form>
+                    </td>
+                    <td>
+                         <form action="{% url 'Mafia.views.remove_user_from_game' game.pk %}"
+                               method="post"
+                               enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="username" value="{{ username }}"/>
+                            <input type="submit" class="save btn btn-default" value="Remove"/>
+                        </form>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No players are currently signed up for this game</p>
+    {% endif %}
+</div>
 
 {% endblock %}
