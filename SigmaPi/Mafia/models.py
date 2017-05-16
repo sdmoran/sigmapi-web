@@ -1,4 +1,6 @@
 
+from datetime import date
+
 from django.db import models
 from django.contrib.auth.models import User
 from collections import defaultdict
@@ -24,6 +26,12 @@ class Game(models.Model):
     )
     is_finished = models.BooleanField(default=False)
 
+    @classmethod
+    def create_game(cls, creator, name):
+        game = Game(creator=creator, name=name, created=date.today())
+        game.save()
+        return game
+
     @property
     def is_accepting(self):
         return self.day_number == 0
@@ -38,13 +46,12 @@ class Game(models.Model):
             time_name = GameTime.get_instance(self.time).name
             return time_name + ' ' + `self.day_number`
 
-    @property
-    def get_playing_users(self):
-        return [
-            p.user
-            for p in Player.objects.filter(game=self)
-        ]
+    def get_players(self):
+        return Player.objects.filter(game=self)
         
+    def get_playing_users(self):
+        return [p.user for p in self.get_players()]
+
     def has_user_playing(self, user):
         try:
             Player.objects.get(game=self, user=user)
