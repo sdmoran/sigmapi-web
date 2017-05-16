@@ -21,6 +21,7 @@ def begin_game(game):
     game.time = GameTime.DAY.code
     game.save()
 
+# TODO delete
 def add_user(game, user):
     if not game.is_accepting:
         raise MafiaUserError('Cannot add user: game is not accepting')

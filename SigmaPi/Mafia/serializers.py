@@ -9,7 +9,8 @@ class PlayerSerializer(serializers.Serializer):
     username = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
-    role = serializers.SerializerMethodField()
+    revealed_role = serializers.SerializerMethodField()
+    secret_info = serializers.SerializerMethodField()
 
     def get_username(self, player):
         return player.user.username
@@ -17,22 +18,27 @@ class PlayerSerializer(serializers.Serializer):
     def get_full_name(self, player):
         return player.user.get_full_name()
 
-    def get_role(self, player):
-        role_name = (
-            Role.get_instance(player.role).name
-            if player.role
-            else "(Unassigned)"
-        )
+    def get_status(self, player):
+        return PlayerStatus.get_instance(player.status).name
+
+    def get_revealed_role(self, player):
         return (
-            role_name if (
-                self.context['user'] == player.game.creator or
-                player.status != PlayerStatus.ALIVE.code
-            )
+            Role.get_instance(player.role).name
+            if player.role and player.status != PlayerStatus.ALIVE.code
             else None
         )
 
-    def get_status(self, player):
-        return PlayerStatus.get_instance(player.status).name
+    def get_secret_info(self, player):
+        if player.game.creator != self.context['user']:
+            return None
+        return {
+            'role': _get_role_name(player.role),
+            'old_role': _get_role_name(player.old_role),
+            'older_role': _get_role_name(player.older_role),
+            'actions_used': player.get_actions_used(),
+            'doused': player.doused,
+            'executioner_target': player.executioner_target,
+        }
 
 
 class UserSerializer(serializers.Serializer):
@@ -59,3 +65,5 @@ class GameSerializer(serializers.Serializer):
         return game.has_user_playing(self.context['user'])
 
 
+def _get_role_name(role_code):
+    return Role.get_instance(role_code).name if role_code else None

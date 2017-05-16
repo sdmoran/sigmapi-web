@@ -7,6 +7,7 @@ from collections import defaultdict
 import json
 
 from enums import *
+from errors import *
 
 GAME_NAME_MAX_LENGTH = 50
 
@@ -60,6 +61,19 @@ class Game(models.Model):
         else:
             return True
 
+    def add_player(self, user):
+        if not self.is_accepting:
+            raise MafiaUserError('Cannot add user: game is not accepting')
+        if user == self.creator:
+            raise MafiaUserError('Cannot add user: is game creator')
+        try:
+            return Player.objects.get(game=self, user=user)
+            # If we reach here, player is already added
+        except Player.DoesNotExist:
+            player = Player(game=self, user=user)
+            player.save()
+            return player
+
 
 class Player(models.Model):
     game = models.ForeignKey(Game)
@@ -89,10 +103,10 @@ class Player(models.Model):
     executioner_target = models.ForeignKey(User, null=True, related_name='executioner_target')
 
     def get_actions_used(self):
-        return defaultdict(
+        return dict(defaultdict(
             (lambda: (0, False)),
             json.loads(self.actions_used_json)
-        )
+        ))
 
     def mark_action_used(self, action_type_code):
         used = self.get_actions_used()
