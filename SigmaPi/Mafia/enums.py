@@ -252,7 +252,7 @@ MafiaRole.YAKUZA = MafiaRole(
     [(MafiaActionType.CORRUPT, MAFIA_UNLIMITED_USES)],
 )
 MafiaRole.SABOTEUR = MafiaRole(
-    'Ma', 'Saboteur', MafiaFaction.MAFIA,
+    'Mt', 'Saboteur', MafiaFaction.MAFIA,
     [(MafiaActionType.SABOTAGE, MAFIA_UNLIMITED_USES)],
     hidden_to_mafia=True,
 )
