@@ -19,9 +19,10 @@ class GamesView(APIView):
 
     def get(self, request):
         games = Game.objects.all()
-        serializer = GameSerializer(games, many=True, context={
-            'user': request.user
-        })
+        serializer = GameSerializer(
+            games, many=True,
+            context={'user': request.user}
+        )
         return OkResponse(serializer.data)
 
     def post(self, request):
@@ -34,15 +35,53 @@ class GamesView(APIView):
                 `GAME_NAME_MAX_LENGTH`
             )
         game = Game.create_game(request.user, request.data['name'])
-        serializer = GameSerializer(game, context={
-            'user': request.user
-        })
+        serializer = GameSerializer(game, context={'user': request.user})
         return OkResponse(serializer.data)
+
+
+class GameView(APIView):
+
+    permissions = (permissions.IsAuthenticated,)
+
+    def get(self, request, game_id):
+        try:
+            game = Game.objects.get(pk=game_id)
+        except Game.DoesNotExist:
+            return NotFoundResponse(
+                'Game with ID ' + game_id + ' does not exist.'
+            )
+        serializer = GameSerializer(game, context={'user': request.user})
+        return OkResponse(serializer.data)
+
+    def delete(self, request, game_id):
+        game = Game.objects.get(pk=game_id)
+        if not (request.user.is_staff or request.user == game.creator):
+            return PermissionDeniedResponse(
+                'To delete a game you must be the game\'s creator, or staff.'
+            )
+        if game.is_finished:
+            return BadRequestResponse(
+                'Cannot delete a finished game.'
+            )
+        game.delete()
+        return OkNoContentResponse()
 
 
 class OkResponse(Response):
     status_code = 200
 
 
+class OkNoContentResponse(Response):
+    status_code = 204
+
+
 class BadRequestResponse(Response):
     status_code = 400
+
+
+class PermissionDeniedResponse(Response):
+    status_code = 403
+
+
+class NotFoundResponse(Response):
+    status_code = 404
