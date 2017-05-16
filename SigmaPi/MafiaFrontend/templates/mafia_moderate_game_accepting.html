@@ -9,7 +9,7 @@
 <div class="spaced-above">
     <h4>Add players</h4>
 
-     <form action="{% url 'Mafia.views.add_user_to_game' game.pk %}" method="post" enctype="multipart/form-data">
+     <form action="{% url 'MafiaFrontend.views.add_user_to_game' game.pk %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ add_user_form }}
         <input type="submit" class="save btn btn-default" value="Add Player"/>
@@ -43,7 +43,7 @@
                     <td>{{ name }}</td>
                     <td>{{ faction_name }}</td>
                     <td>
-                         <form action="{% url 'Mafia.views.assign_role' game.pk %}"
+                         <form action="{% url 'MafiaFrontend.views.assign_role' game.pk %}"
                                method="post"
                                enctype="multipart/form-data">
                             {% csrf_token %}
@@ -63,7 +63,7 @@
                         </form>
                     </td>
                     <td>
-                         <form action="{% url 'Mafia.views.remove_user_from_game' game.pk %}"
+                         <form action="{% url 'MafiaFrontend.views.remove_user_from_game' game.pk %}"
                                method="post"
                                enctype="multipart/form-data">
                             {% csrf_token %}

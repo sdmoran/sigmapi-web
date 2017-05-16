@@ -10,5 +10,5 @@ urlpatterns = patterns('',
     url(r'^links/', include('Links.urls')),
     url(r'^standards/', include('Standards.urls')),
     url(r'^scholarship/', include('Scholarship.urls')),
-    url(r'^mafia/', include('Mafia.urls')),
+    url(r'^mafia/', include('MafiaFrontend.urls')),
 )

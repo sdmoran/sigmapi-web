@@ -6,20 +6,21 @@ import json
 
 from enums import *
 
-MAFIA_GAME_NAME_MAX_LENGTH = 50
+GAME_NAME_MAX_LENGTH = 50
 
-class MafiaGame(models.Model):
+
+class Game(models.Model):
     name = models.CharField(
-        max_length=MAFIA_GAME_NAME_MAX_LENGTH,
+        max_length=GAME_NAME_MAX_LENGTH,
         default='Unnamed Mafia Game'
     )
     created = models.DateField()
     creator = models.ForeignKey(User)
     day_number = models.PositiveSmallIntegerField(default=0)
     time = models.CharField(
-        max_length=MafiaGameTime.CODE_LENGTH,
-        choices=MafiaGameTime.get_choice_tuples(),
-        default=MafiaGameTime.DUSK.code
+        max_length=GameTime.CODE_LENGTH,
+        choices=GameTime.get_choice_tuples(),
+        default=GameTime.DUSK.code
     )
     is_finished = models.BooleanField(default=False)
 
@@ -34,31 +35,47 @@ class MafiaGame(models.Model):
         elif self.is_accepting:
             return 'Accepting Players'
         else:
-            time_name = MafiaGameTime.get_instance(self.time).name
+            time_name = GameTime.get_instance(self.time).name
             return time_name + ' ' + `self.day_number`
+
+    @property
+    def get_playing_users(self):
+        return [
+            p.user
+            for p in Player.objects.filter(game=self)
+        ]
         
-class MafiaPlayer(models.Model):
-    game = models.ForeignKey(MafiaGame)
+    def has_user_playing(self, user):
+        try:
+            Player.objects.get(game=self, user=user)
+        except Player.DoesNotExist:
+            return False
+        else:
+            return True
+
+
+class Player(models.Model):
+    game = models.ForeignKey(Game)
     user = models.ForeignKey(User)
     role = models.CharField(
-        max_length=MafiaRole.CODE_LENGTH,
-        choices=MafiaRole.get_choice_tuples(),
+        max_length=Role.CODE_LENGTH,
+        choices=Role.get_choice_tuples(),
         null=True, blank=True,
     )
     old_role = models.CharField(
-        max_length=MafiaRole.CODE_LENGTH,
-        choices=MafiaRole.get_choice_tuples(),
+        max_length=Role.CODE_LENGTH,
+        choices=Role.get_choice_tuples(),
         null=True, blank=True,
     )
     older_role = models.CharField(
-        max_length=MafiaRole.CODE_LENGTH,
-        choices=MafiaRole.get_choice_tuples(),
+        max_length=Role.CODE_LENGTH,
+        choices=Role.get_choice_tuples(),
         null=True, blank=True,
     )
     status = models.CharField(
-        max_length=MafiaPlayerStatus.CODE_LENGTH,
-        choices=MafiaPlayerStatus.get_choice_tuples(),
-        default=MafiaPlayerStatus.ALIVE.code
+        max_length=PlayerStatus.CODE_LENGTH,
+        choices=PlayerStatus.get_choice_tuples(),
+        default=PlayerStatus.ALIVE.code
     )
     actions_used_json = models.TextField(default='{}')
     doused = models.BooleanField(default=False)
@@ -81,33 +98,29 @@ class MafiaPlayer(models.Model):
 
     @property
     def revealed_as_mayor(self):
-        return self.get_actions_used()[MafiaActionType.REVEAL.code][0] >= 1
+        return self.get_actions_used()[ActionType.REVEAL.code][0] >= 1
 
-class MafiaNightResult(models.Model):
-    game = models.ForeignKey(MafiaGame)
+
+class NightResult(models.Model):
+    game = models.ForeignKey(Game)
     night_number = models.PositiveSmallIntegerField()
     description = models.TextField(default='')
 
-class MafiaAction(models.Model):
-    performer = models.ForeignKey(MafiaPlayer)
+
+class Action(models.Model):
+    performer = models.ForeignKey(Player)
     night_number = models.PositiveSmallIntegerField()
     action_type = models.CharField(
-        max_length=MafiaActionType.CODE_LENGTH,
-        choices=MafiaActionType.get_choice_tuples(),
-        default=MafiaActionType.NO_ACTION.code
+        max_length=ActionType.CODE_LENGTH,
+        choices=ActionType.get_choice_tuples(),
+        default=ActionType.NO_ACTION.code
     )
     target0 = models.ForeignKey(User, related_name='target0', null=True)
     target1 = models.ForeignKey(User, related_name='target1', null=True)
 
-class MafiaPlayerNightStatus(ChoiceEnumeration):
-    CODE_LENGTH = 1
 
-MafiaPlayerNightStatus.SAFE = MafiaPlayerNightStatus('S', 'Safe')
-MafiaPlayerNightStatus.ATTACKED = MafiaPlayerNightStatus('A', 'Attacked')
-MafiaPlayerNightStatus.TERMINATED = MafiaPlayerNightStatus('T', 'Terimated')
-
-class MafiaPlayerNightResult(models.Model):
-    action = models.OneToOneField(MafiaAction)
+class PlayerNightResult(models.Model):
+    action = models.OneToOneField(Action)
 
     controlled_to_target = models.ForeignKey(User, null=True, related_name='controlled_to_target')
     switched_by_json = models.TextField(default='[]')
@@ -118,9 +131,9 @@ class MafiaPlayerNightResult(models.Model):
     defended_by_json = models.TextField(default='[]')
     attempted_corrupted = models.BooleanField(default=False)
     status = models.CharField(
-        max_length=MafiaPlayerNightStatus.CODE_LENGTH,
-        choices=MafiaPlayerNightStatus.get_choice_tuples(),
-        default=MafiaPlayerNightStatus.SAFE.code
+        max_length=PlayerNightStatus.CODE_LENGTH,
+        choices=PlayerNightStatus.get_choice_tuples(),
+        default=PlayerNightStatus.SAFE.code
     )
     doused = models.BooleanField(default=False)
     un_doused = models.BooleanField(default=False)
@@ -165,14 +178,14 @@ class MafiaPlayerNightResult(models.Model):
     @property
     def _resisted(self):
         return self.protected or self.defended or self.bulletproof or self.on_guard or (
-            MafiaRole.get_instance(self.player.role).night_immune
+            Role.get_instance(self.player.role).night_immune
         )
 
     @property
     def died(self):
         return (
-            self.status == MafiaPlayerNightStatus.TERMINATED or (
-                self.status == MafiaPlayerNightStatus.ATTACKED.code and
+            self.status == PlayerNightStatus.TERMINATED or (
+                self.status == PlayerNightStatus.ATTACKED.code and
                 not self._resisted
             )
         )
@@ -185,7 +198,7 @@ class MafiaPlayerNightResult(models.Model):
     def seduced(self):
         return (
             self.attempted_seduced and
-            not MafiaRole.get_instance(self.player.role).immune_to_seduction
+            not Role.get_instance(self.player.role).immune_to_seduction
         )
 
     @property
@@ -198,11 +211,11 @@ class MafiaPlayerNightResult(models.Model):
 
     @property
     def on_guard(self):
-        return self.action_type == MafiaActionType.ON_GUARD.code
+        return self.action_type == ActionType.ON_GUARD.code
 
     @property
     def bulletproof(self):
-        return self.action_type == MafiaActionType.BULLETPROOF_VEST.code
+        return self.action_type == ActionType.BULLETPROOF_VEST.code
 
     @property
     def switched_with_or_self(self):
@@ -273,19 +286,21 @@ class MafiaPlayerNightResult(models.Model):
     def contains_report_line(self, line):
         return line in self.report.splitlines()
 
-class MafiaVote(models.Model):
-    voter = models.ForeignKey(MafiaPlayer)
+
+class Vote(models.Model):
+    voter = models.ForeignKey(Player)
     day_number = models.PositiveSmallIntegerField()
     vote_type = models.CharField(
-        max_length=MafiaVoteType.CODE_LENGTH,
-        choices=MafiaVoteType.get_choice_tuples(),
-        default=MafiaVoteType.ABSTAIN.code
+        max_length=VoteType.CODE_LENGTH,
+        choices=VoteType.get_choice_tuples(),
+        default=VoteType.ABSTAIN.code
     )
     vote = models.ForeignKey(User, null=True)
     comment = models.TextField(default='')
 
-class MafiaDayResult(models.Model):
-    game = models.ForeignKey(MafiaGame)
+
+class DayResult(models.Model):
+    game = models.ForeignKey(Game)
     day_number = models.PositiveSmallIntegerField()
     lynched = models.ForeignKey(User, null=True)
     description = models.TextField(default="")

@@ -19,6 +19,8 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^users/', include('UserInfo.urls')),
     url(r'^secure/', include('Secure.urls')),
+    url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/mafia/v0/', include('Mafia.urls')),
     url(r'^', include('PubSite.urls')),
 )
 

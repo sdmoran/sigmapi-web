@@ -17,7 +17,7 @@ class MafiaTestCase(TestCase):
         user.first_name = FIRST_NAMES[index]
         user.last_name = role.name
         user.save()
-        player = MafiaPlayer(
+        player = Player(
             game=self.game, user=user, role=role.code, executioner_target=executioner_target
         )
         player.save()
@@ -28,9 +28,9 @@ class MafiaTestCase(TestCase):
         self.u_mod.first_name = 'Joe'
         self.u_mod.last_name = 'Moderator'
 
-        self.game = MafiaGame(created=datetime.datetime.now(), creator=self.u_mod)
+        self.game = Game(created=datetime.datetime.now(), creator=self.u_mod)
         self.game.save()
-        self.mayor = self.create_player(MafiaRole.MAYOR, 0)
+        self.mayor = self.create_player(Role.MAYOR, 0)
 
     def test_mafia(self):
 
@@ -40,8 +40,8 @@ class MafiaTestCase(TestCase):
             begin_night(self.game)
             end_night(self.game)
             begin_day(self.game)
-            mayor_vote = MafiaVote.objects.get(voter=self.mayor, day_number=2)
-            mayor_vote.vote_type = MafiaVoteType.LYNCH.code
+            mayor_vote = Vote.objects.get(voter=self.mayor, day_number=2)
+            mayor_vote.vote_type = VoteType.LYNCH.code
             mayor_vote.vote = self.mayor.user
             mayor_vote.save()
             end_day(self.game)
@@ -50,13 +50,13 @@ class MafiaTestCase(TestCase):
 
         self.mayor.refresh_from_db()
         self.assertEqual(self.game.day_number, 2)
-        self.assertEqual(self.game.time, MafiaGameTime.DUSK.code)
-        self.assertEqual(self.mayor.status, MafiaPlayerStatus.LYNCHED.code)
+        self.assertEqual(self.game.time, GameTime.DUSK.code)
+        self.assertEqual(self.mayor.status, PlayerStatus.LYNCHED.code)
 
-        mayor_result = MafiaPlayerNightResult.objects.get(action__performer=self.mayor)
+        mayor_result = PlayerNightResult.objects.get(action__performer=self.mayor)
         self.assertTrue(mayor_result.contains_report_line('You did not perform an action.'))
 
-        day1_result = MafiaDayResult.objects.get(game=self.game, day_number=1)
+        day1_result = DayResult.objects.get(game=self.game, day_number=1)
         self.assertEqual(day1_result.lynched, None)
-        day2_result = MafiaDayResult.objects.get(game=self.game, day_number=2)
+        day2_result = DayResult.objects.get(game=self.game, day_number=2)
         self.assertEqual(day2_result.lynched, self.mayor.user)

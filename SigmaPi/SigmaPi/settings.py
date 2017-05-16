@@ -118,6 +118,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'rest_framework',
     'PubSite',
     'UserInfo',
     'Archive',
@@ -127,6 +128,7 @@ INSTALLED_APPS = (
     'Standards',
     'Scholarship',
     'Mafia',
+    'MafiaFrontend',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
@@ -158,4 +160,11 @@ LOGGING = {
             'propagate': True,
         },
     }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'PAGE_SIZE': 10
 }
