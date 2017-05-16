@@ -52,7 +52,7 @@ Information about a Mafia role.
 }
 ```
 
-## SecretPlayerInfo
+### SecretPlayerInfo
 
 Information about a player that is only available to the player themselves and
 to those with moderator privelages.
@@ -76,10 +76,9 @@ Information about a user of the website.
 
 ### Username
 
-A String. See the [Django username documentation]
-(https://docs.djangoproject.com/en/1.11/ref/contrib/auth/#django.contrib.auth.models.User.username)
+A String. See the [Django username documentation](https://docs.djangoproject.com/en/1.11/ref/contrib/auth/#django.contrib.auth.models.User.username)
 for details.
 
 ### Date
 
-A String in the format yyyy-mm-dd.
+A String in the format `yyyy-mm-dd`.
