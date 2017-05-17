@@ -11,15 +11,15 @@ Information about a Mafia game.
 
 ```javascript
 {
-    'name':            String,        // Name of the game
-    'created':         Date,          // Date the game was created
-    'creator':         User,          // User that created the game
-    'moderators':      Array<User>,   // List of moderators for the game. Does not include the
-                                      //     game's creator
-    'players':         Array<Player>, // List of players signed up for the game
-    'day_number':      Integer,       // Day number. 0 if game is accepting players
-    'is_accepting':    Boolean,       // Whether the game is still accpeting players
-    'user_has_joined': Boolean        // Whether the logged-in user is signed up for this game
+    'name':            String,   // Name of the game
+    'created':         Date,     // Date the game was created
+    'creator':         User,     // User that created the game
+    'moderators':      User[],   // List of moderators for the game. Does not include the
+                                 //     game's creator
+    'players':         Player[], // List of players signed up for the game
+    'day_number':      Integer,  // Day number. 0 if game is accepting players
+    'is_accepting':    Boolean,  // Whether the game is still accpeting players
+    'user_has_joined': Boolean   // Whether the logged-in user is signed up for this game
 }
 ```
 
@@ -47,15 +47,14 @@ Information about a Mafia role.
 
 ```javascript
 {
-    'code': RoleCode,               // Code uniquely identifying this role
-    'name': String,                 // Name of the role
-    'action_usabilities': Array<ActionUsability>,
-                                    // Actions that the role can perform and how often they can
-                                    //     can use them
-    'night_immune': Boolean,        // Whether this role is immune to attack and conversion at 
-                                    //     night
-    'immune_to_seduction': Boolean, // Whether this role is immune to seduction by Escorts and
-                                    //     Hookers
+    'code': RoleCode,                        // Code uniquely identifying this role
+    'name': String,                          // Name of the role
+    'action_usabilities': ActionUsability[], // Actions that the role can perform and how
+                                             //     often they can can use them
+    'night_immune': Boolean,                 // Whether this role is immune to attack and
+                                             //     conversion at night
+    'immune_to_seduction': Boolean,          // Whether this role is immune to seduction by
+                                             //     Escorts and Hookers
 }
 ```
 
@@ -75,7 +74,7 @@ Information about an ability to use an action.
                         //     -1           => usable every night, unlimited uses
                         //     n, where n>0 => usable every night, n uses
 }
-
+```
 
 ## Action
 
@@ -99,15 +98,16 @@ to those with moderator privelages.
 
 ```javascript
 {
-    'apparant_role':       Role,          // Role that the player sees themselves as
-    'old_apparant_role':   Role,          // Role that the player saw themselves as before
-                                          //    they were corrupted/converted
-    'older_apparant_role': Role,          // Role that the player saw themselves as before
-                                          //    two corruptions and/or conversions
-    'actions_available':   Array<Action>, // Actions available to the user this (coming) night
-    'doused':              Boolean,       // Whether the player has been doused by an Arsonist
-    'executioner_target':  User           // If the player's role is Executioner, their target;
-                                          //    otherwise null
+    'apparant_role':       Role,    // Role that the player sees themselves as
+    'old_apparant_role':   Role,    // Role that the player saw themselves as before they were
+                                    //    corrupted/converted
+    'older_apparant_role': Role,    // Role that the player saw themselves as before two or
+                                    //    conversions
+    'actions_availabilities':
+              ActionAvailability[], // Actions available to the user this (coming) night
+    'doused':              Boolean, // Whether the player has been doused by an Arsonist
+    'executioner_target':  User     // If the player's role is Executioner, their target;
+                                    //    otherwise null
 }
 ```
 
@@ -117,8 +117,8 @@ Information about a user of the website.
 
 ```javascript
 {
-  'username': Username,    // The user's username
-  'name': String,          // The user's first and last name. At most 61 characters
+  'username': Username, // The user's username
+  'name': String,       // The user's first and last name. At most 61 characters
 }
 ```
 
