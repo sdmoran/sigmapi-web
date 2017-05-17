@@ -88,7 +88,7 @@ Endpoint Descriptions
 
 ### Get game
 
-`GET .../games/\<game_id:GameID\>/`
+`GET .../games/<game_id:GameID>/`
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
@@ -98,7 +98,7 @@ Endpoint Descriptions
 
 ### Delete game
 
-`DELETE .../games/\<game_id:GameID\>/`
+`DELETE .../games/<game_id:GameID>/`
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
@@ -109,7 +109,7 @@ Endpoint Descriptions
 
 ### List moderators for game
 
-`GET .../games/\<game_id:GameID\>/moderators/`
+`GET .../games/<game_id:GameID>/moderators/`
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
@@ -120,7 +120,7 @@ Endpoint Descriptions
 
 ### Add moderator to game
 
-`PUT .../games/\<game_id:GameID\>/players/\<username:Username\>/`
+`PUT .../games/<game_id:GameID>/players/<username:Username>/`
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
@@ -136,7 +136,7 @@ Endpoint Descriptions
 
 ### Get players in game
 
-`GET .../games/\<game_id:GameID\>/players/`
+`GET .../games/<game_id:GameID>/players/`
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
@@ -146,7 +146,7 @@ Endpoint Descriptions
 
 ### Add player to game
 
-`PUT .../games/\<game_id:GameID\>/players/\<username:Username\>/`
+`PUT .../games/<game_id:GameID>/players/<username:Username>/`
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
@@ -163,17 +163,17 @@ Endpoint Descriptions
 
 ### Get player in game
 
-`GET .../games/\<game_id:GameID\>/players/\<username:Username\>/`
+`GET .../games/<game_id:GameID>/players/<username:Username>/`
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | 404 Condition     | `game_id` is invalid or User `username` is not a player in Game `game_id`          |
-| 200 Data          | Information about the player `username` in the game `game_id`                      |
+| 200 Data          | Information about the Player `username` in the Game `game_id`                      |
 | 200 Data format   | `Player`                                                                           |
 
 ### Remove player from game
 
-`REMOVE .../games/\<game_id:GameID\>/players/\<username:Username\>/`
+`DELETE .../games/<game_id:GameID>/players/<username:Username>/`
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
