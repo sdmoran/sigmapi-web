@@ -8,33 +8,22 @@ All endpoint URLs are prefixed with `http://sigmapigammaiota.org/api/mafia/v0/`.
 
 ### GET games/
 
-- **Return type:** ```{GameID: Game}```
 - **Returns:** Dict mapping game IDs to games for all existing games.
+- **Return type:** ```{GameID: Game}```
 
-### Create game
+### POST games/
 
-```
-POST games/
-```
+- Creates a new game
+- **Argument format:** `{ 'name': String }`
+- **Returns:** The created game
+- **Return type:** ```Game```
+- **Notes:** An ID for the game will be generated, and the created game will be stored at
+             games/<id>
 
-**Argument format:**
-```javascript
-{
-    'name': String
-}
-```
-**Return type:** ```Game```
-**Returns:** The created game
-**Notes:** An ID for the game will be generated, and the created game will be stored at games/<id>
+### GET games/<GameID>/players/
 
-### List players in a game
-
-```
-GET games/<GameID>/players/
-```
-
-**Return type:** ```Player[]```
-**Returns:** All the players in the game with the given ID
+- **Returns:** All the players in the game with the given ID
+- **Return type:** ```Player[]```
 
 Data Specifications
 -------------------
