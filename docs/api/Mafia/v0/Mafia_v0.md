@@ -1,120 +1,179 @@
+# Written by Kyle McCormick
+
 Sigma Pi, Gamma Iota Mafia API, version 0.1
 ===========================================
 
-Endpoints
----------
+
+Endpoint Notes
+--------------
 
 All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
 
 All endpoints other than About (`GET .../`) return 403s for unauthenticated users.
 
+If no condition is listed for a referenced status code, assume it is the default status code,
+and is returned in the event of a successful request.
+
+An example endpoint description is shown below:
+
+### Endpoint title
+
+`METHOD .../path/to/endpoint/`
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Action            | If it is a POST, PUT, DELETE, or PATCH, how the endpoint modifies state            |                                            |
+| Query data format | If it is a POST, PUT, DELETE, or PATCH, the expected input data format             |                                                             |
+| xxx: Condition    | A condition for the xxx status code to be returned                                 |
+| xxx: Data         | If xxx is returned, a description of the returned data                             |
+| xxx: Data format  | If xxx is returned, the format of the returned data                                |                                                                             |
+| xxx: Headers      | If xxx is returned, what special headers are provided                              |
+
+
+Endpoint Descriptions
+---------------------
+
 ### About
 
 `GET .../`
 
-| Property                 | Value                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| Response status code     | 200                                                                                |
-| 200 Response data        | A short description of the purpose of the API and a link to this documentation.    |
-| 200 Response data format | `{ 'about': String, 'documentation_url': String }`  
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| 200: Data         | A short description of the purpose of the API and a link to this documentation.    |
+| 200: Data format  | `{ 'about': String, 'documentation_url': String }`  
 
 ### List roles
 
 `GET .../roles/`
 
-| Property                 | Value                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| Response status code     | 200                                                                                |
-| 200 Response data        | Dict mapping RoleCodes to Roles all existing roles.                                |
-| 200 Response data format | `{ ... RoleID: Role ... }`                                                         |
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| 200: Data         | Dict mapping RoleCodes to Roles all existing roles.                                |
+| 200: Data format  | `{ ... RoleCode: Role ... }`                                                       |
 
-### List actions
+### List action types
 
-`GET .../actions/`
+`GET .../actiontypes/`
 
-| Property                 | Value                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| Response status code     | 200                                                                                |
-| 200 Response data        | Dict mapping ActionCodes to Actions all existing actions.                          |
-| 200 Response data format | `{ ... ActionID: Action ... }`                                                     |
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| 200: Condition    | None                                                                               |
+| 200: Data         | Dict mapping ActionTypeCodes to ActionTypes all existing action types.             |
+| 200: Data format  | `{ ... ActionTypeCode: ActionType ... }`                                           |
 
 ### List games
 
 `GET .../games/`
 
-| Property                 | Value                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| Response status code     | 200                                                                                |
-| 200 Response data        | Dict mapping GameIDs to Games for all existing games.                              |
-| 200 Response data format | `{ ... GameID: Game ... }`                                                         |
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| 200: Condition    | None                                                                               |
+| 200: Data         | Dict mapping GameIDs to Games for all existing games.                              |
+| 200: Data format  | `{ ... GameID: Game ... }`                                                         |
 
 ### Create game
 
 `POST .../games/`
 
-| Property                 | Value                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| Action                   | Creates a new game.                                                                |
-| Query data format        | `{ 'name': String }`                                                               |
-| Response status code     | 400 if `name` is missing or empty; 201 otherwise                                   |
-| 201 Response data        | The created game.                                                                  |
-| 201 Response data format | `Game`                                                                             |
-| 201 Response headers     | Location: Path to the created game                                                 |
-| Notes        | An ID for the game will be generated, and the created game will be stored at `games/<game_id>` |
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Action            | Creates a new game.                                                                |
+| Query data format | `{ 'name': String }`                                                               |
+| 400: Condition    | `name` is missing or empty                                                         |
+| 201: Condition    | No other errors                                                                    | 
+| 201: Data         | The created game.                                                                  |
+| 201: Data format  | `Game`                                                                             |
+| 201: Headers      | Location: Path to the created game (`.../games/<game_id>`)                         |
 
 ### Get game
 
 `GET .../games/\<game_id:GameID\>/`
 
-| Property                 | Value                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| Response status code     | 404 if `game_id` is invalid; 200 otherwise                                         |
-| 200 Response data        | Information about the game with ID `game_id`.                                      |
-| 200 Response data format | `Game`                                                                             |
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| 404: Condition    | `game_id` is invalid                                                               |
+| 200: Data         | Information about the game with ID `game_id`.                                      |
+| 200: Data format  | `Game`                                                                             |
 
 ### Delete game
 
 `DELETE .../games/\<game_id:GameID\>/`
 
-| Property                 | Value                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| Action                   | Deletes the game with the ID `game_id`.                                            |
-| Response status code     | 404 if `game_id` is invalid; 400 if user does not have moderator privelages or game is finished; 204 (No Content) otherwise |
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Action            | Deletes the game with the ID `game_id`.                                            |
+| 404: Condition    | `game_id` is invalid                                                               |
+| 400: Condition    | Requesting user does not have moderator privelages or game is finished             |
+| 204: Data         | None                                                                               |
+
+### List moderators for game
+
+`GET .../games/\<game_id:GameID\>/moderators/`
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| CHANGEME          | 404 if `game_id` is invalid; 200 otherwise                                         |
+| 200: Data         | List of the moderators for the game with the ID `game_id`.                         |
+| 200: Data format  | `User[]`                                                                           |
+| Notes             | Returned list does not include game creator.                                       |
+
+### Add moderator to game
+
+`PUT .../games/\<game_id:GameID\>/players/\<username:Username\>/`
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Action            | Crowns the user with the given Username as a moderator of the game.                |
+| Query data format | `{}`                                                                               |
+| CHANGEME          | 404 if `game_id` is invalid; 400 if `username` does not refer to a User or refers to the creator or a player; 303 if user is already crowned as a moderator; 201 otherwise |
+| 201: Data         | Information about the newly-crowned user.                                          |
+| 201: Data format  | `Game`                                                                             |
+| 201: Headers      | Location: Path to information on the newly-crowned moderator                       |
+| 303: Headers      | Location: Path to information on the already-crowned moderator                     |
 
 ### Get players in game
 
 `GET .../games/\<game_id:GameID\>/players/`
 
-| Property                 | Value                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| Response status code     | 404 if `game_id` is invalid; 200 otherwise                                         |
-| 200 Response data        | List of the players in the game with the ID `game_id`.                             |
-| 200 Response data format | `Player[]`                                                                         |
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| CHANGEME          | 404 if `game_id` is invalid; 200 otherwise                                         |
+| 200: Data        | List of the players in the game with the ID `game_id`.                             |
+| 200: Data format | `Player[]`                                                                         |
 
 ### Add player to game
 
-`PUT games/\<game_id:GameID\>/players/\<username:Username\>/`
+`PUT .../games/\<game_id:GameID\>/players/\<username:Username\>/`
 
-| Property                 | Value                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| Action                   | Adds the user with the given Username to the game.                                 |
-| Query data format        | `{}`                                                                               |
-| Response status code     | 404 if `game_id` is invalid; 400 if `username` does not refer to a User or refers to the creator or a moderator; 303 if user is already added to game; 201 otherwise |
-| 201 Response data        | Information about the newly added player.                                          |
-| 201 Response data format | `Game`                                                                             |
-| 201 Response headers     | Location: Path to information on the newly-added player                            |
-| 303 Response headers     | Location: Path to information on the already-added player                          |
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Action            | Adds the user with the given Username to the game.                                 |
+| Query data format | `{}`                                                                               |
+| CHANGEME          | 404 if `game_id` is invalid; 400 if `username` does not refer to a User or refers to the creator or a moderator; 400 if game is not accepting players; 303 if user is already added to game; 201 otherwise |
+| 201: Data        | Information about the newly-added player.                                          |
+| 201: Data format | `Game`                                                                             |
+| 201: Headers     | Location: Path to information on the newly-added player                            |
+| 303: Headers     | Location: Path to information on the already-added player                          |
 
-### List moderators for game
+### Get player in game
 
-`GET games/\<game_id:GameID\>/moderators/`
+`GET .../games/\<game_id:GameID\>/players/\<username:Username\>/`
 
-| Property                 | Value                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| Response status code     | 404 if `game_id` is invalid; 200 otherwise                                         |
-| 200 Response data        | List of the moderators for the game with the ID `game_id`.                         |
-| 200 Response data format | `User[]`                                                                           |
-| Notes                    | Returned list does not include game creator.                                       |
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| CHANGEME          | 404 if `game_id` is invalid or `username` does not refer to a player; 200 otherwise|
+| 200: Data        | Information about the player `username` in the game `game_id`                      |
+| 200: Data format | `Player`                                                                           |
+
+### Remove player from game
+
+`REMOVE .../games/\<game_id:GameID\>/players/\<username:Username\>/`
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Action            | Removes the player `username` from the game with the ID `game_id`.                 |
+| CHANGEME          | 404 if `game_id` is invalid; 400 if requesting user does not have moderator privelages or game is finished; 204 (No Content) otherwise |
+
 
 Data Specifications
 -------------------
