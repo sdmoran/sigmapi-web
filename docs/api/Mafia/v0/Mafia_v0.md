@@ -230,7 +230,7 @@ Endpoint Descriptions
 | 400 Condition     | Game is finished                                                                   |
 | 204 Condition     | Any other case                                                                     |
 
-## Get player role
+### Get player role
 
 `GET .../games/<game_id:GameID>/players/<username:Username>/role/`
 
