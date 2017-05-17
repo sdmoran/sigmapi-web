@@ -24,7 +24,7 @@ An example endpoint description is shown below:
 | Query             | `METHOD .../path/to/example/endpoint/<var_name:VarType>`                           |
 | Query data format | If it is a POST, PUT, DELETE, or PATCH, the expected input data format             |                                                             |
 | XXX Condition     | The condition upon which the XXX status code is returned                           |
-| XXX Action        | If XXX is retruend, how state is modified                                          |                                            |
+| XXX Action        | If XXX is returned, how state is modified                                          |                                            |
 | XXX Data          | If XXX is returned, a description of the returned data                             |
 | XXX Data format   | If XXX is returned, the format of the returned data                                |                                                                             |
 | XXX Headers       | If XXX is returned, what special headers are provided                              |
@@ -278,7 +278,7 @@ Endpoint Descriptions
 | 403 Condition     | Requesting user is not `username` and does not have moderator privelages           |
 | 204 Action        | Sets the action of Player `username` in Game `game_id` for the current day         |
 
-### Get the night results for a player
+### Get night results for a player
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
@@ -286,10 +286,10 @@ Endpoint Descriptions
 | 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
 | 403 Condition     | Requesting user is not `username` and does not have moderator privelages           |
 | 200 Data          | List of all Player `username`'s night results up to the current night              |
-| 200 Data format   | `NightResult[]`                                                                    |
+| 200 Data format   | `PlayerNightResult[]`                                                              |
 | 200 Notes         | Returned array is indexed by night number. Because nights are 1-indexed, element 0 is null. |
 
-### Get the night result for a player for a specific night
+### Get night result for a player for a specific night
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
@@ -298,9 +298,9 @@ Endpoint Descriptions
 | 404 Condition     | Night `night_number` is less than 1 or greater than Game `game_id`'s day number    |
 | 403 Condition     | Requesting user is not `username` and does not have moderator privelages           |
 | 200 Data          | Player `username`'s night results for night `night_number`                         |
-| 200 Data format   | `NightResult`                                                                      |        
+| 200 Data format   | `PlayerNightResult`                                                                |        
 
-### Get all town night results
+### Get town night results
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
@@ -308,9 +308,19 @@ Endpoint Descriptions
 | 404 Condition     | `game_id` is invalid                                                               |
 | 200 Data          | List of all town night results for every night up to the current one               |
 | 200 Data format   | `TownNightResult`                                                                  |
-| 200 Notes         | Returned array is indexed by day number. Because nights are 1-indexed, element 0 is null. |
+| 200 Notes         | Returned array is indexed by day number. Because nights are `1-indexed, element 0 is null. |
 
-### Get all town day results
+### Get town night result for specific night
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Query             | `GET .../games/<game_id:GameID>/nightresults/<night_number:Integer>/`              |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 404 Condition     | `night_number` is less than 1 or greater than Game `game_id`'s day number    |
+| 200 Data          | Town night results for night `night_number`                                        |
+| 200 Data format   | `TownNightResult`                                                                  |        
+
+### Get town day results
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
@@ -319,6 +329,16 @@ Endpoint Descriptions
 | 200 Data          | List of all town day results for every day up to the current one                   |
 | 200 Data format   | `TownDayResult`                                                                    |
 | 200 Notes         | Returned array is indexed by day number. Because days are 1-indexed, element 0 is null. |
+
+### Get town day result for specific day
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Query             | `GET .../games/<game_id:GameID>/dayresults/<day_number:Integer>/`                  |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 404 Condition     | `day_number` is less than 1 or greater than Game `game_id`'s day number            |
+| 200 Data          | Town day results for day `day_number`                                              |
+| 200 Data format   | `TownDayResult`                                                                    |        
 
 Data Specifications
 -------------------
@@ -505,17 +525,17 @@ them that night. Automatically generated.
 ### TownNightResult
 
 A String describing what happened in the town on a specific night.
-Automatically generated, but can be overridden by the moderator.
+Automatically generated, but can be overridden by those with moderator privelages.
 
 ### TownDayResult
 
 A String describing what happened in the town on a specific day. 
-Automatically generated, but can be overridden by the moderator.
+Automatically generated, but can be overridden by those with moderator privelages.
 
 Other Notes
 -----------
 
-A user 'Moderator privelages' over a game if any of the following are true:
+A user has 'Moderator privelages' over a game if any of the following are true:
 1. They created the game
 2. They were crowned a moderator of the game
 3. They have global moderator permissions
