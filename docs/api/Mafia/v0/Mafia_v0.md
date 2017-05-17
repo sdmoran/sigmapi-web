@@ -8,7 +8,9 @@ All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
 
 All endpoints other than `.../` return 403s for unauthenticated users.
 
-### GET .../
+### About
+
+GET .../
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
@@ -16,15 +18,39 @@ All endpoints other than `.../` return 403s for unauthenticated users.
 | 200 Response data        | A short description of the purpose of the API, and a link to this documentation.   |
 | 200 Response data format | `{ 'about': String, 'documentation_url': String }`  
 
-### GET .../games/
+### List roles
+
+GET .../roles/
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
 | Response status code     | 200                                                                                |
-| 200 Response data        | Dict mapping game IDs to games for all existing games.                             |
+| 200 Response data        | Dict mapping RoleCodes to Roles all existing roles.                                |
+| 200 Response data format | `{ ... RoleID: Role ... }`                                                         |
+
+### List actions
+
+GET .../actions/
+
+| Property                 | Value                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Response status code     | 200                                                                                |
+| 200 Response data        | Dict mapping ActionCodes to Actions all existing actions.                          |
+| 200 Response data format | `{ ... ActionID: Action ... }`                                                     |
+
+### List games
+
+GET .../games/
+
+| Property                 | Value                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Response status code     | 200                                                                                |
+| 200 Response data        | Dict mapping GameIDs to Games for all existing games.                              |
 | 200 Response data format | `{ ... GameID: Game ... }`                                                         |
 
-### POST .../games/
+### Create game
+
+POST .../games/
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
@@ -56,7 +82,7 @@ All endpoints other than `.../` return 403s for unauthenticated users.
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
 | Response status code     | 404 if `game_id` is invalid; 200 otherwise                                         |
-| 200 Response data        | All list of the players in the game with the ID `game_id`.                         |
+| 200 Response data        | List of the players in the game with the ID `game_id`.                             |
 | 200 Response data format | `Player[]`                                                                         |
 
 ### PUT games/\<game_id:GameID\>/players/\<username:Username\>/
@@ -76,7 +102,7 @@ All endpoints other than `.../` return 403s for unauthenticated users.
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
 | Response status code     | 404 if `game_id` is invalid; 200 otherwise                                         |
-| 200 Response data        | All list of the moderators for the game with the ID `game_id`.                     |
+| 200 Response data        | List of the moderators for the game with the ID `game_id`.                         |
 | 200 Response data format | `User[]`                                                                           |
 | Notes                    | Returned list does not include game creator.                                       |
 
