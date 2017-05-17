@@ -8,12 +8,9 @@ All endpoint URLs are prefixed with `http://sigmapigammaiota.org/api/mafia/v0/`.
 
 ### List games
 
-```
-GET games/
-```
-
-**Return type:** ```{GameID: Game}```
-**Returns:** Dict mapping game IDs to games for all existing games.
+- **URL:** ```GET games/```
+- **Return type:** ```{GameID: Game}```
+- **Returns:** Dict mapping game IDs to games for all existing games.
 
 ### Create game
 
