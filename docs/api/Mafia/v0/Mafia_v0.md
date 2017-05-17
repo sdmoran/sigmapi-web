@@ -8,51 +8,60 @@ All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
 
 ### GET .../
 
-| Property                 | Value                                                                            |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| Response status code     | 200                                                                              |
-| 200 Response data        | A short description of the purpose of the API, and a link to this documentation. |
-| 200 Response data format | `{ 'about': String }`
+| Property                 | Value                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Response status code     | 200                                                                                |
+| 200 Response data        | A short description of the purpose of the API, and a link to this documentation.   |
+| 200 Response data format | `{ 'about': String }`  
 
 ### GET .../games/
 
-| Property                 | Value                                                                            |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| Response status code     | 200                                                                              |
-| 200 Response data        | Dict mapping game IDs to games for all existing games.                           |
-| 200 Response data format | `{GameID: Game}`                                                                 |
+| Property                 | Value                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Response status code     | 200                                                                                |
+| 200 Response data        | Dict mapping game IDs to games for all existing games.                             |
+| 200 Response data format | `{ ... GameID: Game ... }`                                                         |
 
 ### POST .../games/
 
-| Property                 | Value                                                                            |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| Query data format        | `{ 'name': String }`                                                             |
-| Response status code     | 200 if name exists and is non-empty; 400 otherwise                               |
-| 201 Response data        | The created game.                                                                |
-| 201 Response data format | `Game`                                                                           |
-| 201 Response headers     | Location: Path to the created game                                               |
-| Notes             | An ID for the game will be generated, and the created game will be stored at games/<id> |
+| Property                 | Value                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Action                   | Creates a new game.                                                                |
+| Query data format        | `{ 'name': String }`                                                               |
+| Response status code     | 201 if `name` exists and is non-empty; 400 otherwise                               |
+| 201 Response data        | The created game.                                                                  |
+| 201 Response data format | `Game`                                                                             |
+| 201 Response headers     | Location: Path to the created game                                                 |
+| Notes        | An ID for the game will be generated, and the created game will be stored at games/<game_id>   |
 
-### GET games/\<GameID\>/players/
+### GET .../games/\<game_id:GameID\>/players/
 
-- **Returns:** All list of the players in the game with the given GameID
-- **Return type:** `Player[]`
+| Property                 | Value                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Response status code     | 404 if `game_id` is invalid; 200 otherwise                                         |
+| 200 Response data        | All list of the players in the game with the ID game_id.                           |
+| 200 Response data format | `Player[]`                                                                         |
 
-### PUT games/\<GameID\>/players/\<Username\>/
+### PUT games/\<game_id:GameID\>/players/\<username:Username\>/
 
-- Adds the player with the given Username to the game
-- **Argument format:** `{}`
-- **Returns:** Information about the newly added player
-- **Return type:** `Player`
-- **Notes:** Adding a player who is already added is a no-op, and will still return the Player
+| Property                 | Value                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Action                   | Adds the player with the given Username to the game.                               |
+| Query data format        | `{}`                                                                               |
+| Response status code     | 404 if `game_id` is invalid; 400 if `username` does not refer to a User or refers to the creator or a moderator; 200 otherwise      |
+| 201 Response data        | Information about the newly added player.                                          |
+| 201 Response data format | `Game`                                                                             |
+| 201 Response headers     | Location: Path to the created game                                                 |
+| Notes                    | Adding a player who is already added is a no-op, but it will still generate a 201  |
 
-### GET games/\<GameID\>/moderators/
+### GET games/\<game_id:GameID\>/moderators/
 
-- **Returns:** All the moderators for the game with the given ID
-- **Return type:** ```User[]```
-- **Notes:** Returned list does not include game creator
-
-
+| Property                 | Value                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Response status code     | 404 if `game_id` is invalid; 200 otherwise                                         |
+| 200 Response data        | All list of the moderators for the game with the ID game_id.                       |
+| 200 Response data format | `User[]`                                                                           |
+| Notes                    | Returned list does not include game creator.                                       |
 
 Data Specifications
 -------------------
