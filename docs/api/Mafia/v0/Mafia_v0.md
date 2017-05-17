@@ -34,10 +34,12 @@ A wrapper around User that contains Game-playing information.
     'revealed_role': Role,             // The player's role, as revealed, if it has been
                                        //     revealed; null otherwise
     'secret_info':   SecretPlayerInfo, // Further information about the player. Non-null if
-                                       // the logged-in user is this player or has moderator
-                                       // privelages; null otherwise
-    'actual_role':   Role              // Player's true role. Non-null if the logged-in user
-                                       //    has moderator privelages; null otherwise
+                                       //     and only if the logged-in user is this player,
+                                       //     the loggin-in user has moderator privelages, or
+                                       //     the game is finished
+    'actual_role':   Role              // Player's true role. Non-null if and only if the 
+                                       //    logged-in user has moderator privelages or the
+                                       //    game is finished
 }
 ```
 
@@ -62,34 +64,19 @@ Information about a Mafia role.
 
 A case-sensitive, two-character String that uniquely identifies a role. The first letter indicates the faction (V => Village, R => Rogue, M => Mafia).
 
-## ActionUsability
+### ActionUsability
 
 Information about an ability to use an action.
 
 ```javascript
 {
-    'action': Action, // The action
-    'uses':   Integer // Specification of how often and how many times action can be used.
-                      //     -2           => usable every other night, unlimited uses
-                      //     -1           => usable every night, unlimited uses
-                      //     n, where n>0 => usable every night, n uses
+    'action_type': ActionType, // Type of the usable action
+    'uses':        Integer     // How often and how many times action can be used.
+                               //     -2           => usable every other night, unlimited uses
+                               //     -1           => usable every night, unlimited uses
+                               //     n, where n>0 => usable every night, n uses
 }
 ```
-
-### Action
-
-Information about an action.
-
-```javascript
-{
-    'code': ActionCode, // Code uniquely identifying this action
-    'name': String      // Name of the action
-}
-```
-
-### ActionCode
-
-A case-sensitive, two-character String that uniquely identifies an action.
 
 ### SecretPlayerInfo
 
@@ -117,10 +104,46 @@ Information about the availability of an action to a player.
 
 ```javascript
 {
-    'action': Action,     // The action
-    'uses_left': Integer, // Uses remaining for this action. -1 if unlimited
+    'action_type': ActionType, // Type of the available action
+    'uses_left':   Integer,    // Uses remaining for this action. -1 if unlimited
 }
 ```
+
+### Action
+
+Information about an action that was performed by a player.
+
+```javascript
+{
+    'action_type_code': ActionTypeCode // Code for the action type
+    'target0_username': Username       // Username of the first target
+    'target1_username': Username       // Username of the second target
+}
+```
+
+### ActionType
+
+Information about an action.
+
+```javascript
+{
+    'code':                ActionTypeCode, // Code uniquely identifying this action type
+    'name':                String          // Name of the action as it appears to the user. 
+                                           //     Not a unique identifier
+    'num_targets':         Integer,        // Number of targets this action takes. 0, 1, or 2
+    'targets_can_be_self': Boolean[],      // Array of Booleans, each signifying whether the
+                                           //     target at that position can be the action
+                                           //     performer themselves. For example,
+                                           //     [True, False] would indicate that the 1st
+                                           //     target can be the performer but the 2nd can't
+    'targets_dead': Boolean                // Whether targets are selected from all dead 
+                                           //     players instead of the live ones
+}
+```
+
+### ActionTypeCode
+
+A case-sensitive, two-character String that uniquely identifies an action type.
 
 ### User
 

@@ -76,15 +76,13 @@ class ActionType(ChoiceEnumeration):
     CODE_LENGTH = 2
 
     def __init__(self, code, name, targets_can_be_self,
-                 apparent_name=None, targets_dead=False,
-                 can_target_self=True, is_direct_offense=False,
+                 targets_dead=False, is_direct_offense=False,
                  is_lethal=False, is_covert=False):
         super(ActionType, self).__init__(code, name)
         self.targets_can_be_self = targets_can_be_self
-        self.apparent_name = apparent_name or name
-        self.targets_can_be_self = targets_can_be_self
-        self.can_target_self = can_target_self
+        self.targets_dead = targets_dead
         self.is_direct_offense = is_direct_offense
+        self.is_lethal = is_lethal
         self.is_covert = True
 
     @property
@@ -96,13 +94,13 @@ ActionType.CONTROL = ActionType('Co', 'Control', [False, True])
 ActionType.ON_GUARD = ActionType('OG', 'On Guard', [], is_lethal=True)
 ActionType.SEDUCE = ActionType('Se', 'Seduce', [False])
 ActionType.SWITCH = ActionType('Sw', 'Switch', [True, True])
-ActionType.FRAME = ActionType('Fr', 'Frame', 1)
+ActionType.FRAME = ActionType('Fr', 'Frame', [True])
 ActionType.INVESTIGATE = ActionType('In', 'Investigate', [False])
-ActionType.INSANE_INVESTIGATE = ActionType('II', 'Insane Investigate', [False], apparent_name='Investigate')
+ActionType.INSANE_INVESTIGATE = ActionType('II', 'Investigate', [False])
 ActionType.FORGETFUL_INVESTIGATE = ActionType('FI', 'Forgetful Investigate', [True])
-ActionType.SCRUTINIZE = ActionType('Sc', 'Scrutinize', 1)
+ActionType.SCRUTINIZE = ActionType('Sc', 'Scrutinize', [True])
 ActionType.PROTECT = ActionType('Pr', 'Protect', [False])
-ActionType.DEFEND = ActionType('De', 'Defend', 1, [False], is_lethal=True)
+ActionType.DEFEND = ActionType('De', 'Defend', [False], is_lethal=True)
 ActionType.BULLETPROOF_VEST = ActionType('BV', 'Bulletproof Vest', [])
 ActionType.CORRUPT = ActionType('Co', 'Corrupt', [False], is_direct_offense=True)
 ActionType.SLAY = ActionType('Sl', 'Slay', [True], is_direct_offense=True, is_lethal=True)
@@ -152,8 +150,8 @@ class Role(ChoiceEnumeration):
         self.min_in_game = min_in_game
         self.max_in_game = max_in_game
 
-UNLIMITED_USES = 0
-EVERY_OTHER_NIGHT = -1
+UNLIMITED_USES = -1
+EVERY_OTHER_NIGHT = -2
 
 Role.MAYOR = Role(
     'VM', 'Mayor', Faction.VILLAGE,
