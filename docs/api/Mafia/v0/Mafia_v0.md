@@ -20,7 +20,7 @@ All endpoint URLs are prefixed with `http://sigmapigammaiota.org/api/mafia/v0/`.
 - **Notes:** An ID for the game will be generated, and the created game will be stored at
              games/<id>
 
-### GET games/<GameID>/players/
+### GET games/\<GameID\>/players/
 
 - **Returns:** All the players in the game with the given ID
 - **Return type:** ```Player[]```
