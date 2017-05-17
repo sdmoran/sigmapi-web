@@ -6,13 +6,15 @@ Endpoints
 
 All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
 
+All endpoints other than `.../` return 403s for unauthenticated users.
+
 ### GET .../
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
 | Response status code     | 200                                                                                |
 | 200 Response data        | A short description of the purpose of the API, and a link to this documentation.   |
-| 200 Response data format | `{ 'about': String }`  
+| 200 Response data format | `{ 'about': String, 'documentation_url': String }`  
 
 ### GET .../games/
 
@@ -28,18 +30,33 @@ All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
 | ------------------------ | ---------------------------------------------------------------------------------- |
 | Action                   | Creates a new game.                                                                |
 | Query data format        | `{ 'name': String }`                                                               |
-| Response status code     | 201 if `name` exists and is non-empty; 400 otherwise                               |
+| Response status code     | 400 if `name` is missing or empty; 201 otherwise                                   |
 | 201 Response data        | The created game.                                                                  |
 | 201 Response data format | `Game`                                                                             |
 | 201 Response headers     | Location: Path to the created game                                                 |
-| Notes        | An ID for the game will be generated, and the created game will be stored at games/<game_id>   |
+| Notes        | An ID for the game will be generated, and the created game will be stored at `games/<game_id>` |
+
+### GET .../games/\<game_id:GameID\>/
+
+| Property                 | Value                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Response status code     | 404 if `game_id` is invalid; 200 otherwise                                         |
+| 200 Response data        | Information about the game with ID `game_id`.                                      |
+| 200 Response data format | `Game`                                                                             |
+
+### DELETE .../games/\<game_id:GameID\>/
+
+| Property                 | Value                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Action                   | Deletes the game with the ID `game_id`.                                            |
+| Response status code     | 404 if `game_id` is invalid; 400 if user does not have moderator privelages or game is finished; 204 (No Content) otherwise |
 
 ### GET .../games/\<game_id:GameID\>/players/
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
 | Response status code     | 404 if `game_id` is invalid; 200 otherwise                                         |
-| 200 Response data        | All list of the players in the game with the ID game_id.                           |
+| 200 Response data        | All list of the players in the game with the ID `game_id`.                         |
 | 200 Response data format | `Player[]`                                                                         |
 
 ### PUT games/\<game_id:GameID\>/players/\<username:Username\>/
@@ -48,18 +65,18 @@ All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
 | ------------------------ | ---------------------------------------------------------------------------------- |
 | Action                   | Adds the player with the given Username to the game.                               |
 | Query data format        | `{}`                                                                               |
-| Response status code     | 404 if `game_id` is invalid; 400 if `username` does not refer to a User or refers to the creator or a moderator; 200 otherwise      |
+| Response status code     | 404 if `game_id` is invalid; 400 if `username` does not refer to a User or refers to the creator or a moderator; 303 if user is already added to game; 201 otherwise |
 | 201 Response data        | Information about the newly added player.                                          |
 | 201 Response data format | `Game`                                                                             |
-| 201 Response headers     | Location: Path to the created game                                                 |
-| Notes                    | Adding a player who is already added is a no-op, but it will still generate a 201  |
+| 201 Response headers     | Location: Path to information on the newly-added player                            |
+| 303 Response headers     | Location: Path to information on the already-added player                          |
 
 ### GET games/\<game_id:GameID\>/moderators/
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
 | Response status code     | 404 if `game_id` is invalid; 200 otherwise                                         |
-| 200 Response data        | All list of the moderators for the game with the ID game_id.                       |
+| 200 Response data        | All list of the moderators for the game with the ID `game_id`.                     |
 | 200 Response data format | `User[]`                                                                           |
 | Notes                    | Returned list does not include game creator.                                       |
 
