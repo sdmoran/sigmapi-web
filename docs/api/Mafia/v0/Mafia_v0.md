@@ -233,6 +233,7 @@ Endpoint Descriptions
 
 `GET .../games/<game_id:GameID>/players/<username:Username>/role/`
 
+| Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
