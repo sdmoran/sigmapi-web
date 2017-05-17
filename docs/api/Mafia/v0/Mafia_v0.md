@@ -121,7 +121,7 @@ Endpoint Descriptions
 ### Add moderator to game
 
 `PUT .../games/\<game_id:GameID\>/players/\<username:Username\>/`
-s
+
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Action            | Crowns the user with the given Username as a moderator of the game.                |
