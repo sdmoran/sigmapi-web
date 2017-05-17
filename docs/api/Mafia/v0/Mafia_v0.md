@@ -33,11 +33,11 @@ A wrapper around User that contains Game-playing information.
     'status':        String,           // Either 'Alive', 'Lynched', or 'Died at Night'
     'revealed_role': Role,             // The player's role, as revealed, if it has been
                                        //     revealed; null otherwise
-    'secret_info':   SecretPlayerInfo, // Further information about the player if the logged-in
-                                       //     user is this player or has moderator privelages;
-                                       //     null otherwise.
-    'actual_role':   Role              // Player's true role if the logged-in user has
-                                       //    moderator privelages; null otherwise.
+    'secret_info':   SecretPlayerInfo, // Further information about the player. Non-null if
+                                       // the logged-in user is this player or has moderator
+                                       // privelages; null otherwise
+    'actual_role':   Role              // Player's true role. Non-null if the logged-in user
+                                       //    has moderator privelages; null otherwise
 }
 ```
 
@@ -68,15 +68,15 @@ Information about an ability to use an action.
 
 ```javascript
 {
-    'action': Action,   // The action
-    'uses':   Integer   // Specification of how often / how many times action can be used.
-                        //     -2           => usable every other night, unlimited uses
-                        //     -1           => usable every night, unlimited uses
-                        //     n, where n>0 => usable every night, n uses
+    'action': Action, // The action
+    'uses':   Integer // Specification of how often and how many times action can be used.
+                      //     -2           => usable every other night, unlimited uses
+                      //     -1           => usable every night, unlimited uses
+                      //     n, where n>0 => usable every night, n uses
 }
 ```
 
-## Action
+### Action
 
 Information about an action.
 
@@ -87,7 +87,7 @@ Information about an action.
 }
 ```
 
-## ActionCode
+### ActionCode
 
 A case-sensitive, two-character String that uniquely identifies an action.
 
@@ -108,6 +108,17 @@ to those with moderator privelages.
     'doused':              Boolean, // Whether the player has been doused by an Arsonist
     'executioner_target':  User     // If the player's role is Executioner, their target;
                                     //    otherwise null
+}
+```
+
+### ActionAvailability
+
+Information about the availability of an action to a player.
+
+```javascript
+{
+    'action': Action,     // The action
+    'uses_left': Integer, // Uses remaining for this action. -1 if unlimited
 }
 ```
 
