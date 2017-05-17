@@ -4,26 +4,34 @@ Sigma Pi, Gamma Iota Mafia API, version 0.1
 Endpoints
 ---------
 
-All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0/.
+All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
 
-### GET games/
+### GET .../
 
+| Property                 | Value                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| Response status code     | 200                                                                              |
+| 200 Response data        | A short description of the purpose of the API, and a link to this documentation. |
+| 200 Response data format | `{ 'about': String }`
 
-| Property             | Value                                                  |
-| -------------------- | -------------------------------------------------------|
-| Response status code | 200                                                    |
-| Response data        | Dict mapping game IDs to games for all existing games. |
-| Return data type     | {GameID: Game}                                         |
+### GET .../games/
 
+| Property                 | Value                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| Response status code     | 200                                                                              |
+| 200 Response data        | Dict mapping game IDs to games for all existing games.                           |
+| 200 Response data format | `{GameID: Game}`                                                                 |
 
-### POST games/
+### POST .../games/
 
-- Creates a new game
-- **Data format:** `{ 'name': String }`
-- **Returns:** The created game
-- **Return type:** `Game`
-- **Notes:** An ID for the game will be generated, and the created game will be stored at
-             games/<id>
+| Property                 | Value                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| Query data format        | `{ 'name': String }`                                                             |
+| Response status code     | 200 if name exists and is non-empty; 400 otherwise                               |
+| 201 Response data        | The created game.                                                                |
+| 201 Response data format | `Game`                                                                           |
+| 201 Response headers     | Location: Path to the created game                                               |
+| Notes             | An ID for the game will be generated, and the created game will be stored at games/<id> |
 
 ### GET games/\<GameID\>/players/
 
