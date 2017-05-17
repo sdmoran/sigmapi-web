@@ -1,6 +1,45 @@
 Sigma Pi, Gamma Iota Mafia API, version 0.1
 ===========================================
 
+Endpoints
+---------
+
+All endpoint URLs are prefixed with `http://sigmapigammaiota.org/api/mafia/v0/`.
+
+### List games
+
+```
+GET games/
+```
+
+*Return type:* ```{GameID: Game}```
+*Returns:* Dict mapping game IDs to games for all existing games.
+
+### Create game
+
+```
+POST games/
+```
+
+*Argument format:*
+```javascript
+{
+    'name': String
+}
+```
+*Return type:* ```Game```
+*Returns:* The created game
+*Notes:* An ID for the game will be generated, and the created game will be stored at games/<id>
+
+### List players in a game
+
+```
+GET games/<GameID>/players/
+```
+
+*Return type:* ```Player[]```
+*Returns:* All the players in the game with the given ID
+
 Data Specifications
 -------------------
 
@@ -10,6 +49,7 @@ Information about a Mafia game.
 
 ```javascript
 {
+    'id':              GameID    // ID of the game
     'name':            String,   // Name of the game
     'created':         Date,     // Date the game was created
     'creator':         User,     // User that created the game
@@ -21,6 +61,10 @@ Information about a Mafia game.
     'user_has_joined': Boolean   // Whether the logged-in user is signed up for this game
 }
 ```
+
+### GameID
+
+A String uniquely identifying a game.
 
 ### Player
 
@@ -61,7 +105,8 @@ Information about a Mafia role.
 
 ### RoleCode
 
-A case-sensitive, two-character String that uniquely identifies a role. The first letter indicates the faction (V => Village, R => Rogue, M => Mafia).
+A case-sensitive, two-character String that uniquely identifies a role. The first letter
+indicates the faction (V => Village, R => Rogue, M => Mafia).
 
 ### ActionUsability
 
@@ -110,7 +155,8 @@ Information about the availability of an action to a player.
 
 ### Action
 
-Information about an action that was performed by a player.
+Information about an action that was performed by a player. An action is an
+association between an action type and targets.
 
 ```javascript
 {
@@ -122,7 +168,8 @@ Information about an action that was performed by a player.
 
 ### ActionType
 
-Information about an action.
+Information about an action type. Action types include slay, investigate,
+seduce, etc.
 
 ```javascript
 {
