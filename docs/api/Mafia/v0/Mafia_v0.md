@@ -43,9 +43,9 @@ Endpoint Descriptions
 
 ### List roles
 
-| Query             | `GET .../roles/`                                                                        
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
+| Query             | `GET .../roles/`                                                                   |
 | 200 Data          | Dict mapping RoleCodes to Roles all existing roles                                 |
 | 200 Data format   | `{ ... RoleCode: Role ... }`                                                       |
 
