@@ -6,11 +6,11 @@ Endpoints
 
 All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
 
-All endpoints other than `.../` return 403s for unauthenticated users.
+All endpoints other than About (`.../`) return 403s for unauthenticated users.
 
 ### About
 
-GET .../
+`GET .../`
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
@@ -20,7 +20,7 @@ GET .../
 
 ### List roles
 
-GET .../roles/
+`GET .../roles/`
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
@@ -30,7 +30,7 @@ GET .../roles/
 
 ### List actions
 
-GET .../actions/
+`GET .../actions/`
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
@@ -40,7 +40,7 @@ GET .../actions/
 
 ### List games
 
-GET .../games/
+`GET .../games/`
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
@@ -50,7 +50,7 @@ GET .../games/
 
 ### Create game
 
-POST .../games/
+`POST .../games/`
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
