@@ -6,7 +6,7 @@ Endpoints
 
 All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
 
-All endpoints other than About (`.../`) return 403s for unauthenticated users.
+All endpoints other than About (`GET .../`) return 403s for unauthenticated users.
 
 ### About
 
@@ -15,7 +15,7 @@ All endpoints other than About (`.../`) return 403s for unauthenticated users.
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
 | Response status code     | 200                                                                                |
-| 200 Response data        | A short description of the purpose of the API, and a link to this documentation.   |
+| 200 Response data        | A short description of the purpose of the API and a link to this documentation.    |
 | 200 Response data format | `{ 'about': String, 'documentation_url': String }`  
 
 ### List roles
@@ -62,7 +62,9 @@ All endpoints other than About (`.../`) return 403s for unauthenticated users.
 | 201 Response headers     | Location: Path to the created game                                                 |
 | Notes        | An ID for the game will be generated, and the created game will be stored at `games/<game_id>` |
 
-### GET .../games/\<game_id:GameID\>/
+### Get game
+
+`GET .../games/\<game_id:GameID\>/`
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
@@ -70,14 +72,18 @@ All endpoints other than About (`.../`) return 403s for unauthenticated users.
 | 200 Response data        | Information about the game with ID `game_id`.                                      |
 | 200 Response data format | `Game`                                                                             |
 
-### DELETE .../games/\<game_id:GameID\>/
+### Delete game
+
+`DELETE .../games/\<game_id:GameID\>/`
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
 | Action                   | Deletes the game with the ID `game_id`.                                            |
 | Response status code     | 404 if `game_id` is invalid; 400 if user does not have moderator privelages or game is finished; 204 (No Content) otherwise |
 
-### GET .../games/\<game_id:GameID\>/players/
+### Get players in game
+
+`GET .../games/\<game_id:GameID\>/players/`
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
@@ -85,11 +91,13 @@ All endpoints other than About (`.../`) return 403s for unauthenticated users.
 | 200 Response data        | List of the players in the game with the ID `game_id`.                             |
 | 200 Response data format | `Player[]`                                                                         |
 
-### PUT games/\<game_id:GameID\>/players/\<username:Username\>/
+### Add player to game
+
+`PUT games/\<game_id:GameID\>/players/\<username:Username\>/`
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
-| Action                   | Adds the player with the given Username to the game.                               |
+| Action                   | Adds the user with the given Username to the game.                                 |
 | Query data format        | `{}`                                                                               |
 | Response status code     | 404 if `game_id` is invalid; 400 if `username` does not refer to a User or refers to the creator or a moderator; 303 if user is already added to game; 201 otherwise |
 | 201 Response data        | Information about the newly added player.                                          |
@@ -97,7 +105,9 @@ All endpoints other than About (`.../`) return 403s for unauthenticated users.
 | 201 Response headers     | Location: Path to information on the newly-added player                            |
 | 303 Response headers     | Location: Path to information on the already-added player                          |
 
-### GET games/\<game_id:GameID\>/moderators/
+### List moderators for game
+
+`GET games/\<game_id:GameID\>/moderators/`
 
 | Property                 | Value                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------- |
