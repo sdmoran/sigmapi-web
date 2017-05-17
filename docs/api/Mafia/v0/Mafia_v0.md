@@ -23,9 +23,9 @@ An example endpoint description is shown below:
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Action            | If it is a POST, PUT, DELETE, or PATCH, how the endpoint modifies state            |                                            |
 | Query data format | If it is a POST, PUT, DELETE, or PATCH, the expected input data format             |                                                             |
 | XXX Condition     | The condition upon which the XXX status code is returned                           |
+| XXX Action        | If XXX is retruend, what state is modified                                         |                                            |
 | XXX Data          | If XXX is returned, a description of the returned data                             |
 | XXX Data format   | If XXX is returned, the format of the returned data                                |                                                                             |
 | XXX Headers       | If XXX is returned, what special headers are provided                              |
@@ -98,9 +98,9 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Action            | Creates a new game                                                                 |
 | Query data format | `{ 'name': String }`                                                               |
 | 400 Condition     | `name` is missing or empty                                                         |
+| 200 Action        | Creates a new game                                                                 |
 | 201 Data          | The created game                                                                   |
 | 201 Data format   | `Game`                                                                             |
 | 201 Headers       | Location: Path to the created game (`.../games/<game_id>`)                         |
@@ -122,11 +122,11 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Action            | Deletes the game with the ID `game_id`                                             |
 | Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | Game is finished                                                                   |
+| 204 Action        | Deletes the game with the ID `game_id`                                             |
 | 204 Condition     | Any other case                                                                     |
 
 ### List moderators for game
@@ -156,13 +156,13 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Action            | Crowns the user with the given Username as a moderator of the game                 |
 | Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | `username` does not refer to a User OR it refers to the creator or a player        |
 | 303 Condition     | User `username` is already crowned as a moderator                                  |
 | 303 Headers       | Location: Path to information on already-crowned moderator                         |
+| 201 Action        | Crowns the user with the given Username as a moderator of the game                 |
 | 201 Data          | Information about the newly-crowned user                                           |
 | 201 Data format   | `Game`                                                                             |
 | 201 Headers       | Location: Path to information on newly-crowned moderator                           |
@@ -173,10 +173,10 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Action            | Un-crowns the User `username` as a moderator the Game `game_id`                    |
 | 404 Condition     | `game_id` is invalid or User `username` is not a moderator for Game `game_id`      |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | Game is finished                                                                   |
+| 204 Action        | Un-crowns the User `username` as a moderator the Game `game_id`                    |
 | 204 Condition     | Any other case                                                                     |
 
 ### List players in game
@@ -205,7 +205,6 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Action            | Adds the User with the given Username to the game                                  |
 | Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
@@ -213,6 +212,7 @@ Endpoint Descriptions
 | 400 Condition     | Game `game_id` game is not accepting players                                       |
 | 303 Condition     | User `username` is already added to game                                           |
 | 303 Headers       | Location: Path to information on the already-added player                          |
+| 201 Action        | Adds the User with the given Username to the game                                  |
 | 201 Data          | Information about the newly-added player                                           |
 | 201 Data format   | `Game`                                                                             |
 | 201 Headers       | Location: Path to information on the newly-added player                            |                                                                          |
@@ -223,10 +223,10 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Action            | Removes the Player `username` from the Game `game_id`                              |
 | 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | Game is finished                                                                   |
+| 204 Action        | Removes the Player `username` from the Game `game_id`                              |
 | 204 Condition     | Any other case                                                                     |
 
 ### Get player role
@@ -246,11 +246,11 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Action            | Sets the role of Player `username` in Game `game_id`                               |
 | Query data format | `{ 'role_code': RoleCode }`                                                        |
 | 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | Game `game_id` game is not accepting players                                       |
+| 201 Action        | Sets the role of Player `username` in Game `game_id`                               |
 | 201 Data          | Information about the newly-assigned role                                          |
 | 201 Data format   | `Role`                                                                             |
 
@@ -260,11 +260,11 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Action            | Sets the role of Player `username` in Game `game_id` to unassigned                 |
 | Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | Game `game_id` game is not accepting players                                       |
+| 204 Action        | Sets the role of Player `username` in Game `game_id` to unassigned                 |
 | 204 Condition     | Any other case                                                                     |
 
 
