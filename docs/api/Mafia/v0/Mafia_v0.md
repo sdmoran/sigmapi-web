@@ -21,7 +21,7 @@ An example endpoint description is shown below:
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `METHOD .../path/to/example/endpoint/                                            ` |
+| Query             | `METHOD .../path/to/example/endpoint/                                            ​​` |
 | Query data format | If it is a POST, PUT, DELETE, or PATCH, the expected input data format             |                                                             |
 | XXX Condition     | The condition upon which the XXX status code is returned                           |
 | XXX Action        | If XXX is retruend, how state is modified                                          |                                            |
@@ -37,7 +37,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../                                                                         `|
+| Query             | `GET .../                                                                        ​​` |
 | 200 Data          | A short description of the purpose of the API and a link to this documentation     |
 | 200 Data format   | `{ 'about': String, 'documentation_url': String }`                                 |
 
@@ -45,7 +45,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../roles/                                                                  ` |     
+| Query             | `GET .../roles/                                                                  ​​` |     
 | 200 Data          | Dict mapping RoleCodes to Roles all existing roles                                 |
 | 200 Data format   | `{ ... RoleCode: Role ... }`                                                       |
 
@@ -53,7 +53,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../roles/<role_code:RoleCode>/                                             ` |
+| Query             | `GET .../roles/<role_code:RoleCode>/                                             ​​` |
 | 404 Condition     | `role_code` is invalid                                                             |
 | 200 Data          | Information about Role referred to by `role_code`                                  |
 | 200 Data format   | `Role`                                                                             |
@@ -62,7 +62,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../actiontypes/                                                            ` |
+| Query             | `GET .../actiontypes/                                                            ​​` |
 | 200 Condition     | None                                                                               |
 | 200 Data          | Dict mapping ActionTypeCodes to ActionTypes all existing action types              |
 | 200 Data format   | `{ ... ActionTypeCode: ActionType ... }`                                           |
@@ -71,7 +71,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../actiontypes/<action_type_code:ActionTypeCode>/                          ` |
+| Query             | `GET .../actiontypes/<action_type_code:ActionTypeCode>/                          ​​` |
 | 404 Condition     | `action_type_code` is invalid                                                      |
 | 200 Data          | Information about ActionType referred to by `action_type_code`                     |
 | 200 Data format   | `ActionType`                                                                       |
@@ -80,7 +80,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../games/                                                                  ` |
+| Query             | `GET .../games/                                                                  ​​` |
 | 200 Condition     | None                                                                               |
 | 200 Data          | Dict mapping GameIDs to Games for all existing games                               |
 | 200 Data format   | `{ ... GameID: Game ... }`                                                         |
@@ -89,7 +89,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `POST .../games/                                                                 ` |
+| Query             | `POST .../games/                                                                 ​​` |
 | Query data format | `{ 'name': String }`                                                               |
 | 400 Condition     | `name` is missing or empty                                                         |
 | 200 Action        | Creates a new game                                                                 |
@@ -101,7 +101,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../games/<game_id:GameID>/                                                 ` |
+| Query             | `GET .../games/<game_id:GameID>/                                                 ​​` |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 200 Data          | Information about the game with ID `game_id`                                       |
@@ -111,7 +111,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `DELETE .../games/<game_id:GameID>/                                              ` |
+| Query             | `DELETE .../games/<game_id:GameID>/                                              ​​` |
 | Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
@@ -123,7 +123,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../games/<game_id:GameID>/moderators/                                      ` |
+| Query             | `GET .../games/<game_id:GameID>/moderators/                                      ​​` |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 200 Data          | List of the moderators for the game with the ID `game_id`                          |
 | 200 Data format   | `User[]`                                                                           |
@@ -133,7 +133,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../games/<game_id:GameID>/moderators/<username:Username>/                  ` |
+| Query             | `GET .../games/<game_id:GameID>/moderators/<username:Username>/                  ​​` |
 | 404 Condition     | `game_id` is invalid or User `username` is not a moderator in Game `game_id`       |
 | 200 Data          | Information about the User `username` that moderates the Game `game_id`            |
 | 200 Data format   | `User`                                                                             |
@@ -142,7 +142,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `PUT .../games/<game_id:GameID>/moderators/<username:Username>/                  ` |
+| Query             | `PUT .../games/<game_id:GameID>/moderators/<username:Username>/                  ​​` |
 | Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
@@ -158,7 +158,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `DELETE .../games/<game_id:GameID>/moderators/<username:Username>/               ` |
+| Query             | `DELETE .../games/<game_id:GameID>/moderators/<username:Username>/               ​​` |
 | 404 Condition     | `game_id` is invalid or User `username` is not a moderator for Game `game_id`      |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | Game is finished                                                                   |
@@ -169,7 +169,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../games/<game_id:GameID>/players/                                         ` |
+| Query             | `GET .../games/<game_id:GameID>/players/                                         ​​` |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 200 Data          | List of the players in the game with the ID `game_id`                              |
 | 200 Data format   | `Player[]`                                                                         |
@@ -178,7 +178,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/                     ` |
+| Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/                     ​​` |
 | 404 Condition     | `game_id` is invalid or User `username` is not a player in Game `game_id`          |
 | 200 Data          | Information about the Player `username` in the Game `game_id`                      |
 | 200 Data format   | `Player`                                                                           |
@@ -187,7 +187,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `PUT .../games/<game_id:GameID>/players/<username:Username>/                     ` |
+| Query             | `PUT .../games/<game_id:GameID>/players/<username:Username>/                     ​​` |
 | Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
@@ -204,7 +204,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `DELETE .../games/<game_id:GameID>/players/<username:Username>/                  ` |
+| Query             | `DELETE .../games/<game_id:GameID>/players/<username:Username>/                  ​​` |
 | 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | Game is finished                                                                   |
@@ -215,7 +215,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/role/                ` |
+| Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/role/                ​​` |
 | 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 200 Data          | Information about the role of Player `username` in Game `game_id`                  |
@@ -225,7 +225,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `PUT .../games/<game_id:GameID>/players/<username:Username>/role/                ` |
+| Query             | `PUT .../games/<game_id:GameID>/players/<username:Username>/role/                ​​` |
 | Query data format | `{ 'role_code': RoleCode }`                                                        |
 | 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
@@ -238,7 +238,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `DELETE .../games/<game_id:GameID>/players/<username:Username>/role/             ` |
+| Query             | `DELETE .../games/<game_id:GameID>/players/<username:Username>/role/             ​​` |
 | Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
