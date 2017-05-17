@@ -37,7 +37,7 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| Query             | `GET .../                                                                         `|
+| Query             | `GET .../                                                                        ` |
 | 200 Data          | A short description of the purpose of the API and a link to this documentation     |
 | 200 Data format   | `{ 'about': String, 'documentation_url': String }`                                 |
 
