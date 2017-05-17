@@ -4,26 +4,43 @@ Sigma Pi, Gamma Iota Mafia API, version 0.1
 Endpoints
 ---------
 
-All endpoint URLs are prefixed with `http://sigmapigammaiota.org/api/mafia/v0/`.
+All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0/.
 
 ### GET games/
 
-- **Returns:** Dict mapping game IDs to games for all existing games.
-- **Return type:** ```{GameID: Game}```
+**Response status code** | 200
+**Response data** | Dict mapping game IDs to games for all existing games.
+**Return data type** | ```{GameID: Game}```
 
 ### POST games/
 
 - Creates a new game
-- **Argument format:** `{ 'name': String }`
+- **Data format:** `{ 'name': String }`
 - **Returns:** The created game
-- **Return type:** ```Game```
+- **Return type:** `Game`
 - **Notes:** An ID for the game will be generated, and the created game will be stored at
              games/<id>
 
 ### GET games/\<GameID\>/players/
 
-- **Returns:** All the players in the game with the given ID
-- **Return type:** ```Player[]```
+- **Returns:** All list of the players in the game with the given GameID
+- **Return type:** `Player[]`
+
+### PUT games/\<GameID\>/players/\<Username\>/
+
+- Adds the player with the given Username to the game
+- **Argument format:** `{}`
+- **Returns:** Information about the newly added player
+- **Return type:** `Player`
+- **Notes:** Adding a player who is already added is a no-op, and will still return the Player
+
+### GET games/\<GameID\>/moderators/
+
+- **Returns:** All the moderators for the game with the given ID
+- **Return type:** ```User[]```
+- **Notes:** Returned list does not include game creator
+
+
 
 Data Specifications
 -------------------
@@ -57,17 +74,19 @@ A wrapper around User that contains Game-playing information.
 
 ```javascript
 {
-    'user':          User,             // User that this player is
-    'status':        String,           // Either 'Alive', 'Lynched', or 'Died at Night'
-    'revealed_role': RoleCode          // Code for he player's role, as revealed, if it has
-                                       //     been revealed; null otherwise
-    'secret_info':   SecretPlayerInfo, // Further information about the player. Non-null if
-                                       //     and only if the logged-in user is this player,
-                                       //     the loggin-in user has moderator privelages, or
-                                       //     the game is finished
-    'actual_role':   RoleCode          // Code for player's true role. Non-null if and only
-                                       //    if the logged-in user has moderator privelages or
-                                       //    the game is finished
+    'user':               User,             // User that this player is
+    'status':             String,           // Either 'Alive', 'Lynched', or 'Died at Night'
+    'revealed_role_code': RoleCode          // Code for he player's role, as revealed, if it
+                                            //     has been revealed; null otherwise
+    'secret_info':        SecretPlayerInfo, // Further information about the player. Non-null
+                                            //     if and only if the logged-in user is this
+                                            //     player, the loggin-in user has moderator
+                                            //     privelages, or the game is finished
+    'actual_role_code':   RoleCode          // Code for player's true role. Non-null if and
+                                            //     only if:
+                                            //       - The logged-in user has moderator 
+                                            //         privelages or the game is finished, AND
+                                            //       - The role has been assigned
 }
 ```
 
