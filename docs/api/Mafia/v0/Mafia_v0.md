@@ -26,10 +26,10 @@ An example endpoint description is shown below:
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Action            | If it is a POST, PUT, DELETE, or PATCH, how the endpoint modifies state            |                                            |
 | Query data format | If it is a POST, PUT, DELETE, or PATCH, the expected input data format             |                                                             |
-| xxx: Condition    | The condition upon which the xxx status code is returned                           |
-| xxx: Data         | If xxx is returned, a description of the returned data                             |
-| xxx: Data format  | If xxx is returned, the format of the returned data                                |                                                                             |
-| xxx: Headers      | If xxx is returned, what special headers are provided                              |
+| XXX Condition     | The condition upon which the XXX status code is returned                           |
+| XXX Data          | If XXX is returned, a description of the returned data                             |
+| XXX Data format   | If XXX is returned, the format of the returned data                                |                                                                             |
+| XXX Headers       | If XXX is returned, what special headers are provided                              |
 
 
 Endpoint Descriptions
@@ -41,8 +41,8 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| 200: Data         | A short description of the purpose of the API and a link to this documentation.    |
-| 200: Data format  | `{ 'about': String, 'documentation_url': String }`  
+| 200 Data          | A short description of the purpose of the API and a link to this documentation.    |
+| 200 Data format   | `{ 'about': String, 'documentation_url': String }`                                 |
 
 ### List roles
 
@@ -50,8 +50,8 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| 200: Data         | Dict mapping RoleCodes to Roles all existing roles.                                |
-| 200: Data format  | `{ ... RoleCode: Role ... }`                                                       |
+| 200 Data          | Dict mapping RoleCodes to Roles all existing roles.                                |
+| 200 Data format   | `{ ... RoleCode: Role ... }`                                                       |
 
 ### List action types
 
@@ -59,9 +59,9 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| 200: Condition    | None                                                                               |
-| 200: Data         | Dict mapping ActionTypeCodes to ActionTypes all existing action types.             |
-| 200: Data format  | `{ ... ActionTypeCode: ActionType ... }`                                           |
+| 200 Condition     | None                                                                               |
+| 200 Data          | Dict mapping ActionTypeCodes to ActionTypes all existing action types.             |
+| 200 Data format   | `{ ... ActionTypeCode: ActionType ... }`                                           |
 
 ### List games
 
@@ -69,9 +69,9 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| 200: Condition    | None                                                                               |
-| 200: Data         | Dict mapping GameIDs to Games for all existing games.                              |
-| 200: Data format  | `{ ... GameID: Game ... }`                                                         |
+| 200 Condition     | None                                                                               |
+| 200 Data          | Dict mapping GameIDs to Games for all existing games.                              |
+| 200 Data format   | `{ ... GameID: Game ... }`                                                         |
 
 ### Create game
 
@@ -81,10 +81,10 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Action            | Creates a new game.                                                                |
 | Query data format | `{ 'name': String }`                                                               |
-| 400: Condition    | `name` is missing or empty                                                         |
-| 201: Data         | The created game.                                                                  |
-| 201: Data format  | `Game`                                                                             |
-| 201: Headers      | Location: Path to the created game (`.../games/<game_id>`)                         |
+| 400 Condition     | `name` is missing or empty                                                         |
+| 201 Data          | The created game.                                                                  |
+| 201 Data format   | `Game`                                                                             |
+| 201 Headers       | Location: Path to the created game (`.../games/<game_id>`)                         |
 
 ### Get game
 
@@ -92,9 +92,9 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| 404: Condition    | `game_id` is invalid                                                               |
-| 200: Data         | Information about the game with ID `game_id`.                                      |
-| 200: Data format  | `Game`                                                                             |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 200 Data          | Information about the game with ID `game_id`.                                      |
+| 200 Data format   | `Game`                                                                             |
 
 ### Delete game
 
@@ -103,9 +103,9 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Action            | Deletes the game with the ID `game_id`.                                            |
-| 404: Condition    | `game_id` is invalid                                                               |
-| 400: Condition    | Requesting user does not have moderator privelages or game is finished             |
-| 204: Condition    | Any other case                                                                     |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 400 Condition     | Requesting user does not have moderator privelages or game is finished             |
+| 204 Condition     | Any other case                                                                     |
 
 ### List moderators for game
 
@@ -113,9 +113,9 @@ Endpoint Descriptions
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| 404: Condition    | `game_id` is invalid                                                               |
-| 200: Data         | List of the moderators for the game with the ID `game_id`.                         |
-| 200: Data format  | `User[]`                                                                           |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 200 Data          | List of the moderators for the game with the ID `game_id`.                         |
+| 200 Data format   | `User[]`                                                                           |
 | Notes             | Returned list does not include game creator.                                       |
 
 ### Add moderator to game
@@ -126,13 +126,13 @@ s
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Action            | Crowns the user with the given Username as a moderator of the game.                |
 | Query data format | `{}`                                                                               |
-| 404: Condition    | `game_id` is invalid                                                               |
-| 400: Condition    | `username` does not refer to a User OR it refers to the creator or a player        |
-| 303: Condition    | User `username` is already crowned as a moderator                                  |
-| 303: Headers      | Location: Path to information on the already-crowned moderator                     |
-| 201: Data         | Information about the newly-crowned user.                                          |
-| 201: Data format  | `Game`                                                                             |
-| 201: Headers      | Location: Path to information on the newly-crowned moderator                       |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 400 Condition     | `username` does not refer to a User OR it refers to the creator or a player        |
+| 303 Condition     | User `username` is already crowned as a moderator                                  |
+| 303 Headers       | Location: Path to information on the already-crowned moderator                     |
+| 201 Data          | Information about the newly-crowned user.                                          |
+| 201 Data format   | `Game`                                                                             |
+| 201 Headers       | Location: Path to information on the newly-crowned moderator                       |
 
 ### Get players in game
 
@@ -140,9 +140,9 @@ s
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| 404: Condition    | `game_id` is invalid                                                               |
-| 200: Data         | List of the players in the game with the ID `game_id`.                             |
-| 200: Data format  | `Player[]`                                                                         |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 200 Data          | List of the players in the game with the ID `game_id`.                             |
+| 200 Data format   | `Player[]`                                                                         |
 
 ### Add player to game
 
@@ -152,14 +152,14 @@ s
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Action            | Adds the user with the given Username to the game.                                 |
 | Query data format | `{}`                                                                               |
-| 404: Condition    | `game_id` is invalid                                                               |
-| 400: Condition    | `username` does not refer to a User or refers to the creator or a moderator        |
-| 400: Condition    | Game `game_id` game is not accepting players                                       |
-| 303: Condition    | User `username` is already added to game                                           |
-| 303: Headers      | Location: Path to information on the already-added player                          |
-| 201: Data         | Information about the newly-added player.                                          |
-| 201: Data format  | `Game`                                                                             |
-| 201: Headers      | Location: Path to information on the newly-added player                            |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 400 Condition     | `username` does not refer to a User or refers to the creator or a moderator        |
+| 400 Condition     | Game `game_id` game is not accepting players                                       |
+| 303 Condition     | User `username` is already added to game                                           |
+| 303 Headers       | Location: Path to information on the already-added player                          |
+| 201 Data          | Information about the newly-added player.                                          |
+| 201 Data format   | `Game`                                                                             |
+| 201 Headers       | Location: Path to information on the newly-added player                            |
 
 ### Get player in game
 
@@ -167,9 +167,9 @@ s
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| 404: Condition    | `game_id` is invalid or User `username` is not a player in Game `game_id`          |
-| 200: Data         | Information about the player `username` in the game `game_id`                      |
-| 200: Data format  | `Player`                                                                           |
+| 404 Condition     | `game_id` is invalid or User `username` is not a player in Game `game_id`          |
+| 200 Data          | Information about the player `username` in the game `game_id`                      |
+| 200 Data format   | `Player`                                                                           |
 
 ### Remove player from game
 
@@ -178,9 +178,9 @@ s
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Action            | Removes the player `username` from the game with the ID `game_id`.                 |
-| 404: Condition    | `game_id` is invalid or User `username` is not a player in Game `game_id`          |
-| 400: Condition    | Requesting user does not have moderator privelages or game is finished             |
-| 204: Condition    | Any other case                                                                     |
+| 404 Condition     | `game_id` is invalid or User `username` is not a player in Game `game_id`          |
+| 400 Condition     | Requesting user does not have moderator privelages or game is finished             |
+| 204 Condition     | Any other case                                                                     |
 
 
 Data Specifications
