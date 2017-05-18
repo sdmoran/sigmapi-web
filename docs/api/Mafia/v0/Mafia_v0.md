@@ -25,7 +25,7 @@ Notes
 
 - All endpoints other than About (`GET .../`) return 403s for unauthenticated users.
 
-- If multiple status code conditions are listed, the status code of the first satisfied condition will be returned.
+- If multiple status code conditions are listed, the status code of the first satisfied condition is returned.
 
 - If a status code is referenced but no Condition is listed for it, assume it is the default status code,
   and is returned in the event of a successful request.
