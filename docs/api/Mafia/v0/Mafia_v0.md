@@ -3,19 +3,34 @@ Sigma Pi, Gamma Iota Mafia API, version 0.1
 ===========================================
 
 
-Endpoint Notes
+Notes
 --------------
 
-All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
+- `A[]` denotes an array with elements of type A
 
-All endpoints other than About (`GET .../`) return 403s for unauthenticated users.
+- `{ ... A: B ... }` denotes a dictionary with keys of type A and values of type B
 
-If multiple status code conditions are listed, the status code of the first satisfied condition will be returned.
+- Game(x) refers to the Game with the GameID x
 
-If a status code is referenced but no Condition is listed for it, assume it is the default status code,
-and is returned in the event of a successful request.
+- Player(x) refers to the Player with the Username x
 
-An example endpoint description is shown below:
+- User(x) refers to the User with the Username x
+
+- A user has 'Moderator privelages' over a game if any of the following are true:
+    1. They created the game
+    2. They were crowned a moderator of the game
+    3. They have global moderator permissions
+
+- All endpoint URLs are prefixed with http://sigmapigammaiota.org/api/mafia/v0.
+
+- All endpoints other than About (`GET .../`) return 403s for unauthenticated users.
+
+- If multiple status code conditions are listed, the status code of the first satisfied condition will be returned.
+
+- If a status code is referenced but no Condition is listed for it, assume it is the default status code,
+  and is returned in the event of a successful request.
+
+- An example endpoint description is shown below:
 
 ### Example endpoint title
 
@@ -38,15 +53,15 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../`                                                                         |
-| 200 Data          | A short description of the purpose of the API and a link to this documentation     |
-| 200 Data format   | `{ 'about': String, 'documentation_url': String }`                                 |
+| 200 Data          | Short description of the purpose of the API, version, and link to this document    |
+| 200 Data format   | `{ 'about': String, 'version': String, documentation_url': String }`               |
 
 ### List roles
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../roles/`                                                                   |
-| 200 Data          | Dict mapping RoleCodes to Roles all existing roles                                 |
+| 200 Data          | Dict mapping RoleCodes to Roles all for existing roles                             |
 | 200 Data format   | `{ ... RoleCode: Role ... }`                                                       |
 
 ### Get role
@@ -63,8 +78,7 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../actiontypes/`                                                             |
-| 200 Condition     | None                                                                               |
-| 200 Data          | Dict mapping ActionTypeCodes to ActionTypes all existing action types              |
+| 200 Data          | Dict mapping ActionTypeCodes to ActionTypes for all existing action types          |
 | 200 Data format   | `{ ... ActionTypeCode: ActionType ... }`                                           |
 
 ### Get action type
@@ -103,8 +117,8 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/`                                                  |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 200 Data          | Information about Game `game_id`                                                   |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
+| 200 Data          | Information about Game(`game_id`)                                                  |
 | 200 Data format   | `Game`                                                                             |
 
 ### Delete game
@@ -113,8 +127,8 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `DELETE .../games/<game_id:GameID>/`                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 400 Condition     | Game `game_id` is finished                                                         |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
+| 400 Condition     | Game(`game_id`) is finished (finished games may not be deleted)                    |
 | 204 Action        | Deletes the game with the ID `game_id`                                             |
 
 ### Get game status
@@ -131,11 +145,11 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `PATCH .../games/<game_id:GameID>/status/`                                         |
-| Query data format | `{ 'action': 'start_game'|'begin_day'|'end_day'|'begin_night'|'end_night' }`       |
+| Query data format | `{ 'action': 'start_game'\|'begin_day'\|'end_day'\|'begin_night'\|'end_night' }`   |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 400 Condition     | Action is invalid given current status. For example, `'begin_night'` during dawn.  |
-| 200 Data          | Information about the newly-modified status of Game `game_id`                      |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
+| 400 Condition     | Action is invalid given current status. For example, `'begin_night'` during dawn   |
+| 200 Data          | Information about the newly-modified status of Game(`game_id`)                     |
 | 200 Data format   | `GameStatus`                                                                       |
 
 ### List moderators for game
@@ -144,7 +158,7 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/moderators/`                                       |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 200 Data          | List of the moderators for Game `game_id`                                          |
+| 200 Data          | List of the moderators for Game(`game_id`)                                         |
 | 200 Data format   | `User[]`                                                                           |
 | Notes             | Returned list does not include game creator                                        |
 
@@ -153,8 +167,8 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/moderators/<username:Username>/`                   |
-| 404 Condition     | `game_id` is invalid or User `username` is not a moderator in Game `game_id`       |
-| 200 Data          | Information about the User `username` that moderates the Game `game_id`            |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a moderator in Game(`game_id`)     |
+| 200 Data          | Information about User(`username`) that moderates Game(`game_id`)                  |
 | 200 Data format   | `User`                                                                             |
 
 ### Add moderator to game
@@ -163,12 +177,12 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `PUT .../games/<game_id:GameID>/moderators/<username:Username>/`                   |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
 | 400 Condition     | `username` does not refer to a User OR it refers to the creator or a player        |
-| 303 Condition     | User `username` is already crowned as a moderator                                  |
+| 303 Condition     | User(`username`) is already crowned as a moderator                                 |
 | 303 Headers       | Location: Path to information on already-crowned moderator                         |
-| 200 Action        | Crowns the user with the given Username as a moderator of the game                 |
-| 200 Data          | Information about the newly-crowned user                                           |
+| 200 Action        | Crowns User(`username`) as a moderator of Game(`game_id`)                          |
+| 200 Data          | Information about the newly-crowned User                                           |
 | 200 Data format   | `User`                                                                             |
 
 ### Remove moderator from game
@@ -176,10 +190,10 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `DELETE .../games/<game_id:GameID>/moderators/<username:Username>/`                |
-| 404 Condition     | `game_id` is invalid or User `username` is not a moderator for Game `game_id`      |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a moderator for Game(`game_id`)    |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
 | 400 Condition     | Game is finished                                                                   |
-| 204 Action        | Un-crowns the User `username` as a moderator the Game `game_id`                    |
+| 204 Action        | Un-crowns User(`username`) as a moderator Game(`game_id`)                          |
 
 ### List players in game
 
@@ -187,7 +201,7 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/players/`                                          |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 200 Data          | List of the players in the game with the ID `game_id`                              |
+| 200 Data          | List of players in Game(`game_id`)                                                 |
 | 200 Data format   | `Player[]`                                                                         |
 
 ### Get player in game
@@ -195,8 +209,8 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/`                      |
-| 404 Condition     | `game_id` is invalid or User `username` is not a player in Game `game_id`          |
-| 200 Data          | Information about the Player `username` in the Game `game_id`                      |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a player in Game(`game_id`)        |
+| 200 Data          | Information about Player(`username`) in  Game(`game_id`)                           |
 | 200 Data format   | `Player`                                                                           |
 
 ### Add player to game
@@ -205,12 +219,12 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `PUT .../games/<game_id:GameID>/players/<username:Username>/`                      |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
 | 400 Condition     | `username` does not refer to a User or refers to the creator or a moderator        |
-| 400 Condition     | Game `game_id` game is not accepting players                                       |
-| 303 Condition     | User `username` is already added to game                                           |
+| 400 Condition     | Game(`game_id`) game is not accepting players                                      |
+| 303 Condition     | User(`username`) is already added to game                                          |
 | 303 Headers       | Location: Path to information on the already-added player                          |
-| 200 Action        | Adds the User with the given Username to the game                                  |
+| 200 Action        | Adds User(`username`) to Game(`game_id`)                                           |
 | 200 Data          | Information about the newly-added player                                           |
 | 200 Data format   | `Player`                                                                           |
 
@@ -219,19 +233,19 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `DELETE .../games/<game_id:GameID>/players/<username:Username>/`                   |
-| 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
 | 400 Condition     | Game is finished                                                                   |
-| 204 Action        | Removes the Player `username` from the Game `game_id`                              |
+| 204 Action        | Removes the Player(`username`) from the Game(`game_id`)                            |
 
 ### Get actual role of player
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/role/`                 |
-| 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 200 Data          | Information about the role of Player `username` in Game `game_id`                  |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
+| 200 Data          | Information about the role of Player(`username`) in Game(`game_id`)                |
 | 200 Data format   | `Role` if role assigned, `null` otherwise                                          |
 
 ### Assign player to role
@@ -240,28 +254,28 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `PUT .../games/<game_id:GameID>/players/<username:Username>/role/`                 |
 | Query data format | `{ 'role_code': RoleCode }`                                                        |
-| 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 400 Condition     | Game `game_id` game is not accepting players                                       |
-| 204 Action        | Sets the role of Player `username` in Game `game_id`                               |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
+| 400 Condition     | Game(`game_id`) game is not accepting players                                      |
+| 204 Action        | Sets the role of Player(`username`) in Game(`game_id`)                             |
 
 ### Unassign player from role
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `DELETE .../games/<game_id:GameID>/players/<username:Username>/role/`              |
-| 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 400 Condition     | Game `game_id` game is not accepting players                                       |
-| 204 Action        | Sets the role of Player `username` in Game `game_id` to unassigned                 |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
+| 400 Condition     | Game(`game_id`) game is not accepting players                                      |
+| 204 Action        | Sets the role of Player(`username`) in Game(`game_id`) to unassigned               |
 
 ### Get lynch votes of a player
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/votes/`                |
-| 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
-| 200 Data          | List of all Player `username`'s lynch votes up to the current day                  |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
+| 200 Data          | List of all Player(`username`)'s lynch votes up to the current day                 |
 | 200 Data format   | `LynchVote[]`                                                                      |
 
 ### Set lynch vote of a player for current day
@@ -270,19 +284,19 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `POST .../games/<game_id:GameID>/players/<username:Username>/votes/`               |
 | Query data format | `LynchVote`                                                                        |
-| 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
 | 403 Condition     | Requesting user is not `username` and does not have moderator privelages           |
-| 400 Condition     | Game `game_id` has not begun or has finished                                       |
-| 204 Action        | Sets the lynch vote of Player `username` in Game `game_id` for the current day     |
+| 400 Condition     | Game(`game_id`) has not begun or has finished                                      |
+| 204 Action        | Sets the lynch vote of Player(`username`) in Game(`game_id`) for the current day   |
 
 ### Get actions of a player
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/actions/`              |
-| 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
 | 403 Condition     | Requesting user is not `username` and does not have moderator privelages           |
-| 200 Data          | List of all Player `username`'s  actions up to the current day                     |
+| 200 Data          | List of all Player(`username`)'s  actions up to the current day                    |
 | 200 Data format   | `Action[]`                                                                         |
 
 ### Set action of a player for current day
@@ -291,18 +305,18 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `POST .../games/<game_id:GameID>/players/<username:Username>/actions/`             |
 | Query data format | `Action`                                                                           |
-| 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
 | 403 Condition     | Requesting user is not `username` and does not have moderator privelages           |
-| 204 Action        | Sets the action of Player `username` in Game `game_id` for the current day         |
+| 204 Action        | Sets the action of Player(`username`) in Game(`game_id`) for the current day       |
 
 ### Get night results for a player
 
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/nightresults/`         |
-| 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
 | 403 Condition     | Requesting user is not `username` and does not have moderator privelages           |
-| 200 Data          | List of all Player `username`'s night results up to the current night              |
+| 200 Data          | List of all Player(`username`)'s night results up to the current night             |
 | 200 Data format   | `PlayerNightResult[]`                                                              |
 | 200 Notes         | Returned array is indexed by night number. Because nights are 1-indexed, element 0 is null. |
 
@@ -311,10 +325,10 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/nightresults/<night_number:Integer>/` |
-| 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
-| 404 Condition     | Night `night_number` is less than 1 or greater than Game `game_id`'s day number    |
+| 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
+| 404 Condition     | Night `night_number` is less than 1 or greater than Game(`game_id`)'s day number   |
 | 403 Condition     | Requesting user is not `username` and does not have moderator privelages           |
-| 200 Data          | Player `username`'s night results for night `night_number`                         |
+| 200 Data          | Player(`username`)'s night results for night `night_number`                        |
 | 200 Data format   | `PlayerNightResult`                                                                |        
 
 ### Get town night results
@@ -333,7 +347,7 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/nightresults/<night_number:Integer>/`              |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 404 Condition     | `night_number` is less than 1 or greater than Game `game_id`'s day number          |
+| 404 Condition     | `night_number` is less than 1 or greater than Game(`game_id`)'s day number         |
 | 200 Data          | Town night results for night `night_number`                                        |
 | 200 Data format   | `TownNightResult`                                                                  |        
 
@@ -344,9 +358,9 @@ Endpoint Descriptions
 | Query             | `PUT .../games/<game_id:GameID>/nightresults/<night_number:Integer>/`              |
 | Query data format | `{ 'town_night_result': TownNightResult }`                                         |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 404 Condition     | `night_number` is less than 1 or greater than Game `game_id`'s night number        |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 204 Action        | Sets the night result of Game `game_id` for night `night_number` to `town_night_result` |
+| 404 Condition     | `night_number` is less than 1 or greater than Game(`game_id`)'s night number       |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
+| 204 Action        | Sets the night result of Game(`game_id`) for night `night_number` to `town_night_result`|
 
 ### Reset town night result for specific night to default
 
@@ -354,9 +368,9 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `DELETE .../games/<game_id:GameID>/nightresults/<night_number:Integer>/`           |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 404 Condition     | `night_number` is less than 1 or greater than Game `game_id`'s night number        |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 204 Action        | Resets the night result of Game `game_id` for night `night_number` to the automatically generated default. |
+| 404 Condition     | `night_number` is less than 1 or greater than Game(`game_id`)'s night number       |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
+| 204 Action        | Resets the night result of Game(`game_id`) for night `night_number` to the automatically generated default.|
 
 ### Get town day results
 
@@ -374,7 +388,7 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/dayresults/<day_number:Integer>/`                  |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 404 Condition     | `day_number` is less than 1 or greater than Game `game_id`'s day number            |
+| 404 Condition     | `day_number` is less than 1 or greater than Game(`game_id`)'s day number           |
 | 200 Data          | Town day results for day `day_number`                                              |
 | 200 Data format   | `TownDayResult`                                                                    |        
 
@@ -385,9 +399,9 @@ Endpoint Descriptions
 | Query             | `PUT .../games/<game_id:GameID>/dayresults/<day_number:Integer>/`                  |
 | Query data format | `{ 'town_day_result': TownDayResult }`                                             |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 404 Condition     | `day_number` is less than 1 or greater than Game `game_id`'s day number            |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 204 Action        | Sets the day result of Game `game_id` for day `day_number` to `town_day_result`    |
+| 404 Condition     | `day_number` is less than 1 or greater than Game(`game_id`)'s day number           |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
+| 204 Action        | Sets the day result of Game(`game_id`) for day `day_number` to `town_day_result`   |
 
 ### Reset town day result for specific day to default
 
@@ -395,9 +409,9 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `DELETE .../games/<game_id:GameID>/dayresults/<day_number:Integer>/`               |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 404 Condition     | `day_number` is less than 1 or greater than Game `game_id`'s day number            |
-| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 204 Action        | Resets the day result of Game `game_id` for day `day_number` to the automatically generated default. |
+| 404 Condition     | `day_number` is less than 1 or greater than Game(`game_id`)'s day number           |
+| 403 Condition     | Requesting user does not have moderator privelages for Game(`game_id`)             |
+| 204 Action        | Resets the day result of Game(`game_id`) for day `day_number` to the automatically generated default.|
 
 Data Specifications
 -------------------
@@ -603,11 +617,3 @@ Automatically generated, but can be overridden by those with moderator privelage
 
 A String describing what happened in the town on a specific day. 
 Automatically generated, but can be overridden by those with moderator privelages.
-
-Other Notes
------------
-
-A user has 'Moderator privelages' over a game if any of the following are true:
-1. They created the game
-2. They were crowned a moderator of the game
-3. They have global moderator permissions
