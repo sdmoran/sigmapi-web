@@ -43,6 +43,7 @@ Information about a Mafia game.
 {
     'id':              GameID     // ID of the game
     'name':            String,    // Name of the game
+    'thumbnail':       String,    // URL to image representing game
     'created':         Date,      // Date the game was created
     'creator':         User,      // User that created the game
     'moderators':      User[],    // List of moderators for the game. Does not include the
@@ -79,6 +80,7 @@ A wrapper around User that contains Game-playing information.
 {
     'user':               User,             // User that this player is
     'status':             String,           // Either 'Alive', 'Lynched', or 'Died at Night'
+    'thumbnail':          String,           // URL to image representing game
     'revealed_role_code': RoleCode          // Code for he player's role, as revealed, if it
                                             //     has been revealed; null otherwise
     'secret_info':        SecretPlayerInfo, // Further information about the player. Non-null
@@ -99,14 +101,15 @@ Information about a Mafia role.
 
 ```javascript
 {
-    'code': RoleCode,                        // Code uniquely identifying this role
-    'name': String,                          // Name of the role
-    'action_usabilities': ActionUsability[], // Actions that the role can perform and how
-                                             //     often they can can use them
-    'night_immune': Boolean,                 // Whether this role is immune to attack and
-                                             //     conversion at night
-    'immune_to_seduction': Boolean,          // Whether this role is immune to seduction by
-                                             //     Escorts and Hookers
+    'code':                RoleCode,          // Code uniquely identifying this role
+    'name':                String,            // Name of the role
+    'thumbnail':           String,            // URL to small square image that represents role
+    'action_usabilities':  ActionUsability[], // Actions that the role can perform and how
+                                              //     often they can can use them
+    'night_immune':        Boolean,           // Whether this role is immune to attack and
+                                              //     conversion at night
+    'immune_to_seduction': Boolean,           // Whether this role is immune to seduction by
+                                              //     Escorts and Hookers
 }
 ```
 
@@ -183,6 +186,7 @@ seduce, etc.
     'code':                ActionTypeCode, // Code uniquely identifying this action type
     'name':                String          // Name of the action as it appears to the user.
                                            //     Not a unique identifier
+    'thumbnail':           String,         // URL to small square image that represents action
     'description':         String,         // Detailed description of effects of action
     'num_targets':         Integer,        // Number of targets this action takes. 0, 1, or 2
     'targets_can_be_self': Boolean[],      // Array of Booleans, each signifying whether the
