@@ -93,7 +93,7 @@ Endpoint Descriptions
 | Query data format | `{ 'name': String }`                                                               |
 | 400 Condition     | `name` is missing or empty                                                         |
 | 200 Action        | Creates a new game                                                                 |
-| 201 Data          | The created game                                                                   |
+| 201 Data          | Information about the created game                                                 |
 | 201 Data format   | `Game`                                                                             |
 | 201 Headers       | Location: Path to the created game (`.../games/<game_id>`)                         |
 
@@ -104,7 +104,7 @@ Endpoint Descriptions
 | Query             | `GET .../games/<game_id:GameID>/`                                                  |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 200 Data          | Information about the game with ID `game_id`                                       |
+| 200 Data          | Information about Game `game_id`                                                   |
 | 200 Data format   | `Game`                                                                             |
 
 ### Delete game
@@ -114,8 +114,29 @@ Endpoint Descriptions
 | Query             | `DELETE .../games/<game_id:GameID>/`                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
-| 400 Condition     | Game is finished                                                                   |
+| 400 Condition     | Game `game_id` is finished                                                         |
 | 204 Action        | Deletes the game with the ID `game_id`                                             |
+
+### Get game status
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Query             | `GET .../games/<game_id:GameID>/status/`                                           |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 200 Data          | Information about the status of Game`game_id`                                      |
+| 200 Data format   | `GameStatus`                                                                       |
+
+### Start/advance game
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Query             | `PATCH .../games/<game_id:GameID>/status/`                                         |
+| Query data format | `{ 'action': 'start_game'|'begin_day'|'end_day'|'begin_night'|'end_night' }`       |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
+| 400 Condition     | Action is invalid given current status. For example, `'begin_night'` during dawn.  |
+| 200 Data          | Information about the newly-modified status of Game `game_id`                      |
+| 200 Data format   | `GameStatus`                                                                       |
 
 ### List moderators for game
 
@@ -123,7 +144,7 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/moderators/`                                       |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 200 Data          | List of the moderators for the game with the ID `game_id`                          |
+| 200 Data          | List of the moderators for Game `game_id`                                          |
 | 200 Data format   | `User[]`                                                                           |
 | Notes             | Returned list does not include game creator                                        |
 
@@ -387,22 +408,35 @@ Information about a Mafia game.
 
 ```javascript
 {
-    'id':              GameID    // ID of the game
-    'name':            String,   // Name of the game
-    'created':         Date,     // Date the game was created
-    'creator':         User,     // User that created the game
-    'moderators':      User[],   // List of moderators for the game. Does not include the
-                                 //     game's creator
-    'players':         Player[], // List of players signed up for the game
-    'day_number':      Integer,  // Day number. 0 if game is accepting players
-    'is_accepting':    Boolean,  // Whether the game is still accpeting players
-    'user_has_joined': Boolean   // Whether the logged-in user is signed up for this game
+    'id':              GameID     // ID of the game
+    'name':            String,    // Name of the game
+    'created':         Date,      // Date the game was created
+    'creator':         User,      // User that created the game
+    'moderators':      User[],    // List of moderators for the game. Does not include the
+                                  //     game's creator
+    'players':         Player[],  // List of players signed up for the game
+    'status':          GameStatus // Status of the game
+    'user_has_joined': Boolean    // Whether the logged-in user is signed up for this game
 }
 ```
 
 ### GameID
 
-A String uniquely identifying a game.
+An alphanumeric String that uniquely identifies a game.
+
+### GameStatus
+
+Information about the status of gameplay in a game.
+
+```javascript
+{
+    'day_number':      Integer,   // Day number. 0 if game is still accepting players
+    'time':            String,    // Either 'dawn', 'day', 'dusk', or 'night'
+    'is_accepting':    Boolean,   // Whether the game is still accepting players
+    'is_finished':     Boolean    // Whether the game has finished
+    'winners':         Username   // List of the players who won. Null if game is not finished
+}
+```
 
 ### Player
 
@@ -445,8 +479,8 @@ Information about a Mafia role.
 
 ### RoleCode
 
-A case-sensitive, two-character String that uniquely identifies a role. The first letter
-indicates the faction (V => Village, R => Rogue, M => Mafia).
+A case-sensitive, two-character alphanumeric String that uniquely identifies a role.
+The first letter indicates the faction (V => Village, R => Rogue, M => Mafia).
 
 ### ActionUsability
 
@@ -477,7 +511,7 @@ to those with moderator privelages.
     'actions_availabilities':
               ActionAvailability[],       // Actions available to the user this (coming) night
     'doused':                   Boolean,  // Whether the player has been doused by an Arsonist
-    'executioner_target':       User      // If the player's role is Executioner, their target;
+    'executioner_target':       Username  // If the player's role is Executioner, their target;
                                           //    otherwise null
 }
 ```
@@ -529,7 +563,7 @@ seduce, etc.
 
 ### ActionTypeCode
 
-A case-sensitive, two-character String that uniquely identifies an action type.
+A case-sensitive, two-character alphanumeric String that uniquely identifies an action type.
 
 ### User
 
