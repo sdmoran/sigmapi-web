@@ -183,6 +183,7 @@ seduce, etc.
     'code':                ActionTypeCode, // Code uniquely identifying this action type
     'name':                String          // Name of the action as it appears to the user.
                                            //     Not a unique identifier
+    'description':         String,         // Detailed description of effects of action
     'num_targets':         Integer,        // Number of targets this action takes. 0, 1, or 2
     'targets_can_be_self': Boolean[],      // Array of Booleans, each signifying whether the
                                            //     target at that position can be the action
