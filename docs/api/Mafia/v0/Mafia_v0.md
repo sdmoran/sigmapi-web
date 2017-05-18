@@ -108,7 +108,7 @@ Information about a Mafia role.
                                               //     often they can can use them
     'night_immune':        Boolean,           // Whether this role is immune to attack and
                                               //     conversion at night
-    'immune_to_seduction': Boolean,           // Whether this role is immune to seduction by
+    'immune_to_seduction': Boolean            // Whether this role is immune to seduction by
                                               //     Escorts and Hookers
 }
 ```
@@ -159,7 +159,7 @@ Information about the availability of an action to a player.
 ```javascript
 {
     'action_type_code': ActionTypeCode, // Code for type of the available action
-    'uses_left':        Integer,        // Uses remaining for this action. -1 if unlimited
+    'uses_left':        Integer         // Uses remaining for this action. -1 if unlimited
 }
 ```
 
@@ -210,7 +210,7 @@ Information about a user of the website.
 ```javascript
 {
     'username': Username, // The user's username
-    'name': String,       // The user's first and last name. At most 61 characters
+    'name': String        // The user's first and last name. At most 61 characters
 }
 ```
 
