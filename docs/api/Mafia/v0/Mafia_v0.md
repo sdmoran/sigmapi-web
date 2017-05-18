@@ -112,7 +112,6 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `DELETE .../games/<game_id:GameID>/`                                               |
-| Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | Game is finished                                                                   |
@@ -142,7 +141,6 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `PUT .../games/<game_id:GameID>/moderators/<username:Username>/`                   |
-| Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | `username` does not refer to a User OR it refers to the creator or a player        |
@@ -185,7 +183,6 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `PUT .../games/<game_id:GameID>/players/<username:Username>/`                      |
-| Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid                                                               |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | `username` does not refer to a User or refers to the creator or a moderator        |
@@ -232,7 +229,6 @@ Endpoint Descriptions
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `DELETE .../games/<game_id:GameID>/players/<username:Username>/role/`              |
-| Query data format | `{}`                                                                               |
 | 404 Condition     | `game_id` is invalid or User `username` is not a Player in Game `game_id`          |
 | 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
 | 400 Condition     | Game `game_id` game is not accepting players                                       |
@@ -316,9 +312,30 @@ Endpoint Descriptions
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `GET .../games/<game_id:GameID>/nightresults/<night_number:Integer>/`              |
 | 404 Condition     | `game_id` is invalid                                                               |
-| 404 Condition     | `night_number` is less than 1 or greater than Game `game_id`'s day number    |
+| 404 Condition     | `night_number` is less than 1 or greater than Game `game_id`'s day number          |
 | 200 Data          | Town night results for night `night_number`                                        |
 | 200 Data format   | `TownNightResult`                                                                  |        
+
+### Set town night result for specific night
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Query             | `PUT .../games/<game_id:GameID>/nightresults/<night_number:Integer>/`              |
+| Query data format | `{ 'town_night_result': TownNightResult }`                                         |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 404 Condition     | `night_number` is less than 1 or greater than Game `game_id`'s night number        |
+| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
+| 204 Action        | Sets the night result of Game `game_id` for night `night_number` to `town_night_result` |
+
+### Reset town night result for specific night to default
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Query             | `DELETE .../games/<game_id:GameID>/nightresults/<night_number:Integer>/`           |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 404 Condition     | `night_number` is less than 1 or greater than Game `game_id`'s night number        |
+| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
+| 204 Action        | Resets the night result of Game `game_id` for night `night_number` to the automatically generated default. |
 
 ### Get town day results
 
@@ -339,6 +356,27 @@ Endpoint Descriptions
 | 404 Condition     | `day_number` is less than 1 or greater than Game `game_id`'s day number            |
 | 200 Data          | Town day results for day `day_number`                                              |
 | 200 Data format   | `TownDayResult`                                                                    |        
+
+### Set town day result for specific day
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Query             | `PUT .../games/<game_id:GameID>/dayresults/<day_number:Integer>/`                  |
+| Query data format | `{ 'town_day_result': TownDayResult }`                                             |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 404 Condition     | `day_number` is less than 1 or greater than Game `game_id`'s day number            |
+| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
+| 204 Action        | Sets the day result of Game `game_id` for day `day_number` to `town_day_result`    |
+
+### Reset town day result for specific day to default
+
+| Property          | Value                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Query             | `DELETE .../games/<game_id:GameID>/dayresults/<day_number:Integer>/`               |
+| 404 Condition     | `game_id` is invalid                                                               |
+| 404 Condition     | `day_number` is less than 1 or greater than Game `game_id`'s day number            |
+| 403 Condition     | Requesting user does not have moderator privelages for Game `game_id`              |
+| 204 Action        | Resets the day result of Game `game_id` for day `day_number` to the automatically generated default. |
 
 Data Specifications
 -------------------
