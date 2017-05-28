@@ -489,8 +489,17 @@ Information about a Mafia role.
                                               //     often they can can use them
     'night_immune':        Boolean,           // Whether this role is immune to attack and
                                               //     conversion at night
-    'immune_to_seduction': Boolean            // Whether this role is immune to seduction by
+    'immune_to_seduction': Boolean,           // Whether this role is immune to seduction by
                                               //     Escorts and Hookers
+    'appears_guilty':      Boolean,           // Whether this role appears guilty when
+                                              //     investigated
+    'min_in_game':         Integer,           // Minimum occurences of this role in a game
+    'max_in_game':         Integer,           // Maximum occurences of this role in a game, or
+                                              //     None if there is no maximum.
+    'win_condition':       String,            // If this role's faction is Rogue, then the
+                                              //     win condition for this role. Else, None.
+    'other_details':       String,            // Other details about the functioning of this
+                                              //     role in the game, or None.
 }
 ```
 

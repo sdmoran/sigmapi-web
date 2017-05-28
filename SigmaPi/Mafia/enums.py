@@ -3,8 +3,12 @@
 
 class ChoiceEnumeration(object):
 
+    MAX_NAME_LENGTH = 30
+
     def __init__(self, code, name):
         self.code = code
+        if len(name) > self.MAX_NAME_LENGTH:
+            raise ValueError('name > MAX_NAME_LENGTH')
         self.name = name
 
     @classmethod
@@ -75,11 +79,12 @@ class ActionType(ChoiceEnumeration):
 
     CODE_LENGTH = 2
 
-    def __init__(self, code, name, targets_can_be_self,
+    def __init__(self, code, name, targets_can_be_self, description,
                  targets_dead=False, is_direct_offense=False,
                  is_lethal=False, is_covert=False):
         super(ActionType, self).__init__(code, name)
         self.targets_can_be_self = targets_can_be_self
+        self.description = description
         self.targets_dead = targets_dead
         self.is_direct_offense = is_direct_offense
         self.is_lethal = is_lethal
@@ -89,32 +94,123 @@ class ActionType(ChoiceEnumeration):
     def num_targets(self):
         return len(targets_can_be_self)
 
-ActionType.NO_ACTION = ActionType('NA', 'No Action', [])
-ActionType.CONTROL = ActionType('Co', 'Control', [False, True])
-ActionType.ON_GUARD = ActionType('OG', 'On Guard', [], is_lethal=True)
-ActionType.SEDUCE = ActionType('Se', 'Seduce', [False])
-ActionType.SWITCH = ActionType('Sw', 'Switch', [True, True])
-ActionType.FRAME = ActionType('Fr', 'Frame', [True])
-ActionType.INVESTIGATE = ActionType('In', 'Investigate', [False])
-ActionType.INSANE_INVESTIGATE = ActionType('II', 'Investigate', [False])
-ActionType.FORGETFUL_INVESTIGATE = ActionType('FI', 'Forgetful Investigate', [True])
-ActionType.SCRUTINIZE = ActionType('Sc', 'Scrutinize', [True])
-ActionType.PROTECT = ActionType('Pr', 'Protect', [False])
-ActionType.DEFEND = ActionType('De', 'Defend', [False], is_lethal=True)
-ActionType.BULLETPROOF_VEST = ActionType('BV', 'Bulletproof Vest', [])
-ActionType.CORRUPT = ActionType('Co', 'Corrupt', [False], is_direct_offense=True)
-ActionType.SLAY = ActionType('Sl', 'Slay', [True], is_direct_offense=True, is_lethal=True)
-ActionType.AMBUSH = ActionType('Am', 'Ambush', [True], is_lethal=True)
-ActionType.SNIPE = ActionType('Sn', 'Snipe', [True], is_lethal=True, is_covert=True)
-ActionType.IGNITE = ActionType('Ig', 'Ignite', [], is_lethal=True)
-ActionType.SABOTAGE = ActionType('Sa', 'Sabotage', [True], is_lethal=True)
-ActionType.DOUSE = ActionType('Do', 'Douse', [True])
-ActionType.UN_DOUSE = ActionType('UD', 'Un-Douse', [True])
-ActionType.DISPOSE = ActionType('Di', 'Dispose', [True])
-ActionType.REVEAL = ActionType('Re', 'Reveal', [])
-ActionType.FOLLOW = ActionType('Fo', 'Follow', [True])
-ActionType.WATCH = ActionType('Wa', 'Watch', [True])
-ActionType.REMEMBER = ActionType('Re', 'Remember', [False], targets_dead=True)
+    @property
+    def thunbmail_url(self):
+        return 'http://greentreesarborcareinc.com/wp-content/uploads/2014/01/image-placeholder.jpg'
+
+ActionType.NO_ACTION = ActionType(
+    'NA', 'No Action', [],
+    'No action is performed.'
+)
+ActionType.CONTROL = ActionType(
+    'Co', 'Control', [False, True],
+    'TODO: describe this action.',
+)
+ActionType.ON_GUARD = ActionType(
+    'OG', 'On Guard', [],
+    'TODO: describe this action.',
+    is_lethal=True
+)
+ActionType.SEDUCE = ActionType(
+    'Se', 'Seduce', [False],
+    'TODO: describe this action.',
+)
+ActionType.SWITCH = ActionType(
+    'Sw', 'Switch', [True, True],
+    'TODO: describe this action.',
+)
+ActionType.FRAME = ActionType(
+    'Fr', 'Frame', [True],
+    'TODO: describe this action.',
+)
+ActionType.INVESTIGATE = ActionType(
+    'In', 'Investigate', [False],
+    'TODO: describe this action.',
+)
+ActionType.INSANE_INVESTIGATE = ActionType(
+    'II', 'Investigate', [False],
+    'TODO: describe this action.',
+)
+ActionType.FORGETFUL_INVESTIGATE = ActionType(
+    'FI', 'Forgetful Investigate', [True],
+    'TODO: describe this action.',
+)
+ActionType.SCRUTINIZE = ActionType(
+    'Sc', 'Scrutinize', [True],
+    'TODO: describe this action.',
+)
+ActionType.PROTECT = ActionType(
+    'Pr', 'Protect', [False],
+    'TODO: describe this action.',
+)
+ActionType.DEFEND = ActionType(
+    'De', 'Defend', [False],
+    'TODO: describe this action.',
+    is_lethal=True,
+)
+ActionType.BULLETPROOF_VEST = ActionType(
+    'BV', 'Bulletproof Vest', [],
+    'TODO: describe this action.',
+)
+ActionType.CORRUPT = ActionType(
+    'Co', 'Corrupt', [False],
+    'TODO: describe this action.',
+    is_direct_offense=True,
+)
+ActionType.SLAY = ActionType(
+    'Sl', 'Slay', [True],
+    'TODO: describe this action.',
+    is_direct_offense=True, is_lethal=True,
+)
+ActionType.AMBUSH = ActionType(
+    'Am', 'Ambush', [True],
+    'TODO: describe this action.',
+    is_lethal=True,
+)
+ActionType.SNIPE = ActionType(
+    'Sn', 'Snipe', [True],
+    'TODO: describe this action.',
+    is_lethal=True, is_covert=True,
+)
+ActionType.IGNITE = ActionType(
+    'Ig', 'Ignite', [],
+    'TODO: describe this action.',
+    is_lethal=True,
+)
+ActionType.SABOTAGE = ActionType(
+    'Sa', 'Sabotage', [True],
+    'TODO: describe this action.',
+    is_lethal=True,
+)
+ActionType.DOUSE = ActionType(
+    'Do', 'Douse', [True],
+    'TODO: describe this action.',
+)
+ActionType.UN_DOUSE = ActionType(
+    'UD', 'Un-Douse', [True],
+    'TODO: describe this action.',
+)
+ActionType.DISPOSE = ActionType(
+    'Di', 'Dispose', [True],
+    'TODO: describe this action.',
+)
+ActionType.REVEAL = ActionType(
+    'Re', 'Reveal', [],
+    'TODO: describe this action.',
+)
+ActionType.FOLLOW = ActionType(
+    'Fo', 'Follow', [True],
+    'TODO: describe this action.',
+)
+ActionType.WATCH = ActionType(
+    'Wa', 'Watch', [True],
+    'TODO: describe this action.',
+)
+ActionType.REMEMBER = ActionType(
+    'Re', 'Remember', [False],
+    'TODO: describe this action.',
+    targets_dead=True,
+)
 
 
 class ApparentGuilt(ChoiceEnumeration):
@@ -130,7 +226,8 @@ class Role(ChoiceEnumeration):
     def __init__(self, code, name, faction, action_types_and_uses, apparent_name=None,
                  night_immune=False, immune_to_seduction=False,
                  hidden_to_mafia=False, apparent_guilt=ApparentGuilt.FACTION_BASED,
-                 min_in_game=0, max_in_game=float('inf')):
+                 min_in_game=0, max_in_game=float('inf'),
+                 win_condition=None, other_details=None):
         super(Role, self).__init__(code, name)
 
         self.faction = faction
@@ -149,6 +246,25 @@ class Role(ChoiceEnumeration):
             raise ValueError('Role: min_in_game > max_in_game')
         self.min_in_game = min_in_game
         self.max_in_game = max_in_game
+
+        self.win_condition = win_condition
+        self.other_details = other_details
+
+    @property
+    def max_in_game_json(self):
+        return self.max_in_game if self.max_in_game < float('inf') else None
+
+    @property
+    def appears_guilty(self):
+        return (
+            self.faction == Faction.MAFIA
+            if self.apparent_guilt == ApparentGuilt.FACTION_BASED
+            else self.apparent_guilt == ApparentGuilt.GUILTY
+        )
+
+    @property
+    def thumbnail_url(self):
+        return 'http://greentreesarborcareinc.com/wp-content/uploads/2014/01/image-placeholder.jpg'
 
 UNLIMITED_USES = -1
 EVERY_OTHER_NIGHT = -2
@@ -211,6 +327,7 @@ Role.BOMB = Role(
     [],
     immune_to_seduction=True,
     max_in_game=1,
+    other_details='TODO describe bomb specifics.',
 )
 Role.BODYGUARD = Role(
     'Vg',  'Bodyguard', Faction.VILLAGE,
@@ -229,6 +346,7 @@ Role.GODFATHER = Role(
     [(ActionType.SLAY, UNLIMITED_USES)],
     apparent_guilt=ApparentGuilt.INNOCENT,
     min_in_game=1, max_in_game=1,
+    other_details='TODO describe godfather specifics.',
 )
 Role.LIMO_DRIVER = Role(
     'ML', 'Limo Driver', Faction.MAFIA,
@@ -278,15 +396,18 @@ Role.BASIC_MAFIA = Role(
 Role.JESTER = Role(
     'RJ', 'Jester', Faction.ROGUE,
     [],
+    win_condition='TODO describe win condition.',
 )
 Role.SERIAL_KILLER = Role(
     'RK', 'Serial Killer', Faction.ROGUE,
     [(ActionType.SLAY, UNLIMITED_USES)],
     night_immune=True,
+    win_condition='TODO describe win condition.',
 )
 Role.MASS_MURDERER = Role(
     'RM', 'Mass Murderer', Faction.ROGUE,
     [(ActionType.AMBUSH, EVERY_OTHER_NIGHT)],
+    win_condition='TODO describe win condition.',
 )
 Role.ARSONIST = Role(
     'RA', 'Arsonist', Faction.ROGUE,
@@ -296,23 +417,28 @@ Role.ARSONIST = Role(
         (ActionType.IGNITE, UNLIMITED_USES)
     ],
     night_immune=True,
+    win_condition='TODO describe win condition.',
 )
 Role.WITCH = Role(
     'RW', 'Witch', Faction.ROGUE,
     [(ActionType.CONTROL, UNLIMITED_USES)],
     immune_to_seduction=True,
+    win_condition='TODO describe win condition.',
 )
 Role.AMNESIAC = Role(
     'RE', 'Amnesiac', Faction.ROGUE,
     [(ActionType.REMEMBER, 1)],
+    win_condition='TODO describe win condition.',
 )
 Role.SURVIVOR = Role(
     'RS', 'Survivor', Faction.ROGUE,
     [(ActionType.BULLETPROOF_VEST, 3)],
+    win_condition='TODO describe win condition.',
 )
 Role.EXECUTIONER = Role(
     'RX', 'Executioner', Faction.ROGUE,
     [],
+    win_condition='TODO describe win condition.',
 )
 
 

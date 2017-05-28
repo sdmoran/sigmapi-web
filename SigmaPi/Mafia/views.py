@@ -18,6 +18,45 @@ class AuthAPIView(APIView):
     permissions = (permissions.IsAuthenticated,)
 
 
+_ABOUT_STR = '''TODO write about string
+'''
+
+class AboutView(APIView):
+
+    def get(self, request):
+        return OkResponse({
+            'about': _ABOUT_STR,
+            'version': '0.1',
+            'documentation_url': (
+                'https://github.com/kdmccormick/sigmapi-web/blob/' +
+                'rest-and-relaxation/docs/api/Mafia/v0/Mafia_v0.md'
+            ),
+        })
+
+
+class RolesView(APIView):
+
+    def get(self, request):
+        roles = Role.get_instances()
+        data = {
+            role.code: RoleSerializer(role).data
+            for role in roles
+        }
+        return OkResponse(data)
+
+
+class RoleView(APIView):
+
+    def get(self, request, role_code):
+        role = Role.get_instance(role_code)
+        if role:
+            serializer = RoleSerializer(role)
+            return OkResponse(serializer.data)
+        else:
+            raise Http404('Role code \'' + role_code + '\' is invalid.')
+
+
+'''
 class GamesView(AuthAPIView):
 
     def get(self, request):
@@ -99,6 +138,7 @@ class PlayerView(APIView):
     def put(self, request, game_id, player_username):
         return _add_player(request, game_id, player_username)
 
+'''
 
 class OkResponse(Response):
     status_code = 200

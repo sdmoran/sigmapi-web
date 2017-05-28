@@ -632,11 +632,7 @@ def _list_users(users):
 
 def _investigate(investigator_result, target_result):
     target_role = Role.get_instance(target_result.role)
-    guilty = target_result.framed or (
-        target_role.faction == Faction.MAFIA
-        if target_role.apparent_guilt == ApparentGuilt.FACTION_BASED
-        else target_role.apparent_guilt == ApparentGuilt.GUILTY
-    )
+    guilty = target_result.framed or target_role.appears_guilty
     if investigator_result.action_type == ActionType.INSANE_INVESTIGATE.code:
         guilty = not guilty
     return 'GUILTY' if guilty else 'INNOCENT'

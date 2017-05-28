@@ -1,10 +1,38 @@
 
-from rest_framework import serializers
+from rest_framework.serializers import *
 
 from .models import *
 from .enums import *
 
 
+class ActionUsabilitySerializer(Serializer):
+    action_type_code = SerializerMethodField()
+    uses = SerializerMethodField()
+
+    def get_action_type_code(self, action_type_and_use):
+        return action_type_and_use[0].code
+
+    def get_uses(self, action_type_and_use):
+        return action_type_and_use[1]
+
+
+class RoleSerializer(Serializer):
+    code = CharField(max_length=Role.CODE_LENGTH)
+    name = CharField(max_length=Role.MAX_NAME_LENGTH)
+    thumbnail = ReadOnlyField(source='thumbnail_url')
+    action_usabilities = ListField(
+        child=ActionUsabilitySerializer(),
+        source='action_types_and_uses'
+    )
+    night_immune = BooleanField()
+    immune_to_seduction = BooleanField()
+    appears_guilty = ReadOnlyField()
+    min_in_game = IntegerField()
+    max_in_game = ReadOnlyField(source='max_in_game_json')
+    win_condition = CharField()
+    other_details = CharField()
+
+'''
 class PlayerSerializer(serializers.Serializer):
     username = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
@@ -63,7 +91,7 @@ class GameSerializer(serializers.Serializer):
 
     def get_user_has_joined(self, game):
         return game.has_user_playing(self.context['user'])
-
+'''
 
 def _get_role_name(role_code):
     return Role.get_instance(role_code).name if role_code else None
