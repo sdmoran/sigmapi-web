@@ -45,9 +45,6 @@ Notes
 | XXX Data format   | If XXX is returned, the format of the returned data                                |                                                                             |
 | XXX Headers       | If XXX is returned, what special headers are provided                              |
 
-| 200 Data          | List of all Player(`username`)'s lynch votes up to the current day                 |
-
-
 Endpoint Descriptions
 ---------------------
 
@@ -279,6 +276,8 @@ Endpoint Descriptions
 | Query             | `GET .../games/<game_id:GameID>/players/<username:Username>/votes/`                |
 | 404 Condition     | `game_id` is invalid or User(`username`) is not a Player in Game(`game_id`)        |
 | 200 Data format   | `LynchVote[]`                                                                      |
+| 200 Data          | List of all Player(`username`)'s lynch votes up to the current day                 |
+
 ### Set lynch vote of a player for current day
 
 | Property          | Value                                                                              |
