@@ -32,6 +32,17 @@ class RoleSerializer(Serializer):
     win_condition = CharField()
     other_details = CharField()
 
+
+class ActionTypeSerializer(Serializer):
+    code = CharField(max_length=ActionType.CODE_LENGTH)
+    name = CharField(max_length=Role.MAX_NAME_LENGTH)
+    thumbnail = ReadOnlyField(source='thumbnail_url')
+    description = CharField()
+    num_targets = IntegerField()
+    targets_can_be_self = ListField(child=BooleanField())
+    targets_dead = BooleanField()
+
+
 '''
 class PlayerSerializer(serializers.Serializer):
     username = serializers.SerializerMethodField()

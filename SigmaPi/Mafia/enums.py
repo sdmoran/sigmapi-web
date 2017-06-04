@@ -92,10 +92,10 @@ class ActionType(ChoiceEnumeration):
 
     @property
     def num_targets(self):
-        return len(targets_can_be_self)
+        return len(self.targets_can_be_self)
 
     @property
-    def thunbmail_url(self):
+    def thumbnail_url(self):
         return 'http://greentreesarborcareinc.com/wp-content/uploads/2014/01/image-placeholder.jpg'
 
 ActionType.NO_ACTION = ActionType(

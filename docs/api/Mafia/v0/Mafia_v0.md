@@ -38,9 +38,9 @@ Notes
 | Property          | Value                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------- |
 | Query             | `METHOD .../path/to/example/endpoint/<var_name:VarType>/`                          |
-| Query data format | If it is a POST, PUT, DELETE, or PATCH, the expected input data format             |                                                             |
+| Query data format | If it is a POST, PUT, DELETE, or PATCH, the expected input data format             |
 | XXX Condition     | The condition upon which the XXX status code is returned                           |
-| XXX Action        | If XXX is returned, how state is modified                                          |                                            |
+| XXX Action        | If XXX is returned, how state is modified                                          |
 | XXX Data          | If XXX is returned, a description of the returned data                             |
 | XXX Data format   | If XXX is returned, the format of the returned data                                |                                                                             |
 | XXX Headers       | If XXX is returned, what special headers are provided                              |

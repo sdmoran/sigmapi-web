@@ -34,26 +34,48 @@ class AboutView(APIView):
         })
 
 
-class RolesView(APIView):
+class ChoiceEnumerationAllView(AuthAPIView):
 
     def get(self, request):
-        roles = Role.get_instances()
+        instances = self.enumeration.get_instances()
         data = {
-            role.code: RoleSerializer(role).data
-            for role in roles
+            instance.code: self.serializer(instance).data
+            for instance in instances
         }
         return OkResponse(data)
 
 
-class RoleView(APIView):
+class ChoiceEnumerationSingleView(AuthAPIView):
 
-    def get(self, request, role_code):
-        role = Role.get_instance(role_code)
-        if role:
-            serializer = RoleSerializer(role)
+    def get(self, request, code):
+        instance = self.enumeration.get_instance(code)
+        if instance:
+            serializer = self.serializer(instance)
             return OkResponse(serializer.data)
         else:
-            raise Http404('Role code \'' + role_code + '\' is invalid.')
+            raise Http404(
+                self.enumeration.__name__ + ' code \'' + code + '\' is invalid.'
+            )
+    
+
+class RolesView(ChoiceEnumerationAllView):
+    enumeration = Role
+    serializer = RoleSerializer
+
+
+class RoleView(ChoiceEnumerationSingleView):
+    enumeration = Role
+    serializer = RoleSerializer
+
+
+class ActionTypesView(ChoiceEnumerationAllView):
+    enumeration = ActionType
+    serializer = ActionTypeSerializer
+
+
+class ActionTypeView(ChoiceEnumerationSingleView):
+    enumeration = ActionType
+    serializer = ActionTypeSerializer
 
 
 '''
