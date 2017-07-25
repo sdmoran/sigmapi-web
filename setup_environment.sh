@@ -5,7 +5,7 @@ echo "Installing python packages"
 pip3 install -q -r requirements.txt
 
 echo "Running syncdb..."
-python3 manage.py syncdb
+python3 manage.py migrate --run-syncdb
 
 echo "Loading Fixtures..."
 python3 manage.py loaddata fixtures/dev_data.json

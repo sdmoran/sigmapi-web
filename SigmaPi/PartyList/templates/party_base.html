@@ -10,7 +10,7 @@
 		{% else %}
 		<li>
 		{% endif %}
-			<a href="{% url 'PartyList.views.index' %}">
+			<a href="{% url 'partylist-index' %}">
 				Parties
 			</a>
 		</li>
@@ -24,8 +24,7 @@
 		{% else %}
 		<li>
 		{% endif %}
-
-			<a href="{% url 'PartyList.views.manage_parties' %}">
+			<a href="{% url 'partylist-manage_parties' %}">
 				Manage Parties
 			</a>
 		</li>
@@ -35,8 +34,7 @@
 		{% else %}
 		<li>
 		{% endif %}
-
-			<a href="{% url 'PartyList.views.add_party' %}">
+			<a href="{% url 'partylist-add_party' %}">
 				Add Party
 			</a>
 		</li>
@@ -48,7 +46,7 @@
 		{% else %}
 		<li>
 		{% endif %}
-			<a href="{% url 'PartyList.views.view_blacklist' %}">View Blacklist</a>
+			<a href="{% url 'partylist-view_blacklist' %}">View Blacklist</a>
 		</li>
 
 		{% if perms.PartyList.manage_blacklist %}
@@ -57,7 +55,7 @@
 		{% else %}
 		<li>
 		{% endif %}
-			<a href="{% url 'PartyList.views.manage_blacklist' %}">Manage Blacklist</a>
+			<a href="{% url 'partylist-manage_blacklist' %}">Manage Blacklist</a>
 		</li>
 		{% endif %}
 

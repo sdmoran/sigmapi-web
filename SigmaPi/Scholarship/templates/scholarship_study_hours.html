@@ -36,7 +36,7 @@ Sigma Pi Secure - Study Hours
 {% endfor %}
 {% endif %}
 
-<form enctype="multipart/form-data" method="post" class="form-inline" action="{% url 'Scholarship.views.update_requirements' %}" style="width: 90%; margin-left: auto; margin-right:auto;">
+<form enctype="multipart/form-data" method="post" class="form-inline" action="{% url 'scholarship-update_requirements' %}" style="width: 90%; margin-left: auto; margin-right:auto;">
 	{% csrf_token %}
 	<div class="form-group">
 		{{update_requirements_form.user}}
@@ -74,7 +74,7 @@ Sigma Pi Secure - Study Hours
 				<td>{{tracked_user.hours_this_week}}</td>
 				<td>{{tracked_user.number_of_hours}}</td>
 				<td>
-					<form type="multipart/form-data" method="post" action="{% url 'Scholarship.views.send_probation' tracked_user.pk %}" id="probation-{{tracked_user.pk}}">
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-send_probation' tracked_user.pk %}" id="probation-{{tracked_user.pk}}">
 						{% csrf_token %}
 						<a href="#" onclick="$('#probation-{{tracked_user.pk}}').submit();">
 							Send Probation
@@ -82,7 +82,7 @@ Sigma Pi Secure - Study Hours
 					</form>
 				</td>
 				<td>
-					<form type="multipart/form-data" method="post" action="{% url 'Scholarship.views.untrack_user' tracked_user.pk %}" id="untrack-{{tracked_user.pk}}">
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-untrack_user' tracked_user.pk %}" id="untrack-{{tracked_user.pk}}">
 						{% csrf_token %}
 						<a href="#" onclick="$('#untrack-{{tracked_user.pk}}').submit();">
 							End Tracking
@@ -128,7 +128,7 @@ Sigma Pi Secure - Study Hours
 {% endfor %}
 {% endif %}
 
-<form enctype="multipart/form-data" method="post" class="form-inline" action="{% url 'Scholarship.views.record_hours' %}" style="width: 90%; margin-left: auto; margin-right:auto;">
+<form enctype="multipart/form-data" method="post" class="form-inline" action="{% url 'scholarship-record_hours' %}" style="width: 90%; margin-left: auto; margin-right:auto;">
 	{% csrf_token %}
 	<div class="form-group">
 		<label class="control-label">I studied </label>

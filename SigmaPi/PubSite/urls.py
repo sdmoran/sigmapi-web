@@ -1,11 +1,14 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
+from django.contrib.auth import views as dsl
 
-urlpatterns = patterns('',
-    url(r'^login', 'django.contrib.auth.views.login'),
-    url(r'^logout', 'django.contrib.auth.views.logout_then_login'),
-    url(r'^$', 'PubSite.views.index'),
-    url(r'^history[/]$', 'PubSite.views.history'),
-    url(r'^service[/]$', 'PubSite.views.service'),
-    url(r'^403/', 'PubSite.views.permission_denied'),
-    url(r'^donate/', 'PubSite.views.donate')
-)
+from . import views
+
+urlpatterns = [
+    url(r'^login', dsl.login, name='pub-login'),
+    url(r'^logout', dsl.logout_then_login, name='pub-logout'),
+    url(r'^$', views.index, name='pub-index'),
+    url(r'^history[/]$', views.history, name='pub-history'),
+    url(r'^service[/]$', views.service, name='pub-service'),
+    url(r'^403/', views.permission_denied, name='pub-permission_denied'),
+    url(r'^donate/', views.donate, name='pub-donate')
+]

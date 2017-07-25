@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib import messages
 
-from sendfile import sendfile
+from django_downloadview import sendfile
 
 from Scholarship.models import TrackedUser, StudyHoursRecord, AcademicResource, LibraryItem
 from Scholarship.forms import TrackedUserForm, StudyHoursRecordForm, AcademicResourceForm, LibraryItemForm
@@ -40,7 +40,7 @@ def get_currently_tracked_users():
 @login_required
 @require_GET
 def index(request):
-    return redirect('Scholarship.views.resources')
+    return redirect('scholarship-resources')
 
 
 @login_required
@@ -83,7 +83,7 @@ def study_hours(request):
 
     return render(request, "scholarship_study_hours.html", context)
 
-@permission_required('Scholarship.scholarship_head', login_url='PubSite.views.permission_denied')
+@permission_required('Scholarship.scholarship_head', login_url='pub-permission_denied')
 @require_POST
 def update_requirements(request):
 
@@ -102,9 +102,9 @@ def update_requirements(request):
     else:
         messages.error(request, "Both user name and number of hours is required. Number of hours cannot be < 0.", extra_tags="track")
 
-    return redirect("Scholarship.views.study_hours")
+    return redirect("scholarship-study_hours")
 
-@permission_required('Scholarship.scholarship_head', login_url='PubSite.views.permission_denied')
+@permission_required('Scholarship.scholarship_head', login_url='pub-permission_denied')
 @require_POST
 def untrack_user(request, user):
 
@@ -116,9 +116,9 @@ def untrack_user(request, user):
     notify.study_hours_untracked(trackedUser)
     messages.info(request, "User's study hours requirement successfully updated.", extra_tags="track")
 
-    return redirect("Scholarship.views.study_hours")
+    return redirect("scholarship-study_hours")
 
-@permission_required('Scholarship.scholarship_head', login_url='PubSite.views.permission_denied')
+@permission_required('Scholarship.scholarship_head', login_url='pub-permission_denied')
 @require_POST
 def send_probation(request, user):
 
@@ -127,7 +127,7 @@ def send_probation(request, user):
     notify.social_probation(trackedUser)
     messages.info(request, "User has successfully been notified about their social probation.", extra_tags="track")
 
-    return redirect("Scholarship.views.study_hours")
+    return redirect("scholarship-study_hours")
 
 @login_required
 @require_POST
@@ -143,7 +143,7 @@ def record_hours(request):
     else:
         messages.error(request, "You must input a positive number of hours studied. The date studied must have taken place this week and not in the future.", extra_tags="report")
 
-    return redirect("Scholarship.views.study_hours")
+    return redirect("scholarship-study_hours")
 
 
 @login_required
@@ -217,9 +217,9 @@ def download_resource(request, resource):
 
         return sendfile(request, resourceObject.resource_pdf.path, attachment=True, attachment_filename=fileName)
     else:
-        return redirect("PubSite.views.permission_denied")
+        return redirect("pub-permission_denied")
 
-@permission_required('Scholarship.scholarship_head', login_url='PubSite.views.permission_denied')
+@permission_required('Scholarship.scholarship_head', login_url='pub-permission_denied')
 @require_POST
 def delete_resource(request, resource):
     """
@@ -232,7 +232,7 @@ def delete_resource(request, resource):
     resourceObject.delete()
 
 
-    return redirect("Scholarship.views.resources")
+    return redirect("scholarship-resources")
 
 @login_required
 @require_GET
@@ -305,9 +305,9 @@ def download_libraryitem(request, item):
 
         return sendfile(request, itemObject.item_pdf.path, attachment=True, attachment_filename=fileName)
     else:
-        return redirect("PubSite.views.permission_denied")
+        return redirect("pub-permission_denied")
 
-@permission_required('Scholarship.scholarship_head', login_url='PubSite.views.permission_denied')
+@permission_required('Scholarship.scholarship_head', login_url='pub-permission_denied')
 @require_POST
 def delete_libraryitem(request, item):
     """
@@ -319,9 +319,9 @@ def delete_libraryitem(request, item):
     itemObject.item_pdf.delete() # Delete actual file
     itemObject.delete()
 
-    return redirect("Scholarship.views.library")
+    return redirect("scholarship-library")
 
-@permission_required('Scholarship.scholarship_head', login_url='PubSite.views.permission_denied')
+@permission_required('Scholarship.scholarship_head', login_url='pub-permission_denied')
 @require_GET
 def approve(request):
     pendingItems = LibraryItem.objects.filter(approved=False)
@@ -335,7 +335,7 @@ def approve(request):
 
     return render(request, "scholarship_approve.html", context)
 
-@permission_required('Scholarship.scholarship_head', login_url='PubSite.views.permission_denied')
+@permission_required('Scholarship.scholarship_head', login_url='pub-permission_denied')
 @require_POST
 def approve_resource(request, resource):
     try:
@@ -348,9 +348,9 @@ def approve_resource(request, resource):
     except:
         messages.error(request, "The resource you tried to approve no longer exists.")
 
-    return redirect("Scholarship.views.approve")
+    return redirect("scholarship-approve")
 
-@permission_required('Scholarship.scholarship_head', login_url='PubSite.views.permission_denied')
+@permission_required('Scholarship.scholarship_head', login_url='pub-permission_denied')
 @require_POST
 def approve_libraryitem(request, item):
     try:
@@ -363,9 +363,9 @@ def approve_libraryitem(request, item):
     except:
         messages.error(request, "The item you tried to approve no longer exists.")
 
-    return redirect("Scholarship.views.approve")
+    return redirect("scholarship-approve")
 
-@permission_required('Scholarship.scholarship_head', login_url='PubSite.views.permission_denied')
+@permission_required('Scholarship.scholarship_head', login_url='pub-permission_denied')
 @require_POST
 def decline_libraryitem(request, item):
     try:
@@ -378,10 +378,10 @@ def decline_libraryitem(request, item):
     except:
         messages.error(request, "The Item you tried to decline has already been declined.")
 
-    return redirect("Scholarship.views.approve")
+    return redirect("scholarship-approve")
 
 
-@permission_required('Scholarship.scholarship_head', login_url='PubSite.views.permission_denied')
+@permission_required('Scholarship.scholarship_head', login_url='pub-permission_denied')
 @require_POST
 def decline_resource(request, resource):
     try:
@@ -394,5 +394,5 @@ def decline_resource(request, resource):
     except:
         messages.error(request, "The resource you tried to decline has already been declined.")
 
-    return redirect("Scholarship.views.approve")
+    return redirect("scholarship-approve")
 

@@ -114,15 +114,15 @@
 <div class="modal" id="accept-summons">
 	<div class="modal-dialog">
 		<div class="modal-content">
-	  		<div class="modal-header">
+			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">
 					<span aria-hidden="true">&times;</span>
 					<span class="sr-only">Close</span>
-	   			</button>
+				</button>
 				<h4 class="modal-title">Approve / Archive Summons</h4>
-	  		</div>
-	  		<div class="modal-body">
-				<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.accept_summons' 0 %}" id="accept-summons-form" role="form">
+			</div>
+			<div class="modal-body">
+				<form enctype="multipart/form-data" method="post" action="{% url 'standards-accept_summons' 0 %}" id="accept-summons-form" role="form">
 					{% csrf_token %}
 					<div class="form-group">
 						Accept the summons and archive the results.
@@ -157,7 +157,7 @@
 				<h4 class="modal-title">Reject Summons</h4>
 	  		</div>
 	  		<div class="modal-body">
-				<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.delete_summons' 0 %}" id="reject-summons-form" role="form">
+				<form enctype="multipart/form-data" method="post" action="{% url 'standards-delete_summons' 0 %}" id="reject-summons-form" role="form">
 					{% csrf_token %}
 					<div class="form-group" id="reject-summons-description">
 						<label for="details" class="control-label">Summons Description</label>

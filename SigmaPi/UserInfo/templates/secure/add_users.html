@@ -3,7 +3,7 @@
 {% block content %}
 <h3>Add a new user.</h3>
 
-<form enctype="multipart/form-data" method="post" action="{% url 'UserInfo.views.add_users' %}" role="form" class="small centered">
+<form enctype="multipart/form-data" method="post" action="{% url 'userinfo-add_users' %}" role="form" class="small centered">
 	{% if message %}
 	<div class="alert alert-info">
 		<strong>Message! </strong>

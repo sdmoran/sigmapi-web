@@ -1,6 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns('',
-    url(r'^$', 'UserInfo.views.users'),
-    url(r'^password/', 'UserInfo.views.change_password'),
-)
+from . import views
+
+
+urlpatterns = [
+    url(r'^$', views.users, name='userinfo-users'),
+    url(r'^password/', views.change_password, name='userinfo-change_password'),
+]

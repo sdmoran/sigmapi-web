@@ -112,7 +112,7 @@ def users(request):
 
     return render(request, 'users.html', context)
 
-@permission_required('UserInfo.manage_users', login_url='Secure.views.index')
+@permission_required('UserInfo.manage_users', login_url='secure-index')
 def add_users(request):
     """
         Provides a view for adding a user
@@ -142,7 +142,7 @@ def add_users(request):
                     context['message'].append("Error adding " + to_add + ".")
     return render(request, 'secure/add_users.html', context)
 
-@permission_required('UserInfo.manage_users', login_url='Secure.views.index')
+@permission_required('UserInfo.manage_users', login_url='secure-index')
 def manage_users(request):
     """
         Provides a view to manage all of the users in the system.
@@ -156,7 +156,7 @@ def manage_users(request):
 
     return render(request, 'secure/manage_users.html', context)
 
-@permission_required('UserInfo.manage_users', login_url='Secure.views.index')
+@permission_required('UserInfo.manage_users', login_url='secure-index')
 def reset_password(request, user):
     """
         Resets a single user's password.
@@ -167,7 +167,7 @@ def reset_password(request, user):
 
     utils.reset_password(requested_user)
 
-    return redirect("UserInfo.views.manage_users")
+    return redirect("userinfo-manage_users")
 
 @login_required
 def edit_user(request, user):
@@ -176,7 +176,7 @@ def edit_user(request, user):
     """
     requested_user = User.objects.get(username__exact=user)
     if (not requested_user == request.user) and not request.user.is_staff:
-        return redirect('PubSite.views.permission_denied')
+        return redirect('pub-permission_denied')
     message = ""
     if request.method == 'POST':
         try:

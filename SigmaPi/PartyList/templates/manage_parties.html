@@ -21,10 +21,10 @@
 				<td>{{ party.name }}</td>
 				<td>{{ party.date }}</td>
 				<td>
-					<a href="{% url 'PartyList.views.edit_party' party.pk %}">Edit</a>
+					<a href="{% url 'partylist-edit_party' party.pk %}">Edit</a>
 				</td>
 				<td>
-					<form method="POST" action="{% url 'PartyList.views.delete_party' party.pk %}">
+					<form method="POST" action="{% url 'partylist-delete_party' party.pk %}">
 						{% csrf_token %}
 						<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
 					</form>
@@ -37,7 +37,7 @@
 {% else %}
 
 <p>
-	No parties exist. <a href="{% url 'PartyList.views.add_party' %}">Create a new one.</a>
+	No parties exist. <a href="{% url 'partylist-add_party' %}">Create a new one.</a>
 </p>
 {% endif %}
 

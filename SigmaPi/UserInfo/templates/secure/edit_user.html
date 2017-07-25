@@ -4,7 +4,7 @@
 
 {% block content %}
 <h3>Edit the fields below to change the user's info.</h3>
-	<form enctype="multipart/form-data" method="post" action="{% url 'UserInfo.views.edit_user' requested_user.username %}" class="medium centered" role="form">
+	<form enctype="multipart/form-data" method="post" action="{% url 'userinfo-edit_user' requested_user.username %}" class="medium centered" role="form">
 		{% csrf_token %}
 		{% if error %}
 		<div class="alert alert-warning">

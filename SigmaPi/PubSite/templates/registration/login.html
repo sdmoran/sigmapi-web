@@ -7,7 +7,7 @@
 
 <h2>You Are Already Logged In.</h2>
 You cannot log in again because you are already logged in.<br/><br/>
-Did you mean to <a href="{% url 'django.contrib.auth.views.logout_then_login' %}">logout?</a><br/><br/>
+Did you mean to <a href="{% url 'pub-logout' %}">logout?</a><br/><br/>
 
 {% else %}
 
@@ -23,7 +23,7 @@ Did you mean to <a href="{% url 'django.contrib.auth.views.logout_then_login' %}
 	</div>
 	{% endif %}
 
-	<form role="form" class="form-horizontal" method="post" action="{% url 'django.contrib.auth.views.login' %}">
+	<form role="form" class="form-horizontal" method="post" action="{% url 'pub-login' %}">
 	{% csrf_token %}
 		<div class="form-group">
 			<label for="id_username" class="col-sm-2 control-label">Username</label>

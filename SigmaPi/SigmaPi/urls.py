@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -7,7 +7,7 @@ from django.contrib import admin
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = [
     # Examples:
     # url(r'^$', 'SigmaPi.views.home', name='home'),
     # url(r'^SigmaPi/', include('SigmaPi.foo.urls')),
@@ -20,7 +20,7 @@ urlpatterns = patterns('',
     url(r'^users/', include('UserInfo.urls')),
     url(r'^secure/', include('Secure.urls')),
     url(r'^', include('PubSite.urls')),
-)
+]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

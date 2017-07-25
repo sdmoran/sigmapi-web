@@ -54,7 +54,7 @@
 		<h4 class="modal-title">Post New Link</h4>
 	  </div>
 	  <div class="modal-body">
-		<form enctype="multipart/form-data" method="post" action="{% url 'Links.views.add_link' %}" id="add-link-form">
+		<form enctype="multipart/form-data" method="post" action="{% url 'links-add_link' %}" id="add-link-form">
 			{% csrf_token %}
 			<div class="form-group">
 				<label for="id_title" class="control-label">Title*</label>

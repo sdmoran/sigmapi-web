@@ -9,7 +9,7 @@ from datetime import datetime
 
 from Links.models import Link, LinkForm
 
-@permission_required('Links.access_link', login_url='PubSite.views.permission_denied')
+@permission_required('Links.access_link', login_url='pub-permission_denied')
 def view_all(request):
     """
         Displays all of the links in the system.
@@ -27,7 +27,7 @@ def view_all(request):
 
     return render(request, "secure/links_view_all.html", context)
 
-@permission_required('Links.add_link', login_url='PubSite.views.permission_denied')
+@permission_required('Links.add_link', login_url='pub-permission_denied')
 def add_link(request):
     """
         Creates a new link to add to the system
@@ -44,11 +44,11 @@ def add_link(request):
                 link.promoted = False
             link.save()
 
-        return redirect('Links.views.view_all')
+        return redirect('links-view_all')
     else:
-        return redirect('PubSite.views.permission_denied')
+        return redirect('pub-permission_denied')
 
-@permission_required('Links.delete_link', login_url='PubSite.views.permission_denied')
+@permission_required('Links.delete_link', login_url='pub-permission_denied')
 def delete_link(request, link):
     """
         Deletes a link.
@@ -59,11 +59,12 @@ def delete_link(request, link):
             desired_link = Link.objects.get(pk=link)
             desired_link.delete()
 
-            return redirect('Links.views.view_all')
+            return redirect('links-view_all')
         except:
-            return redirect('PubSite.views.permission_denied')
+            return redirect('pub-permission_denied')
     else:
-        return redirect('PubSite.views.permission_denied')
+        return redirect('pub-permission_denied')
+
 
 
 
