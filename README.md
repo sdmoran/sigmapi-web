@@ -41,28 +41,28 @@ These steps will walk you through deploying the site on your local machine for t
   Create the database. You will only have to do this once. When prompted to create an admin user, say no. An admin account is loaded from the fixture data in the next step.
 
   ```
-  $ python manage.py syncdb
+  $ python3 manage.py syncdb
   ```
 
 5.
   Load initial data for the database, like an admin, groups, and various users. You will only have to do this once. Read more about what initial data is loaded in the "Fixture Data" section below.
 
   ```
-  $ python manage.py loaddata fixtures/dev_data.json
+  $ python3 manage.py loaddata fixtures/dev_data.json
   ```
 
 6.
   Collect static assets (CSS, JS, images, etc.).
 
   ```
-  $ python manage.py collectstatic
+  $ python3 manage.py collectstatic
   ```
 
 7.
   Run Django.
 
   ```
-  $ python manage.py runserver 0.0.0.0:8000
+  $ python3 manage.py runserver 0.0.0.0:8000
   ```
 
 8.

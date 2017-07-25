@@ -2,7 +2,7 @@
 
 import os
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
-import environment_settings
+from . import environment_settings
 
 # These are settings which must change, depending on whether this is development
 # or production. So, we store them in a separate file.

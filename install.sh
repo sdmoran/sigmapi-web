@@ -4,12 +4,12 @@
 apt-get update -y
 
 # Python dev packages
-apt-get install -y build-essential python python-dev python-setuptools python-pip
+apt-get install -y build-essential python3-dev python3-pip
 
 # Git
 apt-get install -y git
 
-pip install -r /vagrant/SigmaPi/requirements.txt
+pip3 install -r /vagrant/SigmaPi/requirements.txt
 
 # Cleanup
 apt-get clean
