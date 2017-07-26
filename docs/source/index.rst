@@ -3,18 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Sigma Pi, Gamma Iota Chapter's documentation!
-========================================================
+Welcome to Sigma Pi, Gamma Iota Chapter's API documentation!
+============================================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :hidden:
+   :maxdepth: 4
 
+   mafia/index
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Currently, we only offer one API: the :doc:`Mafia API <mafia/index>`.
