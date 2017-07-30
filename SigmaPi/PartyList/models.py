@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django import forms
 from datetime import datetime
+import editdistance
+
 
 def timeStamped(fname, fmt='%Y-%m-%d_{fname}'):
 	"""
@@ -9,11 +11,13 @@ def timeStamped(fname, fmt='%Y-%m-%d_{fname}'):
 	"""
 	return datetime.now().strftime(fmt).format(fname=fname)
 
+
 def partyjobspath(_, filename):
 	"""
 		Defines where party job information should be stored
 	"""
 	return "parties/partyjobs/" + timeStamped(filename)
+
 
 class Party(models.Model):
 	"""
@@ -48,8 +52,31 @@ class Party(models.Model):
 		verbose_name_plural = "Parties"
 		verbose_name = "Party"
 		permissions = (
-            ("manage_parties", "Can manage Parties"),
-        )
+			("manage_parties", "Can manage Parties"),
+		)
+
+
+class BlacklistedGuest(models.Model):
+	name = models.CharField(max_length=100, db_index=True)
+	details = models.TextField()
+
+	MAX_MATCH_EDIT_DISTANCE = 5
+
+	def check_match(self, to_check):
+		check_name = ''.join(c.lower() for c in to_check if not c.isspace())
+		bl_name = ''.join(c.lower() for c in self.name if not c.isspace())
+		edit_distance = editdistance.eval(check_name, bl_name)
+		return (
+			self
+			if edit_distance <= self.MAX_MATCH_EDIT_DISTANCE
+			else None
+		)
+
+	class Meta:
+		permissions = (
+			("manage_blacklist", "Can manage the blacklist"),
+		)
+
 
 class Guest(models.Model):
 	"""
@@ -120,3 +147,10 @@ class PartyGuest(models.Model):
 		data['signedIn'] = self.signedIn
 
 		return data
+
+	def check_blacklisted(self):
+		matches = (
+			blacklisted.check_match(self.guest.name)
+			for blacklisted in BlacklistedGuest.objects.all()
+		)
+		return matches.next() if matches else None

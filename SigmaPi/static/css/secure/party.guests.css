@@ -176,3 +176,13 @@
 		width: 100%;
 	}
 }
+
+.blacklist-option
+{
+	display: block;
+}
+
+.blacklist-option > input
+{
+	margin-right: 5px;
+}

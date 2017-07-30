@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from PartyList.models import Party, Guest, PartyGuest
+from PartyList.models import Party, Guest, PartyGuest, BlacklistedGuest
 from django.http import HttpResponse
 from django.contrib.auth.decorators import permission_required
 from datetime import datetime
@@ -49,6 +49,25 @@ def create(request, party):
 		guestName = request.POST.get('name')
 		guestGender = request.POST.get('gender')
 		guest = None
+
+		if request.POST.get("force") != "true":
+			# Check to see if guest is on the blacklist before creating it
+			for entry in BlacklistedGuest.objects.all():
+				match = entry.check_match(guestName)
+				if not match:
+					continue
+				guest_dict = {
+					'maybe_blacklisted': True,
+					'blacklist_name': match.name,
+					'blacklist_details': match.details,
+					'attempted_name': guestName,
+					'attempted_gender': guestGender,
+				}
+				# Respond with the details on the party guest that was just added
+				return HttpResponse(
+					json.dumps(guest_dict),
+					content_type='application/json'
+				)
 		try:
 			guest = Guest.objects.get(name__exact=guestName,
 									  gender__exact=guestGender)
