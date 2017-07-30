@@ -57,10 +57,17 @@ class Party(models.Model):
 
 
 class BlacklistedGuest(models.Model):
+    #TODO- DOC_UPDATE!
     name = models.CharField(max_length=100, db_index=True)
     details = models.TextField()
 
     MAX_MATCH_EDIT_DISTANCE = 5
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
 
     def check_match(self, to_check):
         check_name = ''.join(c.lower() for c in to_check if not c.isspace())
