@@ -22,17 +22,17 @@
 				</a>
 			</li>
 
-      {% if perms.Archive.access_guide %}
-      {% if '/secure/archives' in request.path %}
-      <li class="active">
-      {% else %}
-      <li>
-      {% endif %}
-      <a id="archives" href="{{ '/secure/archives' }}">
-              Archives
-      </a>
-      </li>
-      {% endif %}
+	  {% if perms.Archive.access_guide %}
+	  {% if '/secure/archives' in request.path %}
+	  <li class="active">
+	  {% else %}
+	  <li>
+	  {% endif %}
+	  <a id="archives" href="{{ '/secure/archives' }}">
+			  Archives
+	  </a>
+	  </li>
+	  {% endif %}
 
 			{% if '/secure/scholarship' in request.path %}
 			<li class="active">
@@ -90,22 +90,22 @@
 		</ul>
 
 		<ul class="nav navbar-nav navbar-right">
-    		<li class="dropdown">
-      			<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.first_name }}
-      				<span class="caret"></span>
-      			</a>
-      			<ul class="dropdown-menu" role="menu">
+			<li class="dropdown">
+	  			<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.first_name }}
+	  				<span class="caret"></span>
+	  			</a>
+	  			<ul class="dropdown-menu" role="menu">
 							{% if user.is_staff %}
-                <li><a href="/admin/">Admin Panel</a>
+				<li><a href="/admin/">Admin Panel</a>
 							{% else %}
-		            <li><a href="{% url 'UserInfo.views.edit_user' user.username %}">Edit Profile</a></li>
-		            <li><a href="{% url 'UserInfo.views.change_password' %}">Change Password</a></li>
-              {% endif %}
-		            <li class="divider"></li>
-		            <li><a href="/logout/">Logout</a></li>
-		        </ul>
-	        </li>
-	        <li>
+					<li><a href="{% url 'UserInfo.views.edit_user' user.username %}">Edit Profile</a></li>
+					<li><a href="{% url 'UserInfo.views.change_password' %}">Change Password</a></li>
+			  {% endif %}
+					<li class="divider"></li>
+					<li><a href="/logout/">Logout</a></li>
+				</ul>
+			</li>
+			<li>
 				<a href="{{'/'}}">
 					<span class="glyphicon glyphicon-home"></span>
 				</a>

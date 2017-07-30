@@ -48,7 +48,7 @@
 	 					<th class="four wide">Reason</th>
 	 					<th class="two wide">Summoner</th>
 	 					<th class="two wide">Approver</th>
-                        <th class="one wide">Archive</th>
+						<th class="one wide">Archive</th>
 	 					<th class="one wide">Reject</th>
 	 				</tr>
 	 			</thead>
@@ -98,7 +98,7 @@
 							{{ history.details }}
 						</td>
 						<td>{{ history.resultReason }}</td>
-                        <td><strong>{% if history.rejected %}<span style="color: red">Rejected</span>{% else %}<span style="color: green">Approved</span>{% endif %}</strong></td>
+						<td><strong>{% if history.rejected %}<span style="color: red">Rejected</span>{% else %}<span style="color: green">Approved</span>{% endif %}</strong></td>
 					</tr>
 					{% endfor %}
 				</tbody>
@@ -113,15 +113,15 @@
 <!-- Accept / Archive Summons Form -->
 <div class="modal" id="accept-summons">
 	<div class="modal-dialog">
-    	<div class="modal-content">
-      		<div class="modal-header">
-        		<button type="button" class="close" data-dismiss="modal">
-        			<span aria-hidden="true">&times;</span>
-        			<span class="sr-only">Close</span>
-       			</button>
-        		<h4 class="modal-title">Approve / Archive Summons</h4>
-      		</div>
-      		<div class="modal-body">
+		<div class="modal-content">
+	  		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+	   			</button>
+				<h4 class="modal-title">Approve / Archive Summons</h4>
+	  		</div>
+	  		<div class="modal-body">
 				<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.accept_summons' 0 %}" id="accept-summons-form" role="form">
 					{% csrf_token %}
 					<div class="form-group">
@@ -136,44 +136,44 @@
 						{{archive_summons_form.resultReason}}
 					</div>
 				</form>
-      		</div>
-      		<div class="modal-footer">
-       			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        		<button type="button" class="btn btn-primary" onclick="$('#accept-summons-form').submit()">Archive Summons</button>
-      		</div>
-    	</div>
+	  		</div>
+	  		<div class="modal-footer">
+	   			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-primary" onclick="$('#accept-summons-form').submit()">Archive Summons</button>
+	  		</div>
+		</div>
   	</div>
 </div>
 
 <!-- Reject Summons Form -->
 <div class="modal" id="reject-summons">
 	<div class="modal-dialog">
-    	<div class="modal-content">
-      		<div class="modal-header">
-        		<button type="button" class="close" data-dismiss="modal">
-        			<span aria-hidden="true">&times;</span>
-        			<span class="sr-only">Close</span>
-       			</button>
-        		<h4 class="modal-title">Reject Summons</h4>
-      		</div>
-      		<div class="modal-body">
+		<div class="modal-content">
+	  		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+	   			</button>
+				<h4 class="modal-title">Reject Summons</h4>
+	  		</div>
+	  		<div class="modal-body">
 				<form enctype="multipart/form-data" method="post" action="{% url 'Standards.views.delete_summons' 0 %}" id="reject-summons-form" role="form">
 					{% csrf_token %}
 					<div class="form-group" id="reject-summons-description">
 						<label for="details" class="control-label">Summons Description</label>
 						{{ archive_summons_form.details }}
 					</div>
-                    <div class="form-group">
+					<div class="form-group">
 						<label for="id_resultReason" class="control-label">Reason for Rejecting</label>
 						{{archive_summons_form.resultReason}}
 					</div>
 				</form>
-      		</div>
-      		<div class="modal-footer">
-       			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        		<button type="button" class="btn btn-primary" onclick="$('#reject-summons-form').submit()">Reject Summons</button>
-      		</div>
-    	</div>
+	  		</div>
+	  		<div class="modal-footer">
+	   			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-primary" onclick="$('#reject-summons-form').submit()">Reject Summons</button>
+	  		</div>
+		</div>
   	</div>
 </div>
 {% endblock %}
@@ -190,31 +190,31 @@
 
 	// Specify the target for the approve summons form when approve summons is clicked
 	$(".approve-summons").click(function(){
-    	var id = $( this ).attr('id');
+		var id = $( this ).attr('id');
 
-    	var oldAction = $("#accept-summons-form").attr('action');
+		var oldAction = $("#accept-summons-form").attr('action');
 
-    	var newAction = oldAction.replace("/0/", "/" + id + "/");
+		var newAction = oldAction.replace("/0/", "/" + id + "/");
 
-    	$("#accept-summons-form").attr('action', newAction);
+		$("#accept-summons-form").attr('action', newAction);
 
-    	$("#accept-summons #archive-summons-description textarea").val($("#reason_" + id).html());
+		$("#accept-summons #archive-summons-description textarea").val($("#reason_" + id).html());
 
-    	$("#accept-summons").modal('show');
-    });
+		$("#accept-summons").modal('show');
+	});
 
-    $(".reject-summons").click(function(){
-    	var id = $( this ).attr('id');
+	$(".reject-summons").click(function(){
+		var id = $( this ).attr('id');
 
-    	var oldAction = $("#reject-summons-form").attr('action');
+		var oldAction = $("#reject-summons-form").attr('action');
 
-    	var newAction = oldAction.replace("/0/", "/" + id + "/");
+		var newAction = oldAction.replace("/0/", "/" + id + "/");
 
-    	$("#reject-summons-form").attr('action', newAction);
+		$("#reject-summons-form").attr('action', newAction);
 
-    	$("#reject-summons #reject-summons-description textarea").val($("#reason_" + id).html());
+		$("#reject-summons #reject-summons-description textarea").val($("#reason_" + id).html());
 
-    	$("#reject-summons").modal('show');
-    });
+		$("#reject-summons").modal('show');
+	});
 </script>
 {% endblock %}

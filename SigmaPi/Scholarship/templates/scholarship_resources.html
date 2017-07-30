@@ -37,7 +37,7 @@
 <div class="alert alert-info">
 	<strong>Info! </strong>
 {% endif %}
-    {{ message }}
+	{{ message }}
 </div>
 {% endfor %}
 {% endif %}
@@ -100,18 +100,18 @@
 <!-- Modify Points Form -->
 <div class="modal" id="upload-resource">
 	<div class="modal-dialog">
-    	<div class="modal-content">
-      		<div class="modal-header">
-        		<button type="button" class="close" data-dismiss="modal">
-        			<span aria-hidden="true">&times;</span>
-        			<span class="sr-only">Close</span>
-       			</button>
-        		<h4 class="modal-title">Upload Academic Resource</h4>
-      		</div>
-      		<div class="modal-body">
-      			<form enctype="multipart/form-data" method="post" action="{% url 'Scholarship.views.upload_resource' %}" id="upload-resource-form">
-      				{% csrf_token %}
-      				<div class="form-group">
+		<div class="modal-content">
+	  		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+	   			</button>
+				<h4 class="modal-title">Upload Academic Resource</h4>
+	  		</div>
+	  		<div class="modal-body">
+	  			<form enctype="multipart/form-data" method="post" action="{% url 'Scholarship.views.upload_resource' %}" id="upload-resource-form">
+	  				{% csrf_token %}
+	  				<div class="form-group">
 						<label class="control-label">Resource Name*</label>
 						{{ upload_resource_form.resource_name }}
 					</div>
@@ -141,34 +141,34 @@
 						<label class="control-label">Resource File (PDF)*</label>
 						<div>
 							<div class="btn btn-success fileinput-button" style="display:inline-block;">
-	       						<span>Select File...</span>
-	        					<!-- The file input field used as target for the file upload widget -->
-	        					{{ upload_resource_form.resource_pdf }}
-	    					</div>
-	    					<span id="file-pdf-name"></span>
-	    				</div>
+		   						<span>Select File...</span>
+								<!-- The file input field used as target for the file upload widget -->
+								{{ upload_resource_form.resource_pdf }}
+							</div>
+							<span id="file-pdf-name"></span>
+						</div>
 					</div>
 					<p>
-	      				{% if is_scholarship_head %}
-	      				Note: Your submission will be visible immediately to all users.
-	      				{% else %}
-	      				Note: Your submission will not be accessible until it is approved by the Scholarship Chair.
-	      				{% endif %}
-      				</p>
-      			</form>
-      		</div>
-      		<div class="modal-footer">
+		  				{% if is_scholarship_head %}
+		  				Note: Your submission will be visible immediately to all users.
+		  				{% else %}
+		  				Note: Your submission will not be accessible until it is approved by the Scholarship Chair.
+		  				{% endif %}
+	  				</p>
+	  			</form>
+	  		</div>
+	  		<div class="modal-footer">
 				<div class="progress hidden" id="upload-progress">
 					<div class="progress-bar" id="upload-progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
 						0%
 					</div>
 				</div>
 				<div id="upload-btns">
-	       			<button type="button" class="btn btn-default" id="cancel-btn" data-dismiss="modal">Cancel</button>
-	        		<button type="button" class="btn btn-primary" id="submit-btn">Submit Resource</button>
-        		</div>
-      		</div>
-    	</div>
+		   			<button type="button" class="btn btn-default" id="cancel-btn" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary" id="submit-btn">Submit Resource</button>
+				</div>
+	  		</div>
+		</div>
   	</div>
 </div>
 {% endblock %}
@@ -194,24 +194,24 @@
 		.on('fileuploadadd', function (e, data) {
 			// Display the name of each file added.
 			$.each(data.files, function (index, file) {
-	            $("#file-pdf-name").html(file.name);
-	        });
+				$("#file-pdf-name").html(file.name);
+			});
 
 			// Add an action listener for click on submit.
-	        $("#submit-btn").click(function(){
-	        	$("#upload-progress").removeClass("hidden");
-	        	$("#upload-btns").addClass("hidden");
+			$("#submit-btn").click(function(){
+				$("#upload-progress").removeClass("hidden");
+				$("#upload-btns").addClass("hidden");
 
-	        	data.submit();
-	        });
+				data.submit();
+			});
 		})
 		.on('fileuploadprogressall', function ( e, data ) {
-        	var progress = parseInt(data.loaded / data.total * 100, 10);
-	        $('#upload-progress-bar').css(
-	            'width',
-	            progress + '%'
-	        );
-	        $('#upload-progress-bar').html(progress + "%");
+			var progress = parseInt(data.loaded / data.total * 100, 10);
+			$('#upload-progress-bar').css(
+				'width',
+				progress + '%'
+			);
+			$('#upload-progress-bar').html(progress + "%");
 		})
 		.on('fileuploaddone', function ( e, data ) {
 			location.reload(); // Refresh the page when the upload is done
