@@ -70,7 +70,7 @@ PartyModule.Guest.prototype.toggleSignedIn = function()
 	// Send the ajax request to sign in / out
 	$.ajax({
 		type: "POST",
-	    url: url + this.id + "/",
+		url: url + this.id + "/",
 	}).done(function( data ) {
 		// If succeeded, change the status accordingly
 		thisOuter.signedIn = !thisOuter.signedIn;
@@ -149,11 +149,11 @@ PartyModule.GuestList.prototype.pollServer = function()
 
 	$.ajax({
 		type: "GET",
-	    url: "poll/",
-	    data: {
-	    	"gender": this.listID,
-	    	"last": this.lastTimePollSucceeded
-	    }
+		url: "poll/",
+		data: {
+			"gender": this.listID,
+			"last": this.lastTimePollSucceeded
+		}
 	}).done(function( data ) {
 		thisOuter.lastTimePollSucceeded = thisOuter.lastTimePollTried;
 
@@ -201,7 +201,7 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 	// Insert the guest at the correct sorted location in the guest list
 	function locationOf(element, array, start, end) {
 		if (array.length === 0)
-	    	return -1;
+			return -1;
 
 		start = start || 0;
 		end = end || array.length;
@@ -215,8 +215,8 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 		if (end - start <= 1) return c == -1 ? pivot - 1 : pivot;
 
 		switch (c) {
-	    	case -1: return locationOf(element, array, start, pivot);
-	    	case 1: return locationOf(element, array, pivot, end);
+			case -1: return locationOf(element, array, start, pivot);
+			case 1: return locationOf(element, array, pivot, end);
 		};
 	};
 	var location = locationOf(guest, this.list); // Find sorted location for guest
@@ -320,7 +320,7 @@ PartyModule.GuestList.prototype.removeGuest = function(guestID)
 
 	$.ajax({
 		type: "DELETE",
-	    url: "destroy/" + guestID + "/",
+		url: "destroy/" + guestID + "/",
 	}).done(function( data ) {
 
 		// Find the location of the guest
@@ -472,7 +472,7 @@ PartyModule.PartyList.prototype.initialize = function()
 	// Send initial "heartbeat" to the server to discover the status of the party.
 	$.ajax({
 		type: "GET",
-	    url: "init/",
+		url: "init/",
 	}).done(function( data ) {
 
 		console.log(data);
@@ -578,16 +578,16 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 	});
 
 	$("#bl_override").click(function () {
-	    if ($('input[name="add"]:checked').val() == "true")
-	    {
-	        outerThis.addGuest($("#attempted-add").text(), $("#attempted-add-gender").text(), true);
-        }
-    });
+		if ($('input[name="add"]:checked').val() == "true")
+		{
+			outerThis.addGuest($("#attempted-add").text(), $("#attempted-add-gender").text(), true);
+		}
+	});
 
 	$("#blacklist_warn").on("hide.bs.modal", function (){
-	    //no matter what we want to reset the default confirmation value when the modal hides
-	    document.getElementById("nForce").checked = true;
-    });
+		//no matter what we want to reset the default confirmation value when the modal hides
+		document.getElementById("nForce").checked = true;
+	});
 
 	$("#search-btn").click(function() {
 		outerThis.filterList($("#search-box").val());
@@ -610,12 +610,12 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender, force)
 
 	$.ajax({
 		type: "POST",
-	    url: "create/",
-	    data: {
-	    	"name": guestName,
-	    	"gender": gender,
+		url: "create/",
+		data: {
+			"name": guestName,
+			"gender": gender,
 			"force": force
-	    }
+		}
 	}).done(function( data ) {
 		var addedGuest = new PartyModule.Guest(data.id, data.name, data.addedByName, data.addedByID, data.signedIn);
 
@@ -659,7 +659,7 @@ PartyModule.PartyList.prototype.pollCount = function()
 
 	$.ajax({
 		type: "GET",
-	    url: "count/poll/",
+		url: "count/poll/",
 	}).done(function( data ) {
 		thisOuter.lastTimePollSucceeded = thisOuter.lastTimePollTried;
 
@@ -689,11 +689,11 @@ PartyModule.PartyList.prototype.updateCount = function(gender, delta)
 
 	$.ajax({
 		type: "POST",
-	    url: "count/delta/",
-	    data: {
-	    	"delta": delta,
-	    	"gender": gender,
-	    }
+		url: "count/delta/",
+		data: {
+			"delta": delta,
+			"gender": gender,
+		}
 	}).done(function( data ) {
 
 		// Update counts

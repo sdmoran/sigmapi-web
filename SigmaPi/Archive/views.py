@@ -11,199 +11,199 @@ from Archive.models import Guide, GuideForm, HouseRules, HouseRulesForm, Bylaws,
 
 @login_required
 def index(request):
-	"""
-		View for the index page of the archives.
-	"""
+    """
+        View for the index page of the archives.
+    """
 
-	if request.user.has_perm('Archive.access_guide'):
-		return redirect(guides)
-	elif request.user.has_perm('Archive.access_bylaws'):
-		return redirect(bylaws)
-	elif request.user.has_perm('Archive.access_houserules'):
-		return redirect(rules)
-	else:
-		return redirect('PubSite.views.permission_denied')
+    if request.user.has_perm('Archive.access_guide'):
+        return redirect(guides)
+    elif request.user.has_perm('Archive.access_bylaws'):
+        return redirect(bylaws)
+    elif request.user.has_perm('Archive.access_houserules'):
+        return redirect(rules)
+    else:
+        return redirect('PubSite.views.permission_denied')
 
 @permission_required('Archive.access_bylaws', login_url='PubSite.views.permission_denied')
 def bylaws(request):
-	"""
-		View for all bylaws.
-	"""
+    """
+        View for all bylaws.
+    """
 
-	if request.method == 'POST':
+    if request.method == 'POST':
 
-		if request.user.has_perm('Archive.add_bylaws'):
+        if request.user.has_perm('Archive.add_bylaws'):
 
-			form = BylawsForm(request.POST, request.FILES)
+            form = BylawsForm(request.POST, request.FILES)
 
-			if form.is_valid():
-				bylaw = form.save(commit=False)
-				bylaw.date = datetime.now()
-				bylaw.save()
-		else:
-			redirect('PubSite.views.permission_denied')
+            if form.is_valid():
+                bylaw = form.save(commit=False)
+                bylaw.date = datetime.now()
+                bylaw.save()
+        else:
+            redirect('PubSite.views.permission_denied')
 
-	bylaws = Bylaws.objects.all()
+    bylaws = Bylaws.objects.all()
 
-	if bylaws:
-		latest = bylaws.latest('date')
-	else:
-		latest = None
+    if bylaws:
+        latest = bylaws.latest('date')
+    else:
+        latest = None
 
-	form = BylawsForm()
+    form = BylawsForm()
 
-	context = {
-		'latest': latest,
-		'bylaws': bylaws,
-		'form': form
-	}
+    context = {
+        'latest': latest,
+        'bylaws': bylaws,
+        'form': form
+    }
 
-	return render(request, "secure/archives_bylaws.html", context)
+    return render(request, "secure/archives_bylaws.html", context)
 
 
 @permission_required('Archive.access_bylaws', login_url='PubSite.views.permission_denied')
 def download_bylaw(request, bylaw):
-	"""
-		View for downloading bylaws
-	"""
+    """
+        View for downloading bylaws
+    """
 
-	bylawObject = Bylaws.objects.get(pk=bylaw)
-	return sendfile(request, bylawObject.filepath.path, attachment=True, attachment_filename="Bylaws " + str(bylawObject.date) + ".pdf")
+    bylawObject = Bylaws.objects.get(pk=bylaw)
+    return sendfile(request, bylawObject.filepath.path, attachment=True, attachment_filename="Bylaws " + str(bylawObject.date) + ".pdf")
 
 
 @permission_required('Archive.delete_bylaws', login_url='PubSite.views.permission_denied')
 def delete_bylaw(request):
-	"""
-		Deletes the bylaws with the given primary key.
-	"""
+    """
+        Deletes the bylaws with the given primary key.
+    """
 
-	if request.method == 'POST':
-		bylaw_id = strip_tags(request.POST['post_id'])
+    if request.method == 'POST':
+        bylaw_id = strip_tags(request.POST['post_id'])
 
-		post = Bylaws.objects.get(pk=bylaw_id)
+        post = Bylaws.objects.get(pk=bylaw_id)
 
-		post.filepath.delete() # Delete actual file
-		post.delete()
-	return redirect('Archive.views.bylaws')
+        post.filepath.delete() # Delete actual file
+        post.delete()
+    return redirect('Archive.views.bylaws')
 
 
 @permission_required('Archive.access_houserules', login_url='PubSite.views.permission_denied')
 def rules(request):
-	"""
-		View for all house rules
-	"""
-	form = HouseRulesForm()
+    """
+        View for all house rules
+    """
+    form = HouseRulesForm()
 
-	# If its a POST, we're trying to update the rules.
-	if request.method == 'POST':
-		# Check permissions before going forward
-		if request.user.has_perm('Archive.add_houserules'):
-			form = HouseRulesForm(request.POST, request.FILES)
+    # If its a POST, we're trying to update the rules.
+    if request.method == 'POST':
+        # Check permissions before going forward
+        if request.user.has_perm('Archive.add_houserules'):
+            form = HouseRulesForm(request.POST, request.FILES)
 
-			if form.is_valid():
-				rule = form.save(commit=False)
-				rule.date = datetime.now()
-				rule.save()
-		else:
-			redirect('PubSite.views.permission_denied')
+            if form.is_valid():
+                rule = form.save(commit=False)
+                rule.date = datetime.now()
+                rule.save()
+        else:
+            redirect('PubSite.views.permission_denied')
 
-	rules = HouseRules.objects.all()
-	if rules:
-		latest = rules.latest('date')
-	else:
-		latest = None
+    rules = HouseRules.objects.all()
+    if rules:
+        latest = rules.latest('date')
+    else:
+        latest = None
 
-	context = {
-		'latest': latest,
-		'rules': rules,
-		'form': form
-		}
+    context = {
+        'latest': latest,
+        'rules': rules,
+        'form': form
+        }
 
-	return render(request, "secure/archives_rules.html", context)
+    return render(request, "secure/archives_rules.html", context)
 
 
 @permission_required('Archive.access_houserules', login_url='PubSite.views.permission_denied')
 def download_rules(request, rules):
-	"""
-		View for downloading rules
-	"""
+    """
+        View for downloading rules
+    """
 
-	houseRuleObject = HouseRules.objects.get(pk=rules)
+    houseRuleObject = HouseRules.objects.get(pk=rules)
 
-	return sendfile(request, houseRuleObject.filepath.path, attachment=True, attachment_filename="House Rules " + str(houseRuleObject.date) + ".pdf")
+    return sendfile(request, houseRuleObject.filepath.path, attachment=True, attachment_filename="House Rules " + str(houseRuleObject.date) + ".pdf")
 
 
 @permission_required('Archive.delete_houserules', login_url='PubSite.views.permission_denied')
 def delete_rules(request):
-	"""
-		Deletes the rules with the given primary key.
-	"""
+    """
+        Deletes the rules with the given primary key.
+    """
 
-	if request.method == 'POST':
-		rules_id = strip_tags(request.POST['post_id'])
+    if request.method == 'POST':
+        rules_id = strip_tags(request.POST['post_id'])
 
-		post = HouseRules.objects.get(pk=rules_id)
+        post = HouseRules.objects.get(pk=rules_id)
 
-		post.filepath.delete() # Delete actual file
+        post.filepath.delete() # Delete actual file
 
-		post.delete()
-	return redirect('Archive.views.rules')
+        post.delete()
+    return redirect('Archive.views.rules')
 
 @permission_required('Archive.access_guide', login_url='PubSite.views.permission_denied')
 def guides(request):
-	"""
-		View for all guides
-	"""
+    """
+        View for all guides
+    """
 
-	form = GuideForm()
+    form = GuideForm()
 
-	# If its a POST we're trying to create a guide.
-	if request.method == 'POST':
-		# Check if user has permission to do so first.
-		if request.user.has_perm('Archive.add_guide'):
-			form = GuideForm(request.POST, request.FILES)
+    # If its a POST we're trying to create a guide.
+    if request.method == 'POST':
+        # Check if user has permission to do so first.
+        if request.user.has_perm('Archive.add_guide'):
+            form = GuideForm(request.POST, request.FILES)
 
-			if form.is_valid():
-				guide = form.save(commit=False)
-				guide.path = slugify(guide.name)[:14]
-				guide.datePosted = datetime.now()
-				guide.save()
-				form = GuideForm()
-		else:
-			redirect('PubSite.views.permission_denied')
+            if form.is_valid():
+                guide = form.save(commit=False)
+                guide.path = slugify(guide.name)[:14]
+                guide.datePosted = datetime.now()
+                guide.save()
+                form = GuideForm()
+        else:
+            redirect('PubSite.views.permission_denied')
 
-	guides = Guide.objects.all()
-	context = {
-		'guides': guides,
-		'form': form,
-		}
+    guides = Guide.objects.all()
+    context = {
+        'guides': guides,
+        'form': form,
+        }
 
-	return render(request, "secure/archives_guides.html", context)
+    return render(request, "secure/archives_guides.html", context)
 
 
 @permission_required('Archive.access_guide', login_url='PubSite.views.permission_denied')
 def download_guides(request, guides):
-	"""
-		View for downloading guides
-	"""
+    """
+        View for downloading guides
+    """
 
-	guideObject = Guide.objects.get(pk=guides)
+    guideObject = Guide.objects.get(pk=guides)
 
-	return sendfile(request, guideObject.filepath.path, attachment=True, attachment_filename=guideObject.name + ".pdf")
+    return sendfile(request, guideObject.filepath.path, attachment=True, attachment_filename=guideObject.name + ".pdf")
 
 
 @permission_required('Archive.delete_guide', login_url='PubSite.views.permission_denied')
 def delete_guide(request):
-	"""
-		Deletes the guide with the given primary key.
-	"""
+    """
+        Deletes the guide with the given primary key.
+    """
 
-	if request.method == 'POST':
-		guide_id = strip_tags(request.POST['post_id'])
+    if request.method == 'POST':
+        guide_id = strip_tags(request.POST['post_id'])
 
-		post = Guide.objects.get(pk=guide_id)
+        post = Guide.objects.get(pk=guide_id)
 
-		post.filepath.delete() # Delete actual file
+        post.filepath.delete() # Delete actual file
 
-		post.delete()
-	return redirect('Archive.views.guides')
+        post.delete()
+    return redirect('Archive.views.guides')

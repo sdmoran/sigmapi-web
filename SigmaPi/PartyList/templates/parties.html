@@ -16,13 +16,13 @@
 				<th class="two wide">Guest List</th>
 			</tr>
 		</thead>
-	    <tbody>
+		<tbody>
 		{% for p in all_parties reversed %}
-	  	    <tr>
-		    	<td>{{ p.name }}</td>
-		      	<td>{{ p.date }}</td>
-		      	<td>
-			      	{% if p.jobs %}
+	  		<tr>
+				<td>{{ p.name }}</td>
+			  	<td>{{ p.date }}</td>
+			  	<td>
+				  	{% if p.jobs %}
 					<a href="{{ p.jobs.url }}">
 					Jobs
 					</a>
@@ -30,14 +30,14 @@
 				  	Not Posted
 				  	{% endif %}
 			  	</td>
-		      	<td>
+			  	<td>
 					<a href="{% url 'PartyList.views.guests' p.pk %}">
 						Guest List
 					</a>
-		      	</td>
-		    </tr>
+			  	</td>
+			</tr>
 		{% endfor %}
-	    </tbody>
+		</tbody>
 	</table>
 </div>
 
