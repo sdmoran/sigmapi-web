@@ -1,0 +1,24 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('UserInfo', '0004_auto_20170318_1107'),
+    ]
+
+    operations = [
+        migrations.AlterField(
+            model_name='pledgeclass',
+            name='name',
+            field=models.CharField(default='Lambda', max_length=100),
+        ),
+        migrations.AlterField(
+            model_name='userinfo',
+            name='phoneNumber',
+            field=models.CharField(default='', max_length=100, blank=True),
+        ),
+    ]

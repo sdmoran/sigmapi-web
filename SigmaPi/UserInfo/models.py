@@ -43,7 +43,7 @@ class UserInfo(models.Model):
     interests = models.TextField(blank=True)
     favoriteMemory = models.TextField(blank=True)
     bigBrother = models.ForeignKey(User, related_name="big_brother", default=1)
-    pledgeClass = models.ForeignKey(PledgeClass)
+    pledgeClass = models.ForeignKey(PledgeClass, default=1)
 
     def __unicode__(self):
         return self.user.username
