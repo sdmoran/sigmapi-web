@@ -27,7 +27,7 @@ def guests(request, party):
     try:
         requested_party = Party.objects.get(pk=party)
     except:
-        return redirect("PartyList.views.index")
+        return redirect("partylist-index")
 
     partymode = requested_party.isPartyMode()
 
@@ -48,7 +48,7 @@ def view_blacklist(request):
 
     return render(request, 'blacklist.html', context)
 
-@permission_required('PartyList.manage_blacklist', login_url='PubSite.views.permission_denied')
+@permission_required('PartyList.manage_blacklist', login_url='pub-permission_denied')
 def manage_blacklist(request):
     context = {
         'blacklist': BlacklistedGuest.objects.all(),
@@ -74,7 +74,7 @@ def manage_blacklist(request):
     return render(request, 'manage_blacklist.html', context)
 
 
-@permission_required('PartyList.manage_blacklist', login_url='PubSite.views.permission_denied')
+@permission_required('PartyList.manage_blacklist', login_url='pub-permission_denied')
 def remove_blacklisting(request, bl_id):
 
     if request.method == 'POST':
@@ -86,12 +86,12 @@ def remove_blacklisting(request, bl_id):
             'blacklist': BlacklistedGuest.objects.all()
         }
 
-        return redirect('PartyList.views.manage_blacklist')
+        return redirect('partylist-manage_blacklist')
 
-    return redirect('PartyList.views.manage_blacklist')
+    return redirect('partylist-manage_blacklist')
 
 
-@permission_required('PartyList.manage_parties', login_url='PubSite.views.permission_denied')
+@permission_required('PartyList.manage_parties', login_url='pub-permission_denied')
 def add_party(request):
     """
         Provides a view to add a party.
@@ -110,7 +110,7 @@ def add_party(request):
 
     return render(request, 'add_party.html', context)
 
-@permission_required('PartyList.manage_parties', login_url='PubSite.views.permission_denied')
+@permission_required('PartyList.manage_parties', login_url='pub-permission_denied')
 def manage_parties(request):
     """
         Provides a view to manage all of the parties in the system.
@@ -124,7 +124,7 @@ def manage_parties(request):
 
     return render(request, 'manage_parties.html', context)
 
-@permission_required('PartyList.manage_parties', login_url='PubSite.views.permission_denied')
+@permission_required('PartyList.manage_parties', login_url='pub-permission_denied')
 def edit_party(request, party):
     """
         Provides a view to edit a single party.
@@ -133,7 +133,7 @@ def edit_party(request, party):
     try:
         requested_party = Party.objects.get(pk=party)
     except:
-        return redirect("PartyList.views.manage_parties")
+        return redirect("partylist-manage_parties")
 
     errors = None
 
@@ -143,7 +143,7 @@ def edit_party(request, party):
 
         if form.is_valid(): # Check that form is valid
             form.save()
-            return redirect("PartyList.views.manage_parties")
+            return redirect("partylist-manage_parties")
     else:
         form = EditPartyInfoForm(instance=requested_party)
 
@@ -155,7 +155,7 @@ def edit_party(request, party):
 
     return render(request, 'edit_party.html', context)
 
-@permission_required('PartyList.manage_parties', login_url='PubSite.views.permission_denied')
+@permission_required('PartyList.manage_parties', login_url='pub-permission_denied')
 def delete_party(request, party):
     """
         Deletes the party with the ID that is sent in the post request
@@ -165,8 +165,8 @@ def delete_party(request, party):
         try:
             party = Party.objects.get(pk=party)
         except:
-            return redirect("PartyList.views.manage_parties")
+            return redirect("partylist-manage_parties")
 
         party.delete()
 
-    return redirect("PartyList.views.manage_parties")
+    return redirect("partylist-manage_parties")

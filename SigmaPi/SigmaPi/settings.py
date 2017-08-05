@@ -1,7 +1,6 @@
 # DEVELOPMENT settings for Sigma Pi website.
 
 import os
-from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from . import environment_settings
 
 # These are settings which must change, depending on whether this is development
@@ -10,7 +9,7 @@ DEBUG = environment_settings.DEBUG
 ADMINS = environment_settings.ADMINS
 DATABASES = environment_settings.DATABASES
 ALLOWED_HOSTS = environment_settings.ALLOWED_HOSTS
-SENDFILE_BACKEND = environment_settings.SENDFILE_BACKEND
+DOWNLOADVIEW_BACKEND = environment_settings.DOWNLOADVIEW_BACKEND
 MEDIA_ROOT = environment_settings.MEDIA_ROOT
 STATIC_ROOT = environment_settings.STATIC_ROOT
 STATICFILES_DIRS = environment_settings.STATICFILES_DIRS
@@ -23,10 +22,9 @@ DEFAULT_FROM_EMAIL = environment_settings.DEFAULT_FROM_EMAIL
 SERVER_EMAIL = environment_settings.SERVER_EMAIL
 
 
-TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.request',)
+#TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.request',)
 
 BASE_DIR = os.getcwd()
-TEMPLATE_DEBUG = DEBUG
 
 EC_EMAIL = "sigmapi@wpi.edu"
 ACTIVES_EMAIL = "sigmapiactives@wpi.edu"
@@ -79,33 +77,45 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/secure/'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
-)
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {'context_processors' : [
+            'django.template.context_processors.request',
+            'django.contrib.auth.context_processors.auth'
+            ]
+        }
+
+    }
+]
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    #These two things may be the same, but django is warning to add the second one
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_downloadview.SmartDownloadMiddleware'
 )
+
+DOWNLOADVIEW_RULES = [
+    {
+        'destination_dir': 'lightpd-optimized-by-middleware'
+    }
+]
 
 ROOT_URLCONF = 'SigmaPi.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'SigmaPi.wsgi.application'
-
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-)
 
 INSTALLED_APPS = (
     'django.contrib.auth',

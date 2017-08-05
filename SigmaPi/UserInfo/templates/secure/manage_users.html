@@ -31,10 +31,10 @@
 				<td>{{ user.last_name }}</td>
 				<td>{{ user.username }}</td>
 				<td>
-					<a href="{% url 'UserInfo.views.edit_user' user.username %}">Edit</a>
+					<a href="{% url 'userinfo-edit_user' user.username %}">Edit</a>
 				</td>
 				<td>
-					<a href="{% url 'UserInfo.views.reset_password' user.username %}">Reset</a>
+					<a href="{% url 'userinfo-reset_password' user.username %}">Reset</a>
 				</td>
 			</tr>
 			{% endif %}
@@ -43,6 +43,6 @@
 	</table>
 </div>
 {% else %}
-No users found.  <a href="{% url 'UserInfo.views.add_users' %}">Create a new one.</a>
+No users found.  <a href="{% url 'userinfo-add_users' %}">Create a new one.</a>
 {% endif %}
 {% endblock %}

@@ -13,7 +13,7 @@
 			<!-- Actions on a link -->
 			<div class="link-actions">
 				{% if perms.Links.delete_link %}
-				<form action="{% url 'Links.views.delete_link' link.pk %}" method="post" id="delete_link_{{ link.pk }}">
+				<form action="{% url 'links-delete_link' link.pk %}" method="post" id="delete_link_{{ link.pk }}">
 					{% csrf_token %}
 					<a href="javascript:$('#delete_link_{{ link.pk }}').submit();" name="Delete Link">Delete Link</a>
 				</form>

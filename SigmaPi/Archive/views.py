@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import permission_required
 from django.utils.html import strip_tags
 from django.template.defaultfilters import slugify
 from datetime import datetime
-from sendfile import sendfile
+from django_downloadview import sendfile
 from Archive.models import Guide, GuideForm, HouseRules, HouseRulesForm, Bylaws, BylawsForm
 
 
@@ -22,9 +22,9 @@ def index(request):
     elif request.user.has_perm('Archive.access_houserules'):
         return redirect(rules)
     else:
-        return redirect('PubSite.views.permission_denied')
+        return redirect('pub-permission_denied')
 
-@permission_required('Archive.access_bylaws', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_bylaws', login_url='pub-permission_denied')
 def bylaws(request):
     """
         View for all bylaws.
@@ -41,7 +41,7 @@ def bylaws(request):
                 bylaw.date = datetime.now()
                 bylaw.save()
         else:
-            redirect('PubSite.views.permission_denied')
+            redirect('pub-permission_denied')
 
     bylaws = Bylaws.objects.all()
 
@@ -61,7 +61,7 @@ def bylaws(request):
     return render(request, "secure/archives_bylaws.html", context)
 
 
-@permission_required('Archive.access_bylaws', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_bylaws', login_url='pub-permission_denied')
 def download_bylaw(request, bylaw):
     """
         View for downloading bylaws
@@ -71,7 +71,7 @@ def download_bylaw(request, bylaw):
     return sendfile(request, bylawObject.filepath.path, attachment=True, attachment_filename="Bylaws " + str(bylawObject.date) + ".pdf")
 
 
-@permission_required('Archive.delete_bylaws', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.delete_bylaws', login_url='pub-permission_denied')
 def delete_bylaw(request):
     """
         Deletes the bylaws with the given primary key.
@@ -84,10 +84,10 @@ def delete_bylaw(request):
 
         post.filepath.delete() # Delete actual file
         post.delete()
-    return redirect('Archive.views.bylaws')
+    return redirect('archive-bylaws')
 
 
-@permission_required('Archive.access_houserules', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_houserules', login_url='pub-permission_denied')
 def rules(request):
     """
         View for all house rules
@@ -105,7 +105,7 @@ def rules(request):
                 rule.date = datetime.now()
                 rule.save()
         else:
-            redirect('PubSite.views.permission_denied')
+            redirect('pub-permission_denied')
 
     rules = HouseRules.objects.all()
     if rules:
@@ -122,7 +122,7 @@ def rules(request):
     return render(request, "secure/archives_rules.html", context)
 
 
-@permission_required('Archive.access_houserules', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_houserules', login_url='pub-permission_denied')
 def download_rules(request, rules):
     """
         View for downloading rules
@@ -133,7 +133,7 @@ def download_rules(request, rules):
     return sendfile(request, houseRuleObject.filepath.path, attachment=True, attachment_filename="House Rules " + str(houseRuleObject.date) + ".pdf")
 
 
-@permission_required('Archive.delete_houserules', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.delete_houserules', login_url='pub-permission_denied')
 def delete_rules(request):
     """
         Deletes the rules with the given primary key.
@@ -147,9 +147,9 @@ def delete_rules(request):
         post.filepath.delete() # Delete actual file
 
         post.delete()
-    return redirect('Archive.views.rules')
+    return redirect('archive-rules')
 
-@permission_required('Archive.access_guide', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_guide', login_url='pub-permission_denied')
 def guides(request):
     """
         View for all guides
@@ -170,7 +170,7 @@ def guides(request):
                 guide.save()
                 form = GuideForm()
         else:
-            redirect('PubSite.views.permission_denied')
+            redirect('pub-permission_denied')
 
     guides = Guide.objects.all()
     context = {
@@ -181,7 +181,7 @@ def guides(request):
     return render(request, "secure/archives_guides.html", context)
 
 
-@permission_required('Archive.access_guide', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.access_guide', login_url='pub-permission_denied')
 def download_guides(request, guides):
     """
         View for downloading guides
@@ -192,7 +192,7 @@ def download_guides(request, guides):
     return sendfile(request, guideObject.filepath.path, attachment=True, attachment_filename=guideObject.name + ".pdf")
 
 
-@permission_required('Archive.delete_guide', login_url='PubSite.views.permission_denied')
+@permission_required('Archive.delete_guide', login_url='pub-permission_denied')
 def delete_guide(request):
     """
         Deletes the guide with the given primary key.
@@ -206,4 +206,4 @@ def delete_guide(request):
         post.filepath.delete() # Delete actual file
 
         post.delete()
-    return redirect('Archive.views.guides')
+    return redirect('archive-guides')

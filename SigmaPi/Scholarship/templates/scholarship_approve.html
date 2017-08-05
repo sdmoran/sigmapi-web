@@ -53,12 +53,12 @@
 				<td>{{resource.term}}</td>
 				<td>{{resource.submittedBy.first_name}} {{ resource.submittedBy.last_name}}</td>
 				<td>
-					<a href="{% url 'Scholarship.views.download_resource' resource.pk %}">
+					<a href="{% url 'scholarship-download_resource' resource.pk %}">
 						Download
 					</a>
 				</td>
 				<td>
-					<form type="multipart/form-data" method="post" action="{% url 'Scholarship.views.approve_resource' resource.pk %}" id="accept-{{resource.pk}}">
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-approve_resource' resource.pk %}" id="accept-{{resource.pk}}">
 						{% csrf_token %}
 						<a href="#" onclick="$('#accept-{{resource.pk}}').submit();">
 							Approve
@@ -66,7 +66,7 @@
 					</form>
 				</td>
 				<td>
-					<form type="multipart/form-data" method="post" action="{% url 'Scholarship.views.decline_resource' resource.pk %}" id="delete-{{resource.pk}}">
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-decline_resource' resource.pk %}" id="delete-{{resource.pk}}">
 						{% csrf_token %}
 						<a href="#" onclick="$('#delete-{{resource.pk}}').submit();">
 							Deny
@@ -109,13 +109,13 @@
 				<td>{{libraryItem.isbn_number}}</td>
 				<td>{{libraryItem.edition}}</td>
 				<td>
-					<a href="{% url 'Scholarship.views.download_libraryitem' libraryItem.pk %}">
+					<a href="{% url 'scholarship-download_libraryitem' libraryItem.pk %}">
 						Download
 					</a>
 				</td>
 				<td>{{libraryItem.submittedBy.first_name}} {{ libraryItem.submittedBy.last_name}}</td>
 				<td>
-					<form type="multipart/form-data" method="post" action="{% url 'Scholarship.views.approve_libraryitem' libraryItem.pk %}" id="approve-{{libraryItem.pk}}">
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-approve_libraryitem' libraryItem.pk %}" id="approve-{{libraryItem.pk}}">
 						{% csrf_token %}
 						<a href="#" onclick="$('#approve-{{libraryItem.pk}}').submit();">
 							Approve
@@ -123,7 +123,7 @@
 					</form>
 				</td>
 				<td>
-					<form type="multipart/form-data" method="post" action="{% url 'Scholarship.views.decline_libraryitem' libraryItem.pk %}" id="decline-{{libraryItem.pk}}">
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-decline_libraryitem' libraryItem.pk %}" id="decline-{{libraryItem.pk}}">
 						{% csrf_token %}
 						<a href="#" onclick="$('#decline-{{libraryItem.pk}}').submit();">
 							Deny

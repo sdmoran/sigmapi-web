@@ -24,7 +24,7 @@
 
 {% if latest %}
 <p>
-	The most recent version of the house rules may be viewed <a href="{% url 'Archive.views.download_rules' latest.pk %}">here.</a>
+	The most recent version of the house rules may be viewed <a href="{% url 'archive-download_rules' latest.pk %}">here.</a>
 </p>
 {% endif %}
 {% if rules %}
@@ -44,11 +44,11 @@
 			<tr>
 				<td>{{ rule.date }}</td>
 				<td>
-					<a href="{% url 'Archive.views.download_rules' rule.pk %}">View</a>
+					<a href="{% url 'archive-download_rules' rule.pk %}">View</a>
 				</td>
 				{% if perms.Archive.delete_houserules %}
 				<td>
-					<form method="post" action="{% url 'Archive.views.delete_rules' %}">
+					<form method="post" action="{% url 'archive-delete_rules' %}">
 						{% csrf_token %}
 						<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
 						<input type="hidden" name="post_id" value="{{ rule.pk }}"/>
@@ -80,7 +80,7 @@
 		<h4 class="modal-title">Update House Rules</h4>
 	  </div>
 	  <div class="modal-body">
-		<form enctype="multipart/form-data" method="post" action="{% url 'Archive.views.rules' %}" id="add-rules-form">
+		<form enctype="multipart/form-data" method="post" action="{% url 'archive-rules' %}" id="add-rules-form">
 			{% csrf_token %}
 			<div class="form-group">
 		<p>Rules file MUST be a PDF.</p>

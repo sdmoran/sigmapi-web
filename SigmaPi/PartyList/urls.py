@@ -1,25 +1,27 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.views.generic import RedirectView
 
-urlpatterns = patterns('',
-    url(r'^$', RedirectView.as_view(pattern_name='PartyList.views.index')),
-    url(r'^all/$', 'PartyList.views.index'),
-    url(r'^add/$', 'PartyList.views.add_party'),
-    url(r'^blacklist/$', 'PartyList.views.view_blacklist'),
-    url(r'^blacklist/manage/$', 'PartyList.views.manage_blacklist'),
-    url(r'^blacklist/manage/remove/(?P<bl_id>[\d]+)/$', 'PartyList.views.remove_blacklisting'),
-    url(r'^manage/$', 'PartyList.views.manage_parties'),
-    url(r'^edit/(?P<party>[\d]+)/$', 'PartyList.views.edit_party'),
-    url(r'^delete/(?P<party>[\d]+)/$', 'PartyList.views.delete_party'),
-    url(r'^view/(?P<party>[\d]+)/guests/$', 'PartyList.views.guests'),
-    url(r'^view/(?P<party>[\d]+)/guests/create/$', 'PartyList.api.create'),
-    url(r'^view/(?P<party>[\d]+)/guests/destroy/(?P<guestID>[\d]+)/$', 'PartyList.api.destroy'),
-    url(r'^view/(?P<party>[\d]+)/guests/signIn/(?P<guestID>[\d]+)/$', 'PartyList.api.signin'),
-    url(r'^view/(?P<party>[\d]+)/guests/signOut/(?P<guestID>[\d]+)/$', 'PartyList.api.signout'),
-    url(r'^view/(?P<party>[\d]+)/guests/poll/$', 'PartyList.api.poll'),
-    url(r'^view/(?P<party>[\d]+)/guests/export/$', 'PartyList.api.export_list'),
-    url(r'^view/(?P<party>[\d]+)/guests/count/$', 'PartyList.api.updateCount'),
-    url(r'^view/(?P<party>[\d]+)/guests/count/delta/$', 'PartyList.api.updateManualDelta'),
-    url(r'^view/(?P<party>[\d]+)/guests/count/poll/$', 'PartyList.api.pollCount'),
-    url(r'^view/(?P<party>[\d]+)/guests/init/$', 'PartyList.api.initPulse'),
-)
+from . import views, api
+
+urlpatterns = [
+    url(r'^$', RedirectView.as_view(pattern_name='PartyList.views.index'), name='partylist-index-old'),
+    url(r'^all/$', views.index, name='partylist-index'),
+    url(r'^add/$', views.add_party, name='partylist-add_party'),
+    url(r'^blacklist/$', views.view_blacklist, name='partylist-view_blacklist'),
+    url(r'^blacklist/manage/$', views.manage_blacklist, name='partylist-manage_blacklist'),
+    url(r'^blacklist/manage/remove/(?P<bl_id>[\d]+)/$', views.remove_blacklisting, name='partylist-remove_blacklisting'),
+    url(r'^manage/$', views.manage_parties, name='partylist-manage_parties'),
+    url(r'^edit/(?P<party>[\d]+)/$', views.edit_party, name='partylist-edit_party'),
+    url(r'^delete/(?P<party>[\d]+)/$', views.delete_party, name='partylist-delete_party'),
+    url(r'^view/(?P<party>[\d]+)/guests/$', views.guests, name='partylist-guests'),
+    url(r'^view/(?P<party>[\d]+)/guests/create/$', api.create, name='partylist-api-create'),
+    url(r'^view/(?P<party>[\d]+)/guests/destroy/(?P<guestID>[\d]+)/$', api.destroy, name='partlist-api-destroy'),
+    url(r'^view/(?P<party>[\d]+)/guests/signIn/(?P<guestID>[\d]+)/$', api.signin, name='partylist-api-signin'),
+    url(r'^view/(?P<party>[\d]+)/guests/signOut/(?P<guestID>[\d]+)/$', api.signout, name='partylist-api-signout'),
+    url(r'^view/(?P<party>[\d]+)/guests/poll/$', api.poll, name='partylist-api-poll'),
+    url(r'^view/(?P<party>[\d]+)/guests/export/$', api.export_list, name='partylist-api-export_list'),
+    url(r'^view/(?P<party>[\d]+)/guests/count/$', api.updateCount, name='partylist-api-updateCount'),
+    url(r'^view/(?P<party>[\d]+)/guests/count/delta/$', api.updateManualDelta, name='partylist-api-updateManualDelta'),
+    url(r'^view/(?P<party>[\d]+)/guests/count/poll/$', api.pollCount, name='partylist-api-pollCount'),
+    url(r'^view/(?P<party>[\d]+)/guests/init/$', api.initPulse, name='partylist-api-initPulse'),
+]

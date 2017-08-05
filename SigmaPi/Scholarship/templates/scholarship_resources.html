@@ -67,13 +67,13 @@
 				<td>{{resource.year}}</td>
 				<td>{{resource.term}}</td>
 				<td>
-					<a href="{% url 'Scholarship.views.download_resource' resource.pk %}">
+					<a href="{% url 'scholarship-download_resource' resource.pk %}">
 						Download
 					</a>
 				</td>
 				{% if is_scholarship_head %}
 				<td>
-					<form type="multipart/form-data" method="post" action="{% url 'Scholarship.views.delete_resource' resource.pk %}" id="delete-{{resource.pk}}">
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-delete_resource' resource.pk %}" id="delete-{{resource.pk}}">
 						{% csrf_token %}
 						<a href="#" onclick="$('#delete-{{resource.pk}}').submit();">
 							Delete
@@ -109,7 +109,7 @@
 				<h4 class="modal-title">Upload Academic Resource</h4>
 	  		</div>
 	  		<div class="modal-body">
-	  			<form enctype="multipart/form-data" method="post" action="{% url 'Scholarship.views.upload_resource' %}" id="upload-resource-form">
+	  			<form enctype="multipart/form-data" method="post" action="{% url 'scholarship-upload_resource' %}" id="upload-resource-form">
 	  				{% csrf_token %}
 	  				<div class="form-group">
 						<label class="control-label">Resource Name*</label>

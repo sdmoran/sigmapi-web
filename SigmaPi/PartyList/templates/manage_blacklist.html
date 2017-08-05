@@ -22,7 +22,7 @@
 				<td>{{ person.name }}</td>
 				<td>{{ person.details }}</td>
 				<td>
-					<form method="POST" action="{% url 'PartyList.views.remove_blacklisting' person.id %}">
+					<form method="POST" action="{% url 'partylist-remove_blacklisting' person.id %}">
 						{% csrf_token %}
 						<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
 					</form>
@@ -44,7 +44,7 @@
 
 <h3>Add to Blacklist</h3>
 
-<form method="post" action="{% url 'PartyList.views.manage_blacklist' %}">
+<form method="post" action="{% url 'partylist-manage_blacklist' %}">
 	{% csrf_token %}
 	{% if message %}
 	<div class="alert alert-info">

@@ -35,7 +35,7 @@ DATABASES = {
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
 
-SENDFILE_BACKEND = 'sendfile.backends.development'
+DOWNLOADVIEW_BACKEND = 'django_downloadview.lighttpd.XSendfileMiddleware'
 
 # Todo: These should probably be absolute paths in prod.
 MEDIA_ROOT = './content/'

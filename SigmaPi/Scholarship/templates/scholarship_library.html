@@ -66,13 +66,13 @@
 				<td>{{item.course}}</td>
 				<td>{{item.edition}}</td>
 				<td>
-					<a href="{% url 'Scholarship.views.download_libraryitem' item.pk %}">
+					<a href="{% url 'scholarship-download_libraryitem' item.pk %}">
 						Download
 					</a>
 				</td>
 				{% if is_scholarship_head %}
 				<td>
-					<form type="multipart/form-data" method="post" action="{% url 'Scholarship.views.delete_libraryitem' item.pk %}" id="delete-{{item.pk}}">
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-delete_libraryitem' item.pk %}" id="delete-{{item.pk}}">
 						{% csrf_token %}
 						<a href="#" onclick="$('#delete-{{item.pk}}').submit();">
 							Delete
@@ -107,7 +107,7 @@
 				<h4 class="modal-title">Upload Library Item</h4>
 	  		</div>
 	  		<div class="modal-body">
-	  			<form enctype="multipart/form-data" method="post" action="{% url 'Scholarship.views.upload_libraryitem' %}" id="upload-item-form">
+	  			<form enctype="multipart/form-data" method="post" action="{% url 'scholarship-upload_libraryitem' %}" id="upload-item-form">
 	  				{% csrf_token %}
 	  				<div class="form-group">
 						<label class="control-label">Title*</label>

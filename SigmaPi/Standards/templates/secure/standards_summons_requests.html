@@ -57,13 +57,13 @@
 						{% endif %}
 	 					<td>{{ summons.summoner.first_name }} {{ summons.summoner.last_name }}</td>
 	 					<td>
-	 						<form method="POST" action="{% url 'Standards.views.approve_summons_request' summons.pk %}">
+	 						<form method="POST" action="{% url 'standards-approve_summons_request' summons.pk %}">
 								{% csrf_token %}
 								<input type="submit" class="btn btn-success btn-sm" value="Approve"/>
 							</form>
 	 					</td>
 	 					<td>
-	 						<form method="POST" action="{% url 'Standards.views.reject_summons_request' summons.pk %}">
+	 						<form method="POST" action="{% url 'standards-reject_summons_request' summons.pk %}">
 								{% csrf_token %}
 								<input type="submit" class="btn btn-danger btn-sm" value="Reject"/>
 							</form>

@@ -81,7 +81,7 @@
 				<h4 class="modal-title">Send Summons</h4>
 	  		</div>
 	  		<div class="modal-body">
-				<form id="send-summons-form" enctype="multipart/form-data" method="post" action="{% url 'Standards.views.send_summons_request' %}">
+				<form id="send-summons-form" enctype="multipart/form-data" method="post" action="{% url 'standards-send_summons_request' %}">
 					{% csrf_token %}
 					<div class="form-group">
 						Submit a request to summons a Brother/Pledge. The summons request will be reviewed by the Fourth Counselor and sent to Standards Board.
