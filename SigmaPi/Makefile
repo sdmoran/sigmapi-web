@@ -1,6 +1,6 @@
 
-PYTHON=python3.5
-PIP=sudo pip3.5
+PYTHON=python3.6
+PIP=sudo pip3.6
 MANAGE=$(PYTHON) manage.py
 DEV_DATA=fixtures/dev_data.json
 
