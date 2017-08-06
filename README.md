@@ -32,39 +32,26 @@ $ vagrant ssh
 $ cd /vagrant/SigmaPi
 ```
 
-### 4.Create the database.
+### 4. Set up development environment
 
-You will only have to do this once. When prompted to create an admin user, say no. An admin account is loaded from the fixture data in the next step.
-
-```
-$ python3 manage.py syncdb
-```
-
-### 5. Load initial data for the database.
-
-This inclues admin, groups, and various users. You will only have to do this once. Read more about what initial data is loaded in the "Fixture Data" section below.
+You will only have to do this once. This installs requirements, loads initial
+data for the database, and collects static files.
 
 ```
-$ python3 manage.py loaddata fixtures/dev_data.json
+$ make dev
 ```
 
-### 6. Collect static assets (CSS, JS, images, etc.).
+### 5. Run Django.
 
 ```
-$ python3 manage.py collectstatic
+$ make run
 ```
 
-### 7. Run Django.
-
-```
-$ python3 manage.py runserver 0.0.0.0:8000
-```
-
-### 8. Open a web browser on your computer, and navigate to localhost:8000 to view the site.
+### 6. Open a web browser on your computer, and navigate to localhost:8000 to view the site.
 
 You can make changes to the code and your running instance will be updated automatically. You can log into the site with the admin account credentials you created earlier.
 
-When you are d  e state it was in previously.
+When you are done working, it is best to run `vagrant suspend` from your host (not from the VM) in order to stop the VM from running in the background. Later you can `vagrant resume` to bring the VM back to the state it was in previously.
 
 ## Deploying to WebFaction
 
@@ -119,6 +106,11 @@ steward:steward # The steward.
 
 ### Updating Fixture Data
 
+```
+$ make dumpdata
+```
+
+This runs the following command:
 ```
 python manage.py dumpdata --natural-foreign -e contenttypes -e auth.Permission > fixtures/dev_data.json
 ```
