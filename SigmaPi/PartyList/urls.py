@@ -4,7 +4,7 @@ from django.views.generic import RedirectView
 from . import views, api
 
 urlpatterns = [
-    url(r'^$', RedirectView.as_view(pattern_name='PartyList.views.index'), name='partylist-index-old'),
+    url(r'^$', RedirectView.as_view(pattern_name='partylist-index'), name='partylist-index-old'),
     url(r'^all/$', views.index, name='partylist-index'),
     url(r'^add/$', views.add_party, name='partylist-add_party'),
     url(r'^blacklist/$', views.view_blacklist, name='partylist-view_blacklist'),
