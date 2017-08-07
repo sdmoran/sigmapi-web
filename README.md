@@ -1,8 +1,21 @@
 # Sigma Pi Gamma Iota Chapter's website
 
-This Python Django application powers the Sigma Pi Gamma Iota Chapter's website, which can be found at: https://sigmapigammaiota.org/
+This Python Django application powers the Sigma Pi, Gamma Iota Chapter's website, which can be found at: https://sigmapigammaiota.org/
 
-This project uses [Vagrant](https://www.vagrantup.com/) to keep the build environment standard between developers. In particular, I would recommend you install [Vagrant 1.6.3](https://www.vagrantup.com/download-archive/v1.6.3.html).
+# Developer Guide
+
+## Dependencies
+
+* [Git](https://git-scm.com/downloads): Version control system.
+  The latest version is recommended.
+* [Virtualbox](https://www.virtualbox.org/wiki/Downloads): Virtualization software
+  for local development. The latest version is recommended.
+* [Vagrant](https://releases.hashicorp.com/vagrant/): Used to keep
+  the build environment standard between developers.
+  Version 1.9.7 is recommended.
+* [vagrant-vbguest](https://github.com/dotless-de/vagrant-vbguest): For integration
+  between Virtualbox and Vagrant. The latest version is recommended.
+
 
 ## First time setup
 
@@ -74,7 +87,7 @@ Note that the `deploy.sh` script in that folder should be a copy of the one in t
 
 At this point you should be *done*, unless you need to...
 
-### 3. Rollback if necessary 
+### 3. Rollback if necessary
 
 There may be warnings on deploy, but if there is a failure in production after deployment then you should perform a rollback. In the same directory as the `delpoy.sh` script is `rollback.sh`, which will revert production to its previous deploy.
 
