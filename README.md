@@ -1,8 +1,21 @@
 # Sigma Pi Gamma Iota Chapter's website
 
-This Python Django application powers the Sigma Pi Gamma Iota Chapter's website, which can be found at: https://sigmapigammaiota.org/
+This Python Django application powers the Sigma Pi, Gamma Iota Chapter's website, which can be found at: https://sigmapigammaiota.org/
 
-This project uses [Vagrant](https://www.vagrantup.com/) to keep the build environment standard between developers. In particular, I would recommend you install [Vagrant 1.6.3](https://www.vagrantup.com/download-archive/v1.6.3.html).
+# Developer Guide
+
+## Dependencies
+
+* [Git](https://git-scm.com/downloads): Version control system.
+  The latest version is recommended.
+* [Virtualbox](https://www.virtualbox.org/wiki/Downloads): Virtualization software
+  for local development. The latest version is recommended.
+* [Vagrant](https://releases.hashicorp.com/vagrant/): Used to keep
+  the build environment standard between developers.
+  Version 1.9.7 is recommended.
+* [vagrant-vbguest](https://github.com/dotless-de/vagrant-vbguest): For integration
+  between Virtualbox and Vagrant. The latest version is recommended.
+
 
 ## First time setup
 
@@ -32,39 +45,26 @@ $ vagrant ssh
 $ cd /vagrant/SigmaPi
 ```
 
-### 4.Create the database.
+### 4. Set up development environment
 
-You will only have to do this once. When prompted to create an admin user, say no. An admin account is loaded from the fixture data in the next step.
-
-```
-$ python3 manage.py syncdb
-```
-
-### 5. Load initial data for the database.
-
-This inclues admin, groups, and various users. You will only have to do this once. Read more about what initial data is loaded in the "Fixture Data" section below.
+You will only have to do this once. This installs requirements, loads initial
+data for the database, and collects static files.
 
 ```
-$ python3 manage.py loaddata fixtures/dev_data.json
+$ make dev
 ```
 
-### 6. Collect static assets (CSS, JS, images, etc.).
+### 5. Run Django.
 
 ```
-$ python3 manage.py collectstatic
+$ make run
 ```
 
-### 7. Run Django.
-
-```
-$ python3 manage.py runserver 0.0.0.0:8000
-```
-
-### 8. Open a web browser on your computer, and navigate to localhost:8000 to view the site.
+### 6. Open a web browser on your computer, and navigate to localhost:8000 to view the site.
 
 You can make changes to the code and your running instance will be updated automatically. You can log into the site with the admin account credentials you created earlier.
 
-When you are d  e state it was in previously.
+When you are done working, it is best to run `vagrant suspend` from your host (not from the VM) in order to stop the VM from running in the background. Later you can `vagrant resume` to bring the VM back to the state it was in previously.
 
 ## Deploying to WebFaction
 
@@ -87,7 +87,7 @@ Note that the `deploy.sh` script in that folder should be a copy of the one in t
 
 At this point you should be *done*, unless you need to...
 
-### 3. Rollback if necessary 
+### 3. Rollback if necessary
 
 There may be warnings on deploy, but if there is a failure in production after deployment then you should perform a rollback. In the same directory as the `delpoy.sh` script is `rollback.sh`, which will revert production to its previous deploy.
 
@@ -119,6 +119,11 @@ steward:steward # The steward.
 
 ### Updating Fixture Data
 
+```
+$ make dumpdata
+```
+
+This runs the following command:
 ```
 python manage.py dumpdata --natural-foreign -e contenttypes -e auth.Permission > fixtures/dev_data.json
 ```

@@ -1,15 +1,20 @@
 #!/bin/bash
 
-# Install essential packages from Apt
-apt-get update -y
+# Add custom Python repo in order to get latest Python packages
+yum install -y https://centos7.iuscommunity.org/ius-release.rpm
+yum update -y
 
-# Python dev packages
-apt-get install -y build-essential python3-dev python3-pip
+# Install Python development packages
+yum install -y gcc gcc-c++
+sudo yum install -y python36u python36u-libs python36u-devel python36u-pip
+pip3.6 install -r /vagrant/SigmaPi/requirements.txt
 
-# Git
-apt-get install -y git
+# Install other utilities
+yum install -y git
+yum install -y nano  # Learn vi noobs...
 
-pip3 install -r /vagrant/SigmaPi/requirements.txt
+# Create a python3 alias, and set default directory
+echo "alias python3=\"python3.6\"" >> .bashrc
 
-# Cleanup
-apt-get clean
+# Set the default directory when logging in
+echo "cd /vagrant/SigmaPi" >> .bash_profile
