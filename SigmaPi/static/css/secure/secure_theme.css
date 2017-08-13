@@ -25,7 +25,7 @@ hr.hr {
 {
 	padding-left: 20px;
 	padding-right: 20px;
-	padding-bottom: 10px; 
+	padding-bottom: 10px;
 	margin-top: -10px;
 
 	border-bottom: 1px rgb(124, 43, 131) solid;
@@ -40,7 +40,7 @@ hr.hr {
 {
 	padding-left: 20px;
 	padding-right: 20px;
-	padding-bottom: 10px; 
+	padding-bottom: 10px;
 	margin-top: 10px;
 
 	margin-bottom: 20px;
@@ -55,7 +55,7 @@ hr.hr {
 {
 	background-color: #F8F8F8;
 	border: 2px solid #DDD !important;
-	
+
 	width:80%; /* This needs to be synced up with the footer values in sigmapi_theme.css */
 	max-width:1000px;
 
@@ -96,7 +96,7 @@ hr.hr {
 	padding-right: 10px;
 	padding-bottom: 5px;
 	padding-top: 5px;
-	
+
 	display: inline-block;
 }
 
@@ -339,6 +339,5 @@ th.twelve.wide
 }
 
 .blacklist-table {
-	table-layout: fixed;
 	word-wrap: break-word;
 }
