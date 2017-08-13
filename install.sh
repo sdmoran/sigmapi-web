@@ -13,6 +13,9 @@ pip3.6 install -r /vagrant/SigmaPi/requirements.txt
 yum install -y git
 yum install -y nano  # Learn vi noobs...
 
+# Fix problem where site doesn't load after install
+iptables -F
+
 # Create a python3 alias, and set default directory
 echo "alias python3=\"python3.6\"" >> .bashrc
 
