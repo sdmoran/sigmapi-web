@@ -1,4 +1,5 @@
 <!-- Single link in the system -->
+{% load sigmapiweb_utils %}
 <div class="link">
 	<div class="content">
 		<!-- Title -->
@@ -8,7 +9,7 @@
 			({{ link.url|truncatechars:30 }})
 			<!-- Metadata for link -->
 			<div class="metadata">
-				Posted {{ link.date }} by {{ link.poster.first_name }} {{ link.poster.last_name }}
+				Posted {{ link.date }} by {{ link|full_name:"poster" }}
 			</div>
 			<!-- Actions on a link -->
 			<div class="link-actions">

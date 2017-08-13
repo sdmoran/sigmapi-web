@@ -4,6 +4,7 @@
 
 {% block module_includes %}
 {% load static %}
+{% load sigmapiweb_utils %}
 <script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
 <script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
 {% endblock %}
@@ -49,13 +50,13 @@
 	 				{% for summons in current_requests %}
 	 				<tr>
 	 					<td>{{ summons.dateRequestSent }}</td>
-	 					<td>{{ summons.summonee.first_name }} {{ summons.summonee.last_name }}</td>
+	 					<td>{{ summons|full_name:"summonee" }}</td>
 						{% if summons.spokeWith %}
 	 					<td><strong>Conversation outcome:</strong> {{ summons.outcomes }}. <strong>Further action requested because:</strong> {{summons.standards_action}}</td>
 						{% else %}
 						<td><strong>Special circumstance: </strong>{{summons.special_circumstance}}</td>
 						{% endif %}
-	 					<td>{{ summons.summoner.first_name }} {{ summons.summoner.last_name }}</td>
+	 					<td>{{ summons|full_name:"summoner" }}</td>
 	 					<td>
 	 						<form method="POST" action="{% url 'standards-approve_summons_request' summons.pk %}">
 								{% csrf_token %}

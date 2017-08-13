@@ -30,9 +30,6 @@ class TrackedUser(models.Model):
         Model for a user who currently has their study hours tracked.
     """
 
-    def __unicode__(self):
-        return self.user.__str__()
-
     def __str__(self):
         return self.user.__str__()
 
@@ -69,9 +66,6 @@ class StudyHoursRecord(models.Model):
         Model for a record of study hours made by one tracked user for one day.
     """
 
-    def __unicode__(self):
-        return "Study hours by " + self.user.first_name + " " + self.user.last_name + " on " + self.date.__str__()
-
     def __str__(self):
         return "Study hours by " + self.user.first_name + " " + self.user.last_name + " on " + self.date.__str__()
 
@@ -90,9 +84,6 @@ class AcademicResource(models.Model):
         Model for an academic resource.
     """
 
-    def __unicode__(self):
-        return str(self.course_number) + ": " + str(self.resource_name)
-
     def __str__(self):
         return str(self.course_number) + ": " + str(self.resource_name)
 
@@ -106,7 +97,7 @@ class AcademicResource(models.Model):
     course_number = models.CharField(max_length=100)
     professor_name = models.CharField(max_length=100)
     resource_pdf = models.FileField(upload_to='protected/scholarship/resources')
-    submittedBy = models.ForeignKey(User, on_delete=models.CASCADE)
+    submittedBy = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     approved = models.BooleanField(default=False)
     year = models.IntegerField(blank=True)
     term = models.CharField(blank=True, max_length=1,   \
@@ -120,9 +111,6 @@ class LibraryItem(models.Model):
     """
         Model for a library item.
     """
-
-    def __unicode__(self):
-        return str(self.isbn_number) + ": " + str(self.title)
 
     def __str__(self):
         return str(self.isbn_number) + ": " + str(self.title)
@@ -138,5 +126,5 @@ class LibraryItem(models.Model):
     course = models.CharField(max_length=10, default="", blank=True)
     edition = models.CharField(max_length=100)
     item_pdf = models.FileField(upload_to='protected/scholarship/library')
-    submittedBy = models.ForeignKey(User, on_delete=models.CASCADE)
+    submittedBy = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     approved = models.BooleanField(default=False)

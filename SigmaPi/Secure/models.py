@@ -9,5 +9,5 @@ class CalendarKey(models.Model):
     # The calendar key.
     key = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return str(self.group) + " " + self.key

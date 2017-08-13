@@ -1,8 +1,11 @@
+from datetime import datetime
+import editdistance
+
 from django.db import models
 from django.contrib.auth.models import User
 from django import forms
-from datetime import datetime
-import editdistance
+
+from SigmaPi.utils import get_id_or_sentinel, get_full_name_or_deleted
 
 
 def timeStamped(fname, fmt='%Y-%m-%d_{fname}'):
@@ -36,9 +39,6 @@ class Party(models.Model):
 
     jobs = models.FileField(upload_to=partyjobspath, blank=True, null=True)
 
-    def __unicode__(self):
-        return self.name
-
     def __str__(self):
         return self.name
 
@@ -62,9 +62,6 @@ class BlacklistedGuest(models.Model):
     details = models.TextField()
 
     MAX_MATCH_EDIT_DISTANCE = 5
-
-    def __unicode__(self):
-        return self.name
 
     def __str__(self):
         return self.name
@@ -96,9 +93,6 @@ class Guest(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
-    def __unicode__(self):
-        return self.name
-
     def __str__(self):
         return self.name
 
@@ -122,14 +116,11 @@ class PartyGuest(models.Model):
     """
     party = models.ForeignKey(Party, related_name="party_for_guest", default=1, on_delete=models.CASCADE)
     guest = models.ForeignKey(Guest, related_name="guest", default=1, db_index=True, on_delete=models.CASCADE)
-    addedBy = models.ForeignKey(User, related_name="added_by", default=1, on_delete=models.CASCADE)
+    addedBy = models.ForeignKey(User, related_name="added_by", default=1, null=True, on_delete=models.SET_NULL)
     createdAt = models.DateTimeField(auto_now_add=True, db_index=True)
     signedIn = models.BooleanField(default=False)
     everSignedIn = models.BooleanField(default=False)
     timeFirstSignedIn = models.DateTimeField(auto_now_add=True)
-
-    def __unicode__(self):
-        return self.guest.name
 
     def __str__(self):
         return self.guest.name
@@ -149,8 +140,8 @@ class PartyGuest(models.Model):
         data = {}
         data['id'] = self.id
         data['name'] = self.guest.name
-        data['addedByName'] = self.addedBy.first_name + " " + self.addedBy.last_name
-        data['addedByID'] = self.addedBy.id
+        data['addedByName'] = get_full_name_or_deleted(self.addedBy)
+        data['addedByID'] = get_id_or_sentinel(self.addedBy)
         data['signedIn'] = self.signedIn
 
         return data

@@ -35,10 +35,6 @@ class Bylaws(models.Model):
         Model for a single document of house bylaws.
     """
 
-
-    def __unicode__(self):
-        return self.date.__str__()
-
     def __str__(self):
         return self.date.__str__()
 
@@ -73,9 +69,6 @@ class HouseRules(models.Model):
         Model for a single document of house rules.
     """
 
-    def __unicode__(self):
-        return self.date.__str__()
-
     def __str__(self):
         return self.date.__str__()
 
@@ -108,10 +101,6 @@ class Guide(models.Model):
     """
         Model for a single document of a house guide.
     """
-
-    def __unicode__(self):
-        return self.name
-
     def __str__(self):
         return self.name
 

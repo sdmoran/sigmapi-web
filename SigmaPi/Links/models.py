@@ -8,14 +8,11 @@ class Link(models.Model):
         Model for a single link that a person may submit
     """
 
-    poster = models.ForeignKey(User, on_delete=models.CASCADE)
+    poster = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     date = models.DateTimeField()
     title = models.CharField(max_length=50)
     url = models.URLField()
     promoted = models.BooleanField(default=False)
-
-    def __unicode__(self):
-        return self.title
 
     def __str__(self):
         return self.title

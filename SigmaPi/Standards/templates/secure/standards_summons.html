@@ -4,6 +4,7 @@
 
 {% block module_includes %}
 {% load static %}
+{% load sigmapiweb_utils %}
 <script type="text/javascript" src='{% static "js/lib/moment.min.js" %}'></script>
 <script type="text/javascript" src='{% static "js/lib/bootstrap-datetimepicker.min.js" %}'></script>
 
@@ -56,10 +57,10 @@
 	 				{% for summons in all_summons %}
 	 				<tr>
 	 					<td>{{ summons.dateSummonsSent }}</td>
-	 					<td>{{ summons.summonee.first_name }} {{ summons.summonee.last_name }}</td>
+	 					<td>{{ summons|full_name:"summonee" }}</td>
 	 					<td id="reason_{{ summons.pk }}">{{ summons.reason }}</td>
-	 					<td>{{ summons.summoner.first_name }} {{ summons.summoner.last_name }}</td>
-	 					<td>{{ summons.approver.first_name }} {{ summons.approver.last_name }}</td>
+	 					<td>{{ summons|full_name:"summoner" }}</td>
+	 					<td>{{ summons|full_name:"approver" }}</td>
 	 					<td>
 	 						<a class="btn btn-success btn-sm approve-summons" id="{{ summons.pk }}">
 	 						Approve
@@ -90,10 +91,10 @@
 				</thead>
 				<tbody>
 					{% for history in summons_history %}
-					<tr>	
+					<tr>
 						<td>{{ history.date }}</td>
-						<td>{{ history.summonee.first_name }} {{ history.summonee.last_name }}</td>
-						<td>{{ history.summoner.first_name }} {{ history.summoner.last_name }}</td>
+						<td>{{ history|full_name:"summonee" }}</td>
+						<td>{{ history|full_name:"summoner" }}</td>
 						<td>
 							{{ history.details }}
 						</td>
