@@ -120,9 +120,9 @@ class PartyGuest(models.Model):
     """
         Model to represent a guest for a specific party.
     """
-    party = models.ForeignKey(Party, related_name="party_for_guest", default=1)
-    guest = models.ForeignKey(Guest, related_name="guest", default=1, db_index=True)
-    addedBy = models.ForeignKey(User, related_name="added_by", default=1)
+    party = models.ForeignKey(Party, related_name="party_for_guest", default=1, on_delete=models.CASCADE)
+    guest = models.ForeignKey(Guest, related_name="guest", default=1, db_index=True, on_delete=models.CASCADE)
+    addedBy = models.ForeignKey(User, related_name="added_by", default=1, on_delete=models.CASCADE)
     createdAt = models.DateTimeField(auto_now_add=True, db_index=True)
     signedIn = models.BooleanField(default=False)
     everSignedIn = models.BooleanField(default=False)

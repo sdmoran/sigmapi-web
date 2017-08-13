@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='userinfo',
             name='pledgeClass',
-            field=models.ForeignKey(default=1, to='UserInfo.PledgeClass'),
+            field=models.ForeignKey(default=1, to='UserInfo.PledgeClass', on_delete=models.CASCADE),
         ),
     ]

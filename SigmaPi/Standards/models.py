@@ -7,8 +7,8 @@ class SummonsRequest(models.Model):
         Model for a request to summons a user.
     """
 
-    summoner = models.ForeignKey(User, related_name='+')
-    summonee = models.ForeignKey(User, related_name='+')
+    summoner = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
+    summonee = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
     spokeWith = models.BooleanField()
     outcomes = models.TextField(blank=True)
     standards_action = models.TextField(blank=True)
@@ -37,9 +37,9 @@ class Summons(models.Model):
     """
         Model for a summons that is given to a User.
     """
-    summoner = models.ForeignKey(User, related_name='+')
-    summonee = models.ForeignKey(User, related_name='+')
-    approver = models.ForeignKey(User, related_name='+')
+    summoner = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
+    summonee = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
+    approver = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
     spokeWith = models.BooleanField()
     outcomes = models.TextField(blank=True)
     standards_action = models.TextField(blank=True)
@@ -67,9 +67,9 @@ class SummonsHistoryRecord(models.Model):
     """
         Model for a summons history record.
     """
-    summoner = models.ForeignKey(User, related_name='+')
-    summonee = models.ForeignKey(User, related_name='+')
-    saved_by = models.ForeignKey(User, related_name='+', null=True)
+    summoner = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
+    summonee = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
+    saved_by = models.ForeignKey(User, related_name='+', null=True, on_delete=models.CASCADE)
     details = models.TextField()
     resultReason = models.TextField()
     rejected = models.BooleanField(default=False)

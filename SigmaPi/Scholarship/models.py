@@ -53,7 +53,7 @@ class TrackedUser(models.Model):
 
 
     # Fields for this model.
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     number_of_hours = models.IntegerField(validators=[validate_number])
 
     # Meta information about this model.
@@ -79,7 +79,7 @@ class StudyHoursRecord(models.Model):
         return occurred_this_week(self.date)
 
     # Fields for this model.
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     number_of_hours = models.IntegerField(validators=[validate_number])
     date = models.DateField(validators=[validate_date])
     time_stamp = models.DateTimeField(auto_now_add=True, editable=False)
@@ -106,7 +106,7 @@ class AcademicResource(models.Model):
     course_number = models.CharField(max_length=100)
     professor_name = models.CharField(max_length=100)
     resource_pdf = models.FileField(upload_to='protected/scholarship/resources')
-    submittedBy = models.ForeignKey(User)
+    submittedBy = models.ForeignKey(User, on_delete=models.CASCADE)
     approved = models.BooleanField(default=False)
     year = models.IntegerField(blank=True)
     term = models.CharField(blank=True, max_length=1,   \
@@ -138,5 +138,5 @@ class LibraryItem(models.Model):
     course = models.CharField(max_length=10, default="", blank=True)
     edition = models.CharField(max_length=100)
     item_pdf = models.FileField(upload_to='protected/scholarship/library')
-    submittedBy = models.ForeignKey(User)
+    submittedBy = models.ForeignKey(User, on_delete=models.CASCADE)
     approved = models.BooleanField(default=False)

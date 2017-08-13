@@ -8,7 +8,7 @@ class Link(models.Model):
         Model for a single link that a person may submit
     """
 
-    poster = models.ForeignKey(User)
+    poster = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField()
     title = models.CharField(max_length=50)
     url = models.URLField()

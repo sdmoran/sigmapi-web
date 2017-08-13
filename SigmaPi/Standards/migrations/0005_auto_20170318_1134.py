@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='summonshistoryrecord',
             name='saved_by',
-            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE),
         ),
         migrations.DeleteModel(
             name='Bone',
