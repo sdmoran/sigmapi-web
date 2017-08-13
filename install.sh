@@ -17,7 +17,7 @@ yum install -y nano  # Learn vi noobs...
 iptables -F
 
 # Create a python3 alias, and set default directory
-echo "alias python3=\"python3.6\"" >> .bashrc
+echo "alias python3=\"python3.6\"" >> /home/vagrant/.bashrc
 
 # Set the default directory when logging in
-echo "cd /vagrant/SigmaPi" >> .bash_profile
+echo "cd /vagrant/SigmaPi" >> /home/vagrant/.bash_profile
