@@ -1,0 +1,195 @@
+{% extends 'standards/_base.html' %}
+
+{% block title %}Sigma Pi Secure - Standards {% endblock %}
+
+{% block module_includes %}
+{% load staticfiles %}
+<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+{% endblock %}
+
+{% block content %}
+<h3>The Standards Board</h3>
+<div class="actions">
+	<ul class="nav nav-pills">
+		{% if perms.Standards.add_summonsrequest %}
+		<li>
+			<a href="#" data-toggle="modal" data-target="#send-summons">
+				<span class="glyphicon glyphicon-envelope"></span> Send Summons
+			</a>
+		</li>
+		{% endif %}
+	</ul>
+</div>
+
+<!-- Display any messages -->
+{% if error %}
+<div class="alert alert-warning">
+	<strong>Error!</strong>
+	{{ error | safe }}
+</div>
+{% endif %}
+{% if msg %}
+<div class="alert alert-success">
+	<strong>Success!</strong>
+	{{ msg | safe }}
+</div>
+{% endif %}
+
+<h4>My Summons History</h4>
+
+<!-- Tab panes -->
+<div class="tab-content">
+	<div role="tabpanel" class="tab-pane fade in active" id="summons-history">
+  		<div class="table-responsive no-spaced">
+	  		<table class="dataTable table">
+				<thead>
+					<tr>
+						<th class="two wide">Date Received</th>
+						<th class="four wide">Reason</th>
+						<th class="four wide">Standards Result</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for summons_history_record in summons_history %}
+					<tr>	
+						<td>{{ summons_history_record.date }}</td>
+						<td>
+							{{ summons_history_record.details }}
+						</td>
+						<td>{{ summons_history_record.resultReason }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+  	</div>
+</div>
+{% endblock %}
+
+{% block toplevel_content %}
+
+{% if perms.Standards.add_summonsrequest %}
+<div class="modal" id="send-summons">
+ 	<div class="modal-dialog">
+		<div class="modal-content">
+	  		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+	   			</button>
+				<h4 class="modal-title">Send Summons</h4>
+	  		</div>
+	  		<div class="modal-body">
+				<form id="send-summons-form" enctype="multipart/form-data" method="post" action="{% url 'standards-send_summons_request' %}">
+					{% csrf_token %}
+					<div class="form-group">
+						Submit a request to summons a Brother/Pledge. The summons request will be reviewed by the Fourth Counselor and sent to Standards Board.
+					</div>	
+					<div class="form-group" id="recipient-template">
+						<label class="control-label" for="id_summonee">Recipient*</label>
+						{{ summons_form.summonee }}
+					</div>
+					<div class="form-group">
+						<a href="#" id="add-summons-recipient">
+							<span class="glyphicon glyphicon-plus"></span> Add Recipient
+						</a>
+					</div>
+					<div class="form-group" id="summoner-template">
+						<label class="control-label">Summoner:&nbsp;</label>
+						{{user.last_name}}, {{ user.first_name }}
+					</div>
+					<div class="form-group" id="spoke-with-select">
+						<label class="control-label">Did you speak with the person(s) being summoned before filling out this request?</label>
+						{{summons_form.spokeWith}}
+					</div>
+					<div id="summons_form_spokewith" style="display: none;">
+						<div class="form-group">
+							<label class="control-label" for="id_outcomes">What outcomes resulted from your conversation(s) with the accused?</label>
+							{{summons_form.outcomes}}
+						</div>
+						<div class="form-group">
+							<label class="control-label" for="id_standards_action">Why do you believe action is still required from the Standards Board after having these conversations?</label>
+							{{summons_form.standards_action}}
+						</div>
+					</div>
+					<div id="summons_form_didnotspeak" style="display: none;">
+						<p>
+							Unless you have special circumstance to warrant otherwise, this summons request will be denied on the grounds that the summoner should confront the summoned on the issue before resorting to judicial action.
+						</p>
+						<div class="form-group">
+							<label class="control-label" for="id_special_circumstance">If you have a special circumstance, please describe it below:</label>
+							{{summons_form.special_circumstance}}
+						</div>
+					</div>
+					<input type="hidden" id="recipient-count" name="recipient-count" value="1" class="hidden" style="display:none;"/>
+				</form>
+	  		</div>
+	  		<div class="modal-footer">
+	   			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-primary" onclick="$('#send-summons-form').submit()">Send Summons</button>
+	  		</div>
+		</div>
+  	</div>
+</div>
+
+<!-- Add summons recipient script -->
+<script type="text/javascript">
+	// This should be redone in the future. It is not the best design possible. Was put in quickly to get the functionality working.
+	var summonsRecipientCount = 1;
+	$(document).ready(function() {
+
+		$("#recipient-count").val(summonsRecipientCount); // Make sure count is set to 1. Workaround for browsers that cache form values
+		$("#spoke-with-select").val("");
+		$("#id_outcomes").val("");
+		$("#id_standards_action").val("");
+		$("#id_special_circumstance").val("");
+		$("#add-summons-recipient").click(function(){
+
+			summonsRecipientCount = summonsRecipientCount + 1;
+			$("#recipient-count").val(summonsRecipientCount);
+
+			var copiedTemplate = $("#recipient-template").clone();
+
+			var idVal = "summonee_" + summonsRecipientCount
+
+			copiedTemplate.attr("id", idVal);
+
+			var inputForm = copiedTemplate.find("select");
+
+			inputForm.attr("id", idVal);
+			inputForm.attr("name", idVal);
+
+			copiedTemplate.find("label").html("Recipient " + summonsRecipientCount + "*");
+
+			if ( summonsRecipientCount == 2 )
+			{
+				$("#recipient-template").after(copiedTemplate);
+			}
+			else
+			{
+				$(".form-group#summonee_" + (summonsRecipientCount - 1)).after(copiedTemplate);
+			}
+
+		});
+
+		$("#spoke-with-select input[type=radio]").prop('checked', false);
+		$("#spoke-with-select input[type=radio]").change(function()
+		{
+			if(this.value == 'yes')
+			{
+				$("#summons_form_spokewith").show();
+				$("#summons_form_didnotspeak").hide();
+			}
+			else if(this.value == 'no')
+			{
+				$("#summons_form_spokewith").hide();
+				$("#summons_form_didnotspeak").show();
+			}
+		});
+	});
+
+</script>
+{% endif %}
+
+{% endblock %}

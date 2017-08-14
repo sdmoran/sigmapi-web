@@ -1,0 +1,216 @@
+{% extends 'scholarship/_base.html' %}
+
+{% block title %}Sigma Pi Secure - Library {% endblock %}
+
+{% block module_includes %}
+{% load static %}
+<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+
+<!-- Async file upload library -->
+<script type="text/javascript" src='{% static "js/lib/jquery.ui.widget.js" %}'></script>
+<script type="text/javascript" src='{% static "js/lib/jquery.iframe-transport.js" %}'></script>
+<script type="text/javascript" src='{% static "js/lib/jquery.fileupload.js" %}'></script>
+
+<link rel="stylesheet" type="text/css" href='{% static "css/lib/jquery.fileupload.css" %}'/>
+{% endblock %}
+
+{% block content %}
+
+<h3>View items currently in the library.</h3>
+
+<div class="actions">
+	<ul class="nav nav-pills">
+		<li>
+			<a href="#" data-toggle="modal" data-target="#upload-item">
+				<span class="glyphicon glyphicon-plus"></span> Upload New Item
+			</a>
+		</li>
+	</ul>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+{% if message.level == 40 %}
+<div class="alert alert-danger">
+	<strong>Error! </strong>
+{% else %}
+<div class="alert alert-info">
+	<strong>Info! </strong>
+{% endif %}
+	{{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+{% if items %}
+<div class="table-responsive">
+	<table class="table dataTable">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>ISBN Number</th>
+				<th>Course</th>
+				<th>Edition</th>
+				<th>PDF</th>
+				{% if is_scholarship_head %}
+				<th>Delete</th>
+				{% endif %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in items %}
+			<tr>
+				<td>{{item.title}}</td>
+				<td>{{item.isbn_number}}</td>
+				<td>{{item.course}}</td>
+				<td>{{item.edition}}</td>
+				<td>
+					<a href="{% url 'scholarship-download_libraryitem' item.pk %}">
+						Download
+					</a>
+				</td>
+				{% if is_scholarship_head %}
+				<td>
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-delete_libraryitem' item.pk %}" id="delete-{{item.pk}}">
+						{% csrf_token %}
+						<a href="#" onclick="$('#delete-{{item.pk}}').submit();">
+							Delete
+						</a>
+					</form>
+				</td>
+				{% endif %}
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+<p>
+	There are no library items uploaded. Check back later.
+</p>
+
+{% endif %}
+
+{% endblock %}
+
+{% block toplevel_content %}
+<!-- Modify Points Form -->
+<div class="modal" id="upload-item">
+	<div class="modal-dialog">
+		<div class="modal-content">
+	  		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+	   			</button>
+				<h4 class="modal-title">Upload Library Item</h4>
+	  		</div>
+	  		<div class="modal-body">
+	  			<form enctype="multipart/form-data" method="post" action="{% url 'scholarship-upload_libraryitem' %}" id="upload-item-form">
+	  				{% csrf_token %}
+	  				<div class="form-group">
+						<label class="control-label">Title*</label>
+						{{ upload_item_form.title }}
+					</div>
+
+					<div class="form-group">
+						<label class="control-label">ISBN Number*</label>
+						{{ upload_item_form.isbn_number }}
+					</div>
+					<div class="form-group">
+						<label class="control-label">Course</label>
+						{{ upload_item_form.course }}
+					</div>
+					<div class="form-group">
+						<label class="control-label">Edition*</label>
+						{{ upload_item_form.edition }}
+					</div>
+
+					<div class="form-group">
+						<label class="control-label">PDF*</label>
+						<div>
+							<div class="btn btn-success fileinput-button" style="display:inline-block;">
+		   						<span>Select File...</span>
+								<!-- The file input field used as target for the file upload widget -->
+								{{ upload_item_form.item_pdf }}
+							</div>
+							<span id="file-pdf-name"></span>
+						</div>
+					</div>
+					<p>
+		  				{% if is_scholarship_head %}
+		  				Note: Your submission will be visible immediately to all users.
+		  				{% else %}
+		  				Note: Your submission will not be accessible until it is approved by the Scholarship Chair.
+		  				{% endif %}
+	  				</p>
+	  			</form>
+	  		</div>
+	  		<div class="modal-footer">
+				<div class="progress hidden" id="upload-progress">
+					<div class="progress-bar" id="upload-progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+						0%
+					</div>
+				</div>
+				<div id="upload-btns">
+		   			<button type="button" class="btn btn-default" id="cancel-btn" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary" id="submit-btn">Submit Item</button>
+				</div>
+	  		</div>
+		</div>
+  	</div>
+</div>
+{% endblock %}
+
+{% block embedded_js %}
+
+<!-- Async file upload page specific script -->
+<script type="text/javascript">
+
+	// Initialize file uploader.
+	$("#id_item_pdf").fileupload({
+		url: './upload/',
+		type: 'POST',
+		dataType: 'json',
+		dropZone: null, // Disable drag/drop files
+		pasteZone: null, // Disable paste files
+		singleFileUploads: true, // Upload a single file per XHR request
+		autoUpload: false
+	});
+
+	// Bind file upload action listeners.
+	$("#id_item_pdf")
+		.on('fileuploadadd', function (e, data) {
+			// Display the name of each file added.
+			$.each(data.files, function (index, file) {
+				$("#file-pdf-name").html(file.name);
+			});
+
+			// Add an action listener for click on submit.
+			$("#submit-btn").click(function(){
+				$("#upload-progress").removeClass("hidden");
+				$("#upload-btns").addClass("hidden");
+
+				data.submit();
+			});
+		})
+		.on('fileuploadprogressall', function ( e, data ) {
+			var progress = parseInt(data.loaded / data.total * 100, 10);
+			$('#upload-progress-bar').css(
+				'width',
+				progress + '%'
+			);
+			$('#upload-progress-bar').html(progress + "%");
+		})
+		.on('fileuploaddone', function ( e, data ) {
+			location.reload(); // Refresh the page when the upload is done
+		});
+
+		$("#id_title").val("");
+		$("#id_isbn_number").val("");
+		$("#id_edition").val("");
+		$("#id_item_pdf").val("");
+</script>
+
+{% endblock %}
