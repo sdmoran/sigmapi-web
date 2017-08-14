@@ -55,9 +55,9 @@ class Migration(migrations.Migration):
                 ('signedIn', models.BooleanField(default=False)),
                 ('everSignedIn', models.BooleanField(default=False)),
                 ('timeFirstSignedIn', models.DateTimeField(auto_now_add=True)),
-                ('addedBy', models.ForeignKey(related_name='added_by', default=1, to=settings.AUTH_USER_MODEL)),
-                ('guest', models.ForeignKey(related_name='guest', default=1, to='PartyList.Guest')),
-                ('party', models.ForeignKey(related_name='party_for_guest', default=1, to='PartyList.Party')),
+                ('addedBy', models.ForeignKey(related_name='added_by', default=1, to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('guest', models.ForeignKey(related_name='guest', default=1, to='PartyList.Guest', on_delete=models.CASCADE)),
+                ('party', models.ForeignKey(related_name='party_for_guest', default=1, to='PartyList.Party', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Party Guest',

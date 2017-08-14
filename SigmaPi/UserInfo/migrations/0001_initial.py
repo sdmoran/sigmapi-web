@@ -39,9 +39,9 @@ class Migration(migrations.Migration):
                 ('activities', models.TextField(blank=True)),
                 ('interests', models.TextField(blank=True)),
                 ('favoriteMemory', models.TextField(blank=True)),
-                ('bigBrother', models.ForeignKey(related_name='big_brother', default=1, to=settings.AUTH_USER_MODEL)),
-                ('pledgeClass', models.ForeignKey(to='UserInfo.PledgeClass')),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('bigBrother', models.ForeignKey(related_name='big_brother', default=1, to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('pledgeClass', models.ForeignKey(to='UserInfo.PledgeClass', on_delete=models.CASCADE)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'User Info',

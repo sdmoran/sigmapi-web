@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('approved', models.BooleanField(default=False)),
                 ('year', models.IntegerField(blank=True)),
                 ('term', models.CharField(blank=True, max_length=1, choices=[(b'A', b'A Term'), (b'B', b'B Term'), (b'C', b'C Term'), (b'D', b'D Term'), (b'E', b'E Term')])),
-                ('submittedBy', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('submittedBy', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('edition', models.CharField(max_length=100)),
                 ('item_pdf', models.FileField(upload_to=b'protected/scholarship/library')),
                 ('approved', models.BooleanField(default=False)),
-                ('submittedBy', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('submittedBy', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('number_of_hours', models.IntegerField(validators=[Scholarship.models.validate_number])),
                 ('date', models.DateField(validators=[Scholarship.models.validate_date])),
                 ('time_stamp', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('number_of_hours', models.IntegerField(validators=[Scholarship.models.validate_number])),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'permissions': (('scholarship_head', 'Can modify study hours.'),),

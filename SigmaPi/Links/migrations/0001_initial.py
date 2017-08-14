@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=50)),
                 ('url', models.URLField()),
                 ('promoted', models.BooleanField(default=False)),
-                ('poster', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('poster', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Link',

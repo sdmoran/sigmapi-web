@@ -4,6 +4,7 @@
 
 {% block module_includes %}
 {% load static %}
+{% load sigmapiweb_utils %}
 <script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
 <script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
 
@@ -51,7 +52,7 @@
 				<td>{{resource.professor_name}}</td>
 				<td>{{resource.year}}</td>
 				<td>{{resource.term}}</td>
-				<td>{{resource.submittedBy.first_name}} {{ resource.submittedBy.last_name}}</td>
+				<td>{{resource|full_name:"submittedBy"}}</td>
 				<td>
 					<a href="{% url 'scholarship-download_resource' resource.pk %}">
 						Download
@@ -113,7 +114,7 @@
 						Download
 					</a>
 				</td>
-				<td>{{libraryItem.submittedBy.first_name}} {{ libraryItem.submittedBy.last_name}}</td>
+				<td>{{libraryItem|full_name:"submittedBy"}}</td>
 				<td>
 					<form type="multipart/form-data" method="post" action="{% url 'scholarship-approve_libraryitem' libraryItem.pk %}" id="approve-{{libraryItem.pk}}">
 						{% csrf_token %}

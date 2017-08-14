@@ -1,14 +1,16 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from SigmaPi.utils import get_formal_name_or_deleted
+
 
 class SummonsRequest(models.Model):
     """
         Model for a request to summons a user.
     """
 
-    summoner = models.ForeignKey(User, related_name='+')
-    summonee = models.ForeignKey(User, related_name='+')
+    summoner = models.ForeignKey(User, related_name='+', null=True, on_delete=models.SET_NULL)
+    summonee = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
     spokeWith = models.BooleanField()
     outcomes = models.TextField(blank=True)
     standards_action = models.TextField(blank=True)
@@ -22,11 +24,12 @@ class SummonsRequest(models.Model):
         else:
             return self.special_circumstance
 
-    def __unicode__(self):
-        return self.summoner.last_name + ", " + self.summoner.first_name + " wants to summon " + self.summonee.last_name + ", " + self.summonee.first_name
 
     def __str__(self):
-        return self.summoner.last_name + ", " + self.summoner.first_name + " wants to summon " + self.summonee.last_name + ", " + self.summonee.first_name
+        return '{0} wants to summon {1}'.format(
+            get_formal_name_or_deleted(self.summoner),
+            get_formal_name_or_deleted(self.summonee),
+        )
 
     class Meta:
         verbose_name = "Summons Request"
@@ -37,9 +40,9 @@ class Summons(models.Model):
     """
         Model for a summons that is given to a User.
     """
-    summoner = models.ForeignKey(User, related_name='+')
-    summonee = models.ForeignKey(User, related_name='+')
-    approver = models.ForeignKey(User, related_name='+')
+    summoner = models.ForeignKey(User, related_name='+', null=True, on_delete=models.SET_NULL)
+    summonee = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
+    approver = models.ForeignKey(User, related_name='+', null=True, on_delete=models.SET_NULL)
     spokeWith = models.BooleanField()
     outcomes = models.TextField(blank=True)
     standards_action = models.TextField(blank=True)
@@ -52,11 +55,11 @@ class Summons(models.Model):
         else:
             return self.special_circumstance
 
-    def __unicode__(self):
-        return self.summoner.last_name + ", " + self.summoner.first_name + " has summoned " + self.summonee.last_name + ", " + self.summonee.first_name
-
     def __str__(self):
-        return self.summoner.last_name + ", " + self.summoner.first_name + " has summoned " + self.summonee.last_name + ", " + self.summonee.first_name
+        return '{0} has summoned {1}'.format(
+            get_formal_name_or_deleted(self.summoner),
+            get_formal_name_or_deleted(self.summonee),
+        )
 
     class Meta:
         verbose_name = "Summons"
@@ -67,22 +70,21 @@ class SummonsHistoryRecord(models.Model):
     """
         Model for a summons history record.
     """
-    summoner = models.ForeignKey(User, related_name='+')
-    summonee = models.ForeignKey(User, related_name='+')
-    saved_by = models.ForeignKey(User, related_name='+', null=True)
+    summoner = models.ForeignKey(User, related_name='+', null=True, on_delete=models.SET_NULL)
+    summonee = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
+    saved_by = models.ForeignKey(User, related_name='+', null=True, on_delete=models.SET_NULL)
     details = models.TextField()
     resultReason = models.TextField()
     rejected = models.BooleanField(default=False)
     date = models.DateField()
 
-    def __unicode__(self):
-        return self.summoner.last_name + ", " + self.summoner.first_name + " summoned " + self.summonee.last_name + ", " + self.summonee.first_name
-
     def __str__(self):
-        return self.summoner.last_name + ", " + self.summoner.first_name + " summoned " + self.summonee.last_name + ", " + self.summonee.first_name
+        return '{0} summoned {1}'.format(
+            get_formal_name_or_deleted(self.summoner),
+            get_formal_name_or_deleted(self.summonee),
+        )
 
     class Meta:
         verbose_name = "Summons History Record"
         verbose_name_plural = "Summons History Records"
-
 

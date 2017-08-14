@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 ('newReason', models.TextField()),
                 ('previousExpirationDate', models.DateField()),
                 ('newExpirationDate', models.DateField()),
-                ('bone', models.ForeignKey(to='Standards.Bone')),
+                ('bone', models.ForeignKey(to='Standards.Bone', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Bone Change Record',
@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PiPointsRecord',
             fields=[
-                ('brother', models.OneToOneField(primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
+                ('brother', models.OneToOneField(primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
                 ('jobsTaken', models.PositiveIntegerField(default=0)),
                 ('points', models.PositiveIntegerField(default=0)),
             ],
@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
                 ('date', models.DateTimeField()),
                 ('reason', models.TextField(max_length=1, choices=[(b'P', b'Pre/Post Party Job'), (b'F', b'First Shift Party Job'), (b'S', b'Second Shift Party Job'), (b'H', b'House Job'), (b'M', b'Meal Crew')])),
                 ('witness', models.CharField(default=b'None', max_length=100)),
-                ('requester', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
+                ('requester', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Pi Points Request',
@@ -108,8 +108,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('dateReceived', models.DateField()),
                 ('expirationDate', models.DateField()),
-                ('giver', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('recipient', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
+                ('giver', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('recipient', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Probation',
@@ -123,9 +123,9 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('reason', models.TextField()),
                 ('dateSummonsSent', models.DateField()),
-                ('approver', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('summonee', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('summoner', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
+                ('approver', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('summonee', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('summoner', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Summons',
@@ -142,8 +142,8 @@ class Migration(migrations.Migration):
                 ('date', models.DateField()),
                 ('hasBone', models.BooleanField(default=False)),
                 ('boneID', models.PositiveIntegerField()),
-                ('summonee', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('summoner', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
+                ('summonee', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('summoner', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -155,8 +155,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('reason', models.TextField()),
                 ('dateRequestSent', models.DateField()),
-                ('summonee', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('summoner', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
+                ('summonee', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('summoner', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Summons Request',
@@ -167,37 +167,37 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='pipointschangerecord',
             name='brother',
-            field=models.ForeignKey(to='Standards.PiPointsRecord'),
+            field=models.ForeignKey(to='Standards.PiPointsRecord', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='pipointschangerecord',
             name='modifier',
-            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='jobrequest',
             name='requester',
-            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='bonechangerecord',
             name='modifier',
-            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='bone',
             name='bonee',
-            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='bone',
             name='boner',
-            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]
