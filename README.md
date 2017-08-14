@@ -23,8 +23,8 @@ These steps will walk you through deploying the site on your local machine for t
 
 ### 1. Clone the repository.
 
-```
-$ git clone https://github.com/kdmccormick/sigmapi-web.git
+```bash
+$ git clone https://github.com/sigmapi-gammaiota/sigmapi-web.git
 ...
 $ cd sigmapi-web
 ```
@@ -33,15 +33,17 @@ $ cd sigmapi-web
 
 Note that this may take a few minutes, and a lot of text will fly by.
 
-```
+```bash
 $ vagrant up
 ```
 
 ### 3. Open up a shell on the virtual machine, and navigate to the shared folder.
 
-```
+```bash
 $ vagrant ssh
-...
+```
+You should land in the /vagrant/SigmaPi/ directory but if you don't:
+```bash
 $ cd /vagrant/SigmaPi
 ```
 
@@ -50,19 +52,19 @@ $ cd /vagrant/SigmaPi
 You will only have to do this once. This installs requirements, loads initial
 data for the database, and collects static files.
 
-```
+```bash
 $ make dev
 ```
 
 ### 5. Run Django.
 
-```
+```bash
 $ make run
 ```
 
 ### 6. Open a web browser on your computer, and navigate to localhost:8000 to view the site.
 
-You can make changes to the code and your running instance will be updated automatically. You can log into the site with the admin account credentials you created earlier.
+You can make changes to the code and your running instance will be updated automatically. You can log into the site with the admin account credentials you created earlier.  **NOTE:** Though changes will automatically update, JS and CSS resources will get cached and require a redownload using `ctrl-F5`
 
 When you are done working, it is best to run `vagrant suspend` from your host (not from the VM) in order to stop the VM from running in the background. Later you can `vagrant resume` to bring the VM back to the state it was in previously.
 
@@ -70,15 +72,15 @@ When you are done working, it is best to run `vagrant suspend` from your host (n
 
 ### 1. SSH into our WebFaction box.
 
-Credentials are redacted, contact @austintrose if you need them.
+Credentials are redacted, contact @kdmccormick if you need them.
 
-```
+```bash
 $ ssh our_username@our_domain.webfactional.com
 ```
 
 ### 2. Navigate to the deploy folder, and run the deploy script.
 
-```
+```bash
 $ cd deploy
 $ ./deploy.sh
 ```
@@ -91,7 +93,7 @@ At this point you should be *done*, unless you need to...
 
 There may be warnings on deploy, but if there is a failure in production after deployment then you should perform a rollback. In the same directory as the `delpoy.sh` script is `rollback.sh`, which will revert production to its previous deploy.
 
-Note that there are additional complications if you wish to deploy a code change which requires a database migration. For now defer to @austintrose for that.
+Note that there are additional complications if you wish to deploy a code change which requires a database migration. For now defer to @kdmccormick for that.
 
 ## Fixture Data
 
@@ -119,13 +121,13 @@ steward:steward # The steward.
 
 ### Updating Fixture Data
 
-```
+```bash
 $ make dumpdata
 ```
 
 This runs the following command:
-```
-python manage.py dumpdata --natural-foreign -e contenttypes -e auth.Permission > fixtures/dev_data.json
+```bash
+python3 manage.py dumpdata --natural-foreign -e contenttypes -e auth.Permission > fixtures/dev_data.json
 ```
 > --natural-foreign will use a more durable representation of foreign keys (ex. User.username instead of User.id)
 
