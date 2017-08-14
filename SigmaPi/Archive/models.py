@@ -23,7 +23,7 @@ def bylaws_path(_, filename):
     """
     return "protected/bylaws/" + timeStamped(filename)
 
-def houserules_path(filename):
+def houserules_path(_, filename):
     """
         Path on filesystem where this house rules document should be stored.
     """
