@@ -1,0 +1,147 @@
+{% extends 'scholarship/_base.html' %}
+
+{% block title %}Sigma Pi Secure - Approve Scholarship Content{% endblock %}
+
+{% block module_includes %}
+{% load static %}
+{% load common_utils %}
+<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+
+{% endblock %}
+
+{% block content %}
+<h3>Approve submitted Scholarship content.</h3>
+
+{% if messages %}
+{% for message in messages %}
+{% if message.level == 40 %}
+<div class="alert alert-danger">
+	<strong>Error! </strong>
+{% else %}
+<div class="alert alert-info">
+	<strong>Info! </strong>
+{% endif %}
+	{{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+<h4>Pending Academic Resources</h4>
+{% if resources %}
+<div class="table-responsive">
+	<table class="table dataTable">
+		<thead>
+			<tr>
+				<th>Resource Name</th>
+				<th>Course Number</th>
+				<th>Professor</th>
+				<th>Year</th>
+				<th>Term</th>
+				<th>PDF</th>
+				<th>Submitter</th>
+				<th>Approve</th>
+				<th>Deny</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for resource in resources %}
+			<tr>
+				<td>{{resource.resource_name}}</td>
+				<td>{{resource.course_number}}</td>
+				<td>{{resource.professor_name}}</td>
+				<td>{{resource.year}}</td>
+				<td>{{resource.term}}</td>
+				<td>{{resource|full_name:"submittedBy"}}</td>
+				<td>
+					<a href="{% url 'scholarship-download_resource' resource.pk %}">
+						Download
+					</a>
+				</td>
+				<td>
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-approve_resource' resource.pk %}" id="accept-{{resource.pk}}">
+						{% csrf_token %}
+						<a href="#" onclick="$('#accept-{{resource.pk}}').submit();">
+							Approve
+						</a>
+					</form>
+				</td>
+				<td>
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-decline_resource' resource.pk %}" id="delete-{{resource.pk}}">
+						{% csrf_token %}
+						<a href="#" onclick="$('#delete-{{resource.pk}}').submit();">
+							Deny
+						</a>
+					</form>
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+
+<p>
+	There are no resources pending. Check back later.
+</p>
+
+{% endif %}
+
+<div class="separator"></div>
+<h4>Pending Library Items</h4>
+{% if items %}
+<div class="table-responsive">
+	<table class="table dataTable">
+		<thead>
+			<tr>
+				<th>Library Item Name</th>
+				<th>ISBN Number</th>
+				<th>Edition</th>
+				<th>PDF</th>
+				<th>Submitter</th>
+				<th>Approve</th>
+				<th>Deny</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for libraryItem in items %}
+			<tr>
+				<td>{{libraryItem.title}}</td>
+				<td>{{libraryItem.isbn_number}}</td>
+				<td>{{libraryItem.edition}}</td>
+				<td>
+					<a href="{% url 'scholarship-download_libraryitem' libraryItem.pk %}">
+						Download
+					</a>
+				</td>
+				<td>{{libraryItem|full_name:"submittedBy"}}</td>
+				<td>
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-approve_libraryitem' libraryItem.pk %}" id="approve-{{libraryItem.pk}}">
+						{% csrf_token %}
+						<a href="#" onclick="$('#approve-{{libraryItem.pk}}').submit();">
+							Approve
+						</a>
+					</form>
+				</td>
+				<td>
+					<form type="multipart/form-data" method="post" action="{% url 'scholarship-decline_libraryitem' libraryItem.pk %}" id="decline-{{libraryItem.pk}}">
+						{% csrf_token %}
+						<a href="#" onclick="$('#decline-{{libraryItem.pk}}').submit();">
+							Deny
+						</a>
+					</form>
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+<p>
+	There are no library items uploaded. Check back later.
+</p>
+
+{% endif %}
+
+
+{% endblock %}

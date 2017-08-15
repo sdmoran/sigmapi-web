@@ -1,14 +1,7 @@
 *.pyc*
+__pycache__
 *.DS_Store
-
 .vagrant/
-
 .idea/
-
 venv/
 build/
-
-database
-SigmaPi/database
-SigmaPi/content/*
-SigmaPi/static_dir/

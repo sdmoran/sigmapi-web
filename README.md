@@ -42,9 +42,9 @@ $ vagrant up
 ```bash
 $ vagrant ssh
 ```
-You should land in the /vagrant/SigmaPi/ directory but if you don't:
+You should land in the /vagrant/sigmapiweb/ directory but if you don't:
 ```bash
-$ cd /vagrant/SigmaPi
+$ cd /vagrant/sigmapiweb
 ```
 
 ### 4. Set up development environment

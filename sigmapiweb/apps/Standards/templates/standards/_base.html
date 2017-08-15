@@ -1,0 +1,41 @@
+{% extends 'common/secure_base.html' %}
+
+{% block module_nav %}
+<div class="sub-nav">
+	<ul class="nav nav-pills">
+		{% if '/overview' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'standards-index' %}">
+				Overview
+			</a>
+		</li>
+
+		{% if perms.Standards.change_summons %}
+		{% if '/summons' in request.path and '/request' not in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'standards-manage_summons' %}">
+				Manage Summons
+			</a>
+		</li>
+		{% endif %}
+
+		{% if perms.Standards.delete_summonsrequest %}
+		{% if '/summons/requests' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'standards-manage_summons_requests' %}">
+				View Summons Requests
+			</a>
+		</li>
+		{% endif %}
+	</ul>
+</div>
+{% endblock %}

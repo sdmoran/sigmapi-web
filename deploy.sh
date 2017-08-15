@@ -1,7 +1,7 @@
 # This script will deploy the latest code to production.
 # This script does NOT apply migrations. Do those yourself carefully.
 HOME=/home/sigmapiwpi
-DJANGOAPP=SigmaPi
+DJANGOAPP=sigmapiweb
 STATIC=static
 
 DEPLOY_UTILS=$HOME/deploy
@@ -11,8 +11,8 @@ PROD=$HOME/webapps
 PROD_PYTHON_WEBAPP=$PROD/sigma_pi_web_2
 PROD_STATIC_WEBAPP=$PROD/sigma_pi_web_static
 
-ENV_SETTINGS_DIR=SigmaPi
-ENV_SETTINGS_FNAME=environment_settings.py
+ENV_SETTINGS_DIR=common/settings
+ENV_SETTINGS_FNAME=prod.py
 
 PYTHON=python3.6
 DJANGO_LIB=Django-1.11.4-py3.6.egg/django
@@ -38,7 +38,7 @@ cp $DEPLOY_UTILS/$ENV_SETTINGS_FNAME $PROD_PYTHON_WEBAPP/$DJANGOAPP/$ENV_SETTING
 echo "";
 
 echo "Installing Python dependencies:";
-pip3.6 install --user -r $PROD_PYTHON_WEBAPP/$DJANGOAPP/requirements.txt;
+pip3.6 install --user -r $PROD_PYTHON_WEBAPP/$DJANGOAPP/requirements/prod.txt;
 echo "";
 
 echo "Restarting server...";
