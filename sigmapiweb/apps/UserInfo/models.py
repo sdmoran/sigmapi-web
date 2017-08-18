@@ -1,22 +1,24 @@
-from django.db import models
-from django.forms import ModelForm
-from django import forms
+"""
+Models for UserInfo app.
+"""
 from django.contrib.auth.models import User
+from django.db import models
+
 
 from common.mixins import ModelMixin
 
 
 def filepath(self, filename):
     """
-        Defines where files uploaded by the user should be stored
+    Defines where files uploaded by the user should be stored
     """
     return "users/" + self.user.username + "/" + filename
 
+
 class PledgeClass(ModelMixin, models.Model):
     """
-        Model for user pledge class relationship.
+    Model for pledge class.
     """
-
     name = models.CharField(max_length=100, default="Lambda")
     dateInitiated = models.DateField(blank=True)
 
@@ -28,10 +30,11 @@ class PledgeClass(ModelMixin, models.Model):
         verbose_name = "Pledge Class"
         ordering = ['dateInitiated']
 
+
 class UserInfo(ModelMixin, models.Model):
     """
-        Model for site-specific user info.
-        Complements the built in User models
+    Model for site-specific user info.
+    Complements the built in User models
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     picture = models.FileField(upload_to=filepath, null=True, blank=True)
@@ -42,8 +45,18 @@ class UserInfo(ModelMixin, models.Model):
     activities = models.TextField(blank=True)
     interests = models.TextField(blank=True)
     favoriteMemory = models.TextField(blank=True)
-    bigBrother = models.ForeignKey(User, related_name="big_brother", default=None, null=True, on_delete=models.SET_DEFAULT)
-    pledgeClass = models.ForeignKey(PledgeClass, default=1, on_delete=models.SET_DEFAULT)
+    bigBrother = models.ForeignKey(
+        User,
+        related_name="big_brother",
+        default=None,
+        null=True,
+        on_delete=models.SET_DEFAULT
+    )
+    pledgeClass = models.ForeignKey(
+        PledgeClass,
+        default=1,
+        on_delete=models.SET_DEFAULT
+    )
 
     def __str__(self):
         return self.user.username
@@ -53,36 +66,4 @@ class UserInfo(ModelMixin, models.Model):
         verbose_name = "User Info"
         permissions = (
             ("manage_users", "Can manage users."),
-            )
-
-
-class EditUserInfoForm(ModelForm):
-    """
-        Form for editing a user
-    """
-    phoneNumber = forms.CharField(max_length=100, required=False)
-    major = forms.CharField(max_length=100, required=False)
-    hometown = forms.CharField(max_length=100, required=False)
-    activities = forms.CharField(
-        widget=forms.Textarea,
-        required=False,
-        max_length=450,
-    )
-    interests = forms.CharField(
-        widget=forms.Textarea,
-        required=False,
-        max_length=450
-    )
-    favoriteMemory = forms.CharField(
-        widget=forms.Textarea,
-        required=False,
-        max_length=450,
-    )
-    pledgeClass = forms.ModelChoiceField(
-        queryset=PledgeClass.objects.all(), widget=forms.Select,
-        empty_label=None
-    )
-
-    class Meta:
-        model = UserInfo
-        exclude = ['picture', 'graduationYear', 'user', 'bigBrother']
+        )

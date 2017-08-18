@@ -1,3 +1,6 @@
+"""
+URLs for Secure app.
+"""
 from django.conf.urls import include, url
 
 from apps.Archive import urls as archive_urls
@@ -11,11 +14,33 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.index, name='secure-index'),
-    url(r'^archives/', include(archive_urls)),
-    url(r'^parties/', include(parties_urls)),
-    url(r'^users/', include(userinfo_urls)),
-    url(r'^links/', include(links_urls)),
-    url(r'^standards/', include(standards_urls)),
-    url(r'^scholarship/', include(scholarship_urls))
+    url(
+        regex=r'^$',
+        view=views.index,
+        name='secure-index',
+    ),
+    url(
+        regex=r'^archives/',
+        view=include(archive_urls),
+    ),
+    url(
+        regex=r'^parties/',
+        view=include(parties_urls),
+    ),
+    url(
+        regex=r'^users/',
+        view=include(userinfo_urls),
+    ),
+    url(
+        regex=r'^links/',
+        view=include(links_urls),
+    ),
+    url(
+        regex=r'^standards/',
+        view=include(standards_urls),
+    ),
+    url(
+        regex=r'^scholarship/',
+        view=include(scholarship_urls),
+    ),
 ]

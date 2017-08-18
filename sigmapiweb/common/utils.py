@@ -8,7 +8,7 @@ DELETED_STRING = '[deleted]'
 NONE_SENTINEL_ID = -1
 
 
-def register_model_admin(model_class):
+def register_model_admins(*model_classes):
     """
     Register a model with the admin site with a default list display.
 
@@ -16,20 +16,21 @@ def register_model_admin(model_class):
     `admin_display_fields` on the model class.
 
     Arguments:
-        model_class (class): A class that inherits from
+        *model_classes (list[class]): A class that inherits from
             common.mixins.ModelMixin
     """
-    display_fields = [
-        field.name
-        for field in model_class._meta.fields
-        if field.name not in model_class.admin_display_excluded_fields
-    ]
-    model_admin_class = type(
-        model_class.__name__ + 'Admin',
-        (admin.ModelAdmin,),
-        {'list_display': tuple(display_fields)},
-    )
-    admin.site.register(model_class, model_admin_class)
+    for model_class in model_classes:
+        display_fields = [
+            field.name
+            for field in model_class._meta.fields
+            if field.name not in model_class.admin_display_excluded_fields
+        ]
+        model_admin_class = type(
+            model_class.__name__ + 'Admin',
+            (admin.ModelAdmin,),
+            {'list_display': tuple(display_fields)},
+        )
+        admin.site.register(model_class, model_admin_class)
 
 
 def get_full_name_or_deleted(user):

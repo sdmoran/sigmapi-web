@@ -1,13 +1,30 @@
-from django.conf.urls import include, url
-from django.conf import settings
-from django.conf.urls.static import static
+"""
+URLs for secure part of UserInfo app.
+"""
+from django.conf.urls import url
 
 from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.manage_users, name='userinfo-manage_users'),
-    url(r'^add/', views.add_users, name='userinfo-add_users'),
-    url(r'^edit/(?P<user>\w+)/$', views.edit_user, name='userinfo-edit_user'),
-    url(r'^reset_password/(?P<user>\w+)/$', views.reset_password, name='userinfo-reset_password'),
+    url(
+        regex=r'^$',
+        view=views.manage_users,
+        name='userinfo-manage_users'
+    ),
+    url(
+        regex=r'^add/',
+        view=views.add_users,
+        name='userinfo-add_users'
+    ),
+    url(
+        regex=r'^edit/(?P<user>\w+)/$',
+        view=views.edit_user,
+        name='userinfo-edit_user'
+    ),
+    url(
+        regex=r'^reset_password/(?P<user>\w+)/$',
+        view=views.reset_password,
+        name='userinfo-reset_password'
+    ),
 ]

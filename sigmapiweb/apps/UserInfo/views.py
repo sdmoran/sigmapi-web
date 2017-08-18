@@ -1,62 +1,78 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.http import HttpResponse
+"""
+Views for UserInfo app.
+"""
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
 from django.template.defaultfilters import stringfilter, register
 from django.utils.html import strip_tags
 
 from . import utils
-from .models import UserInfo, EditUserInfoForm, PledgeClass
+from .forms import EditUserInfoForm
+from .models import UserInfo, PledgeClass
+
 
 def users(request):
     """
-        Provides the collections of brothers in the house.
-        Organizes them based on year and exec positions.
+    Provides the collections of brothers in the house.
+
+    Organizes them based on year and exec positions.
+    TODO: Refactor
     """
+    # pylint: disable=too-many-statements
 
     # Find out what current year is the senior year grad date.
     senior_year = utils.get_senior_year()
 
-    # Get the execs.  Use try/catch to avoid crashing the site if an exec is missing.
+    # Get the execs.
+    # Use try/catch to avoid crashing the site if an exec is missing.
     try:
         sage = User.objects.get(groups__name='Sage')
-    except:
+    except User.DoesNotExist:
         sage = None
     try:
         second = User.objects.get(groups__name='2nd Counselor')
-    except:
+    except User.DoesNotExist:
         second = None
     try:
         third = User.objects.get(groups__name='3rd Counselor')
-    except:
+    except User.DoesNotExist:
         third = None
     try:
         fourth = User.objects.get(groups__name='4th Counselor')
-    except:
+    except User.DoesNotExist:
         fourth = None
     try:
         first = User.objects.get(groups__name='1st Counselor')
-    except:
+    except User.DoesNotExist:
         first = None
     try:
         herald = User.objects.get(groups__name='Herald')
-    except:
+    except User.DoesNotExist:
         herald = None
 
     # Get the rest of the users.  Exclude pledges or any execs.
     seniors = User.objects.filter(groups__name='Brothers')
-    seniors = seniors.filter(userinfo__graduationYear__lte=senior_year).prefetch_related('userinfo').order_by("last_name")
+    seniors = seniors.filter(
+        userinfo__graduationYear__lte=senior_year
+    ).prefetch_related('userinfo').order_by("last_name")
 
-    juniors = User.objects.filter(userinfo__graduationYear=(senior_year + 1)).prefetch_related('userinfo').order_by("last_name")
+    juniors = User.objects.filter(
+        userinfo__graduationYear=(senior_year + 1)
+    ).prefetch_related('userinfo').order_by("last_name")
     juniors = juniors.exclude(groups__name='Pledges')
     juniors = juniors.exclude(groups__name='Alumni')
 
-    sophomores = User.objects.filter(userinfo__graduationYear=(senior_year + 2)).prefetch_related('userinfo').order_by("last_name")
+    sophomores = User.objects.filter(
+        userinfo__graduationYear=(senior_year + 2)
+    ).prefetch_related('userinfo').order_by("last_name")
     sophomores = sophomores.exclude(groups__name='Pledges')
     sophomores = sophomores.exclude(groups__name='Alumni')
 
-    freshmen = User.objects.filter(userinfo__graduationYear=(senior_year + 3)).prefetch_related('userinfo').order_by("last_name")
+    freshmen = User.objects.filter(
+        userinfo__graduationYear=(senior_year + 3)
+    ).prefetch_related('userinfo').order_by("last_name")
     freshmen = freshmen.exclude(groups__name='Pledges')
     freshmen = freshmen.exclude(groups__name='Alumni')
 
@@ -112,10 +128,11 @@ def users(request):
 
     return render(request, 'userinfo/public/brothers.html', context)
 
+
 @permission_required('UserInfo.manage_users', login_url='secure-index')
 def add_users(request):
     """
-        Provides a view for adding a user
+    Provides a view for adding a user.
     """
     context = {
         'message': []
@@ -131,24 +148,28 @@ def add_users(request):
             major = strip_tags(request.POST['major'])
             year = strip_tags(request.POST['class'])
 
-            exists = User.objects.filter(username=to_add).count()
-            if exists:
-                context['message'].append("Username " + to_add + " is taken.")
+            try:
+                utils.create_user(
+                    to_add, first_name, last_name, major, year
+                )
+            except utils.CreateUserError as err:
+                context['message'].append(
+                    'Error adding ' + to_add + ': ' + str(err)
+                )
             else:
-                try:
-                    utils.create_user(to_add, first_name, last_name, major, year)
-                    context['message'].append("User " + to_add + " successfully added.")
-                except:
-                    context['message'].append("Error adding " + to_add + ".")
+                context['message'].append(
+                    'User ' + to_add + ' successfully added.'
+                )
     return render(request, 'userinfo/secure/add.html', context)
+
 
 @permission_required('UserInfo.manage_users', login_url='secure-index')
 def manage_users(request):
     """
-        Provides a view to manage all of the users in the system.
+    Provides a view to manage all of the users in the system.
     """
 
-    all_users = User.objects.all().order_by("last_name")
+    all_users = User.objects.all().order_by('last_name')
 
     context = {
         'all_users': all_users
@@ -156,23 +177,22 @@ def manage_users(request):
 
     return render(request, 'userinfo/secure/manage.html', context)
 
-@permission_required('UserInfo.manage_users', login_url='secure-index')
-def reset_password(request, user):
-    """
-        Resets a single user's password.
-    """
 
+@permission_required('UserInfo.manage_users', login_url='secure-index')
+def reset_password(_request, user):
+    """
+    Resets a single user's password.
+    """
     # TODO: This should be changed over to being a POST request in the future.
     requested_user = User.objects.get(username__exact=user)
-
     utils.reset_password(requested_user)
+    return redirect('userinfo-manage_users')
 
-    return redirect("userinfo-manage_users")
 
 @login_required
 def edit_user(request, user):
     """
-        Provides a view to edit a single user.
+    Provides a view to edit a single user.
     """
     requested_user = User.objects.get(username__exact=user)
     if (not requested_user == request.user) and not request.user.is_staff:
@@ -180,25 +200,32 @@ def edit_user(request, user):
     message = ""
     if request.method == 'POST':
         try:
-            form = EditUserInfoForm(request.POST, instance=requested_user.userinfo)
+            form = EditUserInfoForm(
+                request.POST,
+                instance=requested_user.userinfo
+            )
             if form.is_valid():
                 form.save()
-                message = "Profile successfully updated"
+                message = 'Profile successfully updated'
         except UserInfo.DoesNotExist:
-            new_userinfo, created = UserInfo.objects.get_or_create(user=requested_user,
-                                           pledgeClass=PledgeClass.objects.get(id=request.POST["pledgeClass"]),
-                                           phoneNumber=request.POST["phoneNumber"],
-                                           major=request.POST["major"],
-                                           hometown=request.POST["hometown"],
-                                           activities=request.POST["activities"],
-                                           interests=request.POST["interests"],
-                                           favoriteMemory=request.POST["favoriteMemory"])
+            new_userinfo, _created = UserInfo.objects.get_or_create(
+                user=requested_user,
+                pledgeClass=PledgeClass.objects.get(
+                    id=request.POST['pledgeClass']
+                ),
+                phoneNumber=request.POST['phoneNumber'],
+                major=request.POST['major'],
+                hometown=request.POST['hometown'],
+                activities=request.POST['activities'],
+                interests=request.POST['interests'],
+                favoriteMemory=request.POST['favoriteMemory']
+            )
             form = EditUserInfoForm(request.POST, new_userinfo)
-            message = "Profile successfully updated"
+            message = 'Profile successfully updated'
     else:
         try:
             form = EditUserInfoForm(instance=requested_user.userinfo)
-        except UserInfo.DoesNotExist as e:
+        except UserInfo.DoesNotExist:
             form = EditUserInfoForm()
 
     context = {
@@ -206,38 +233,43 @@ def edit_user(request, user):
         'form': form,
         'error': form.errors
     }
-    if message is not "":
+    if message:
         context['message'] = [message]
 
     return render(request, 'userinfo/secure/edit.html', context)
 
+
 @login_required
 def change_password(request):
     """
-        Provides a view where a user can change their change_password
+    Provides a view where a user can change their change_password.
     """
-
     context = {
         'message': []
     }
-
     if request.method == 'POST':
         form = PasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
             form.save()
-            context['message'].append("Password successfully changed.")
+            context['message'].append('Password successfully changed.')
         else:
-            context['message'].append("Error changing password.  Check that your passwords match and that your old password is correct.")
-
+            context['message'].append(
+                'Error changing password. ' +
+                'Check that your passwords match and that your old password ' +
+                'is correct.'
+            )
     context['form'] = PasswordChangeForm(user=request.user)
-
     return render(request, 'userinfo/secure/reset_password.html', context)
 
 
 @register.filter
 @stringfilter
-def profile_image(url):
-    if len(url) == 0:
-        return "/static/img/user-placeholder.png"
-    else:
-        return "/content/" + url
+def profile_image(rel_path):
+    """
+    Returns profile image path given a relative path.
+    """
+    return (
+        '/content/' + rel_path
+        if rel_path
+        else 'static/img/user-placeholder.png'
+    )

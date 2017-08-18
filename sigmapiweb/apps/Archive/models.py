@@ -1,49 +1,50 @@
-from django.db import models
-from django.forms import ModelForm
-from django import forms
+"""
+Models for the Secure app.
+"""
 import datetime
+
+from django.db import models
 
 from common.mixins import ModelMixin
 
 
-def timeStamped(fname, fmt='%Y-%m-%d_{fname}'):
+def timestamp_file_name(fname, fmt='%Y-%m-%d_{fname}'):
     """
-        Utility function to add a timestamp to uploaded files.
+    Utility function to add a timestamp to uploaded files.
     """
-
     return datetime.datetime.now().strftime(fmt).format(fname=fname)
+
 
 def guidepath(_, filename):
     """
-        Path on filesystem where this house guide document should be stored.
+    Path on filesystem where this house guide document should be stored.
     """
-    return "protected/guides/" + timeStamped(filename)
+    return "protected/guides/" + timestamp_file_name(filename)
 
 
 def bylaws_path(_, filename):
     """
-        Path on filesystem where this bylaws document should be stored.
+    Path on filesystem where this bylaws document should be stored.
     """
-    return "protected/bylaws/" + timeStamped(filename)
+    return "protected/bylaws/" + timestamp_file_name(filename)
+
 
 def houserules_path(_, filename):
     """
-        Path on filesystem where this house rules document should be stored.
+    Path on filesystem where this house rules document should be stored.
     """
-    return "protected/houserules/" + timeStamped(filename)
+    return "protected/houserules/" + timestamp_file_name(filename)
 
 
 class Bylaws(ModelMixin, models.Model):
     """
-        Model for a single document of house bylaws.
+    Model for a single document of house bylaws.
     """
+    date = models.DateField()
+    filepath = models.FileField(upload_to=bylaws_path)
 
     def __str__(self):
         return self.date.__str__()
-
-    # Fields for this model.
-    date = models.DateField()
-    filepath = models.FileField(upload_to=bylaws_path)
 
     # Meta information about this model.
     class Meta:
@@ -54,30 +55,15 @@ class Bylaws(ModelMixin, models.Model):
         )
 
 
-class BylawsForm(ModelForm):
-    """
-        Model-driven form for adding a bylaws document.
-    """
-
-    filepath = forms.FileField()
-
-    # Meta information about this form.
-    class Meta:
-        model = Bylaws
-        exclude = ['date']
-
-
 class HouseRules(ModelMixin, models.Model):
     """
-        Model for a single document of house rules.
+    Model for a single document of house rules.
     """
+    date = models.DateField()
+    filepath = models.FileField(upload_to=houserules_path)
 
     def __str__(self):
         return self.date.__str__()
-
-    # Fields for this model.
-    date = models.DateField()
-    filepath = models.FileField(upload_to=houserules_path)
 
     # Meta information about this model.
     class Meta:
@@ -88,31 +74,18 @@ class HouseRules(ModelMixin, models.Model):
         )
 
 
-class HouseRulesForm(ModelForm):
-    """
-        Model-driven form for adding a house rules document.
-    """
-
-    filepath = forms.FileField()
-
-    # Meta information about this form.
-    class Meta:
-        model = HouseRules
-        exclude = ['date']
-
 class Guide(ModelMixin, models.Model):
     """
-        Model for a single document of a house guide.
+    Model for a single document of a house guide.
     """
-    def __str__(self):
-        return self.name
-
-    # Fields for this model.
     name = models.CharField(max_length=100)
     datePosted = models.DateField()
     description = models.TextField(blank=True)
     filepath = models.FileField(upload_to=guidepath)
     path = models.SlugField(max_length=15)
+
+    def __str__(self):
+        return self.name
 
     # Meta information about this model.
     class Meta:
@@ -121,19 +94,3 @@ class Guide(ModelMixin, models.Model):
         permissions = (
             ("access_guide", "Can access guides."),
         )
-
-
-class GuideForm(ModelForm):
-    """
-        Model-driven form for adding a house guide document.
-    """
-
-    name = forms.CharField(max_length=100)
-    description = forms.CharField(widget=forms.Textarea)
-    filepath = forms.FileField()
-
-    # Meta information about this form.
-    class Meta:
-        model = Guide
-        exclude = ['path', 'datePosted']
-

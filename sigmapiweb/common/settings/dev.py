@@ -1,10 +1,10 @@
 """
 Development settings for Sigma Pi, Gamma Iota chapter website.
 """
-
 import os
 
-from .base import *
+# pylint: disable=unused-wildcard-import
+from .base import *  # pylint: disable=wildcard-import
 
 
 DEBUG = True
@@ -15,14 +15,16 @@ ADMINS = (
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'database',                      # Or path to database file if using sqlite3.
+        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'database',   # Or path to database file if using sqlite3.
 
         # The following settings are not used with sqlite3:
         'USER': '',
         'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
+        'HOST': '',    # Empty for localhost through domain sockets
+                       # or '127.0.0.1' for localhost through TCP.
+        'PORT': '',    # Set to empty string for default.
     }
 }
 
@@ -46,7 +48,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(BASE_DIR,'static'),
+    os.path.join(BASE_DIR, 'static'),
 )
 
 FILE_UPLOAD_TEMP_DIR = BASE_DIR

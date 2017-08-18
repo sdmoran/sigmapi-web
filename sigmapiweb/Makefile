@@ -34,9 +34,15 @@ quickrun:
 test:
 	echo lol what tests
 
-quality:
-	pylint apps/*
+quality: pep8 pylint
+
+pep8:
+	pep8 common
+	pep8 apps/* --exclude='apps/*/migrations/*'
+
+pylint:
 	pylint common
+	pylint apps/*
 
 newmigrations:
 	$(MANAGE) makemigrations

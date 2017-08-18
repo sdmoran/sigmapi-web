@@ -1,9 +1,20 @@
+"""
+URLs for public part of UserInfo app.
+"""
 from django.conf.urls import url
 
 from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.users, name='userinfo-users'),
-    url(r'^password/', views.change_password, name='userinfo-change_password'),
+    url(
+        regex=r'^$',
+        view=views.users,
+        name='userinfo-users',
+    ),
+    url(
+        regex=r'^password/',
+        view=views.change_password,
+        name='userinfo-change_password',
+    ),
 ]

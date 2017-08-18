@@ -1,16 +1,16 @@
-from django.db import models
+"""
+Models for Links app.
+"""
 from django.contrib.auth.models import User
-from django import forms
-from django.forms import ModelForm
+from django.db import models
 
 from common.mixins import ModelMixin
 
 
 class Link(ModelMixin, models.Model):
     """
-        Model for a single link that a person may submit
+    Model for a single link that a person may submit
     """
-
     poster = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     date = models.DateTimeField()
     title = models.CharField(max_length=50)
@@ -27,20 +27,3 @@ class Link(ModelMixin, models.Model):
             ("promote_link", "Can promote links."),
             ("access_link", "Can access links."),
         )
-
-class LinkForm(ModelForm):
-    """
-        Form for adding a link
-    """
-
-    title = forms.CharField(max_length = 50)
-    url = forms.URLField(max_length=200)
-    promoted = forms.BooleanField(required=False)
-
-    class Meta:
-        model = Link
-        exclude = ['poster', 'date', 'likeCount', 'commentCount']
-
-
-
-

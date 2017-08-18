@@ -1,317 +1,349 @@
-from django.contrib.auth.decorators import login_required
-from .models import Party, Guest, PartyGuest, BlacklistedGuest
-from django.http import HttpResponse
-from django.contrib.auth.decorators import permission_required
-from datetime import datetime
-from django.views.decorators.csrf import csrf_exempt
-from .widgets import GuestForm
-
-import json
+"""
+API for PartyList app.
+"""
 import csv
+from datetime import datetime
+import json
+
+from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
+from .models import Party, Guest, PartyGuest, BlacklistedGuest
+from .forms import GuestForm
 
 
-"""
-    ATTENTION: If we're going to make an API, let's do our
-        best to keep it RESTful accordin got w3 standards:
-        http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-"""
+# TODO: Make this API follow REST standards
+# For example, replace all those 500s with 4XXs
 
-def userCanEdit(user=None,pg=None):
-    """return true if the given user can edit the party guest making this function
-    allows us to add more cases in which a type of user can edit a guest"""
-    if user.has_perm('PartyList.can_destroy_any_party_guest'):
-        return True
 
-    if pg.addedBy == user:
-        return True
+def user_can_edit(user=None, party_guest=None):
+    """
+    Return whether the given user can edit the party guest.
 
-    return False
+    Arguments:
+        user (User)
+        party_guest (PartyGuest)
+    """
+    return (
+        user.has_perm('PartyList.can_destroy_any_party_guest') or
+        party_guest.addedBy == user
+    )
 
-def getFullGuest(party, date, id):
-    """get a guest and its associated partyGuest model, return as a tuple"""
-    guest = Guest.objects.get(id=id)
-    party = Party.objects.get(name__exact=party, date__exact=date)
-    pGuest = PartyGuest.objects.get(party=party,guest=guest)
 
-    return guest,pGuest
+def get_full_guest(party_name, date, guest_id):
+    """
+    Get guest and party guest as a tuple.
+
+    Arguments:
+        party_name (str)
+        date (datetime)
+        guest_id (int)
+
+    Returns: (Guest, PartyGuest)
+    """
+    guest = Guest.objects.get(id=guest_id)
+    party = Party.objects.get(name__exact=party_name, date__exact=date)
+    party_guest = PartyGuest.objects.get(party=party, guest=guest)
+    return guest, party_guest
+
 
 @login_required
 @csrf_exempt
 @permission_required('PartyList.add_partyguest')
-def create(request, party):
+def create(request, party_id):
     """
-        create a guest object as well as a partyguest object for the given party
+    Create a guest and party guest object for the given party.
     """
-    if request.method == 'POST':
-        partyObj = Party.objects.get(pk=party)
+    if request.method != 'POST':
+        return HttpResponse('Endpoint supports POST method only.', status=405)
 
-        # See if the guest already exists
-        guestName = request.POST.get('name')
-        guestGender = request.POST.get('gender')
-        guest = None
+    party = Party.objects.get(pk=party_id)
 
-        if request.POST.get("force") != "true":
-            # Check to see if guest is on the blacklist before creating it
-            for entry in BlacklistedGuest.objects.all():
-                match = entry.check_match(guestName)
-                if not match:
-                    continue
-                guest_dict = {
-                    'maybe_blacklisted': True,
-                    'blacklist_name': match.name,
-                    'blacklist_details': match.details,
-                    'attempted_name': guestName,
-                    'attempted_gender': guestGender,
-                }
-                # Respond with the details on the party guest that was just added
+    # See if the guest already exists
+    guest_name = request.POST.get('name')
+    guest_gender = request.POST.get('gender')
+    guest = None
+
+    if request.POST.get("force") != "true":
+        # Check to see if guest is on the blacklist before creating it
+        for entry in BlacklistedGuest.objects.all():
+            match = entry.check_match(guest_name)
+            if not match:
+                continue
+            guest_dict = {
+                'maybe_blacklisted': True,
+                'blacklist_name': match.name,
+                'blacklist_details': match.details,
+                'attempted_name': guest_name,
+                'attempted_gender': guest_gender,
+            }
+            # Respond with the details on the party guest that was just added
+            return HttpResponse(
+                json.dumps(guest_dict),
+                content_type='application/json'
+            )
+    try:
+        guest = Guest.objects.get(
+            name__exact=guest_name,
+            gender__exact=guest_gender,
+        )
+    except Guest.DoesNotExist:
+        pass  # Don't need to do anything if failed to find the guest
+
+    # If the guest already exists, check if it exists for the party already
+    if guest:
+        try:
+            party_guest = PartyGuest.objects.get(
+                party__exact=party,
+                guest__exact=guest,
+            )
+        except PartyGuest.DoesNotExist:
+            pass
+        else:
+            # if this guest is already on the list for this party
+            if party_guest:
                 return HttpResponse(
-                    json.dumps(guest_dict),
-                    content_type='application/json'
+                    'The guest you tried to add' +
+                    ' is already on the list.',
+                    status=409,
                 )
-        try:
-            guest = Guest.objects.get(name__exact=guestName,
-                                      gender__exact=guestGender)
-        except:
-            pass # Don't need to do anything if failed to find the guest
-
-        if guest: # If the guest already exists, check if it exists for the party already
-            try:
-                partyguest = PartyGuest.objects.get(party__exact=partyObj, guest__exact=guest)
-
-                if partyguest: # if this guest is already on the list for this party
-                    return HttpResponse('The guest you tried to add is already on the list.', status=409)
-            except:
-                pass
-        else:
-            # Otherwise, if the guest does not exist we create it for later
-            form = GuestForm(request.POST)
-            if form.is_valid():
-                guest = form.save()
-            else:
-                return HttpResponse('Error adding guest: invalid guest format. Contact webmaster.', status=500)
-
-        pGuest = PartyGuest(party=partyObj, guest=guest, addedBy=request.user)
-        pGuest.save()
-
-        # Respond with the details on the party guest that was just added
-        return HttpResponse(json.dumps(pGuest.toJSON()), content_type="application/json")
     else:
-        return HttpResponse('Endpoint supports POST method only.', status=405)
+        # Otherwise, if the guest does not exist we create it for later
+        form = GuestForm(request.POST)
+        if form.is_valid():
+            guest = form.save()
+        else:
+            return HttpResponse(
+                'Error adding guest: invalid guest format. ' +
+                'Contact webmaster.',
+                status=500,
+            )
+
+    party_guest = PartyGuest(party=party, guest=guest, addedBy=request.user)
+    party_guest.save()
+
+    # Respond with the details on the party guest that was just added
+    return HttpResponse(
+        json.dumps(party_guest.to_json()),
+        content_type="application/json",
+    )
+
 
 @login_required
 @csrf_exempt
-def updateCount(request, party):
+def update_manual_delta(request, party_id):
     """
-        Adjust the guest count for a given party and gender
+    Manually update deltas.
+
+    Called when the + or - buttons are pressed.
     """
-
-    if request.method == 'POST':
-        partyObj = Party.objects.get(pk=party)
-        try:
-            gender = request.POST.get('gender')
-            delta = int(request.POST.get('delta'))
-        except:
-            return HttpResponse('Error: Invalid gender or count parameters. Contact webmaster.', status=500)
-
-        if gender == 'M':
-            partyObj.guycount = PartyGuest.objects.filter(party_id=party, signedIn=True, guest__gender='M').count() + \
-                partyObj.guy_delta
-        elif gender == 'F':
-            partyObj.girlcount = PartyGuest.objects.filter(party_id=party, signedIn=True, guest__gender='F').count() + \
-                partyObj.girl_delta
-        else:
-            return HttpResponse('Error: Invalid gender parameter. Contact webmaster.', status=500)
-
-
-        partyObj.save()
-
-        response = {}
-        response['guycount'] = partyObj.guycount
-        response['girlcount'] = partyObj.girlcount
-
-        return HttpResponse(json.dumps(response), content_type="application/json")
-    else:
+    if request.method != 'POST':
         return HttpResponse('Endpoint supports POST method only.', status=405)
+    party = Party.objects.get(pk=party_id)
+    try:
+        gender = request.POST.get('gender')
+        delta = int(request.POST.get('delta'))
+    except (KeyError, ValueError):
+        return HttpResponse(
+            'Error: Invalid gender or count parameters.' +
+            ' Contact webmaster.',
+            status=500,
+        )
+
+    if gender == 'M':
+        party.guy_delta += delta
+        party.guycount += delta
+    elif gender == 'F':
+        party.girl_delta += delta
+        party.girlcount += delta
+    else:
+        return HttpResponse(
+            'Error: Invalid gender parameter.' +
+            ' Contact webmaster.',
+            status=500
+        )
+
+    party.save()
+
+    response = {}
+    response['guycount'] = party.guycount
+    response['girlcount'] = party.girlcount
+
+    return HttpResponse(
+        json.dumps(response),
+        content_type='application/json',
+    )
+
 
 @login_required
-@csrf_exempt
-def updateManualDelta(request, party):
+def poll_count(_request, party_id):
     """
-    Called when the + or - buttons are pressed.  Manually updates deltas.
-    """
-    if request.method == 'POST':
-        partyObj = Party.objects.get(pk=party)
-        try:
-            gender = request.POST.get('gender')
-            delta = int(request.POST.get('delta'))
-        except:
-            return HttpResponse('Error: Invalid gender or count parameters. Contact webmaster.', status=500)
-
-        if gender == 'M':
-            partyObj.guy_delta += delta
-            partyObj.guycount += delta
-        elif gender == 'F':
-            partyObj.girl_delta += delta
-            partyObj.girlcount += delta
-        else:
-            return HttpResponse('Error: Invalid gender parameter. Contact webmaster.', status=500)
-
-        partyObj.save()
-
-        response = {}
-        response['guycount'] = partyObj.guycount
-        response['girlcount'] = partyObj.girlcount
-
-        return HttpResponse(json.dumps(response), content_type="application/json")
-    else:
-        return HttpResponse('Endpoint supports POST method only.', status=405)
-
-@login_required
-def pollCount(request, party):
-    """
-        Poll the guest count
+    Poll the guest count
     """
     try:
-        partyObj = Party.objects.get(pk=party)
-    except:
+        party = Party.objects.get(pk=party_id)
+    except Party.DoesNotExist:
         return HttpResponse("Error: Party not found.", status=500)
 
     response = {}
-    response['guycount'] = partyObj.guycount
-    response['girlcount'] = partyObj.girlcount
+    response['guycount'] = party.guycount
+    response['girlcount'] = party.girlcount
 
     return HttpResponse(json.dumps(response), content_type="application/json")
 
+
 @login_required
 @csrf_exempt
-def signin(request, party, guestID):
+def sign_in(
+        request,
+        party_id,  # pylint: disable=unused-argument
+        party_guest_id
+):  # pylint: disable=unused-argument
     """
-        Signin a guest with given ID
+    Sign-in a guest with given ID.
     """
-    if request.method == 'POST':
-        try:
-            partyGuest = PartyGuest.objects.get(pk=guestID)
-            partyGuest.signedIn = True
-
-            if partyGuest.everSignedIn == False:
-                partyGuest.everSignedIn = True
-                partyGuest.timeFirstSignedIn = datetime.now()
-
-            partyGuest.save()
-        except:
-            return HttpResponse('Error signing in guest. Contact webmaster.', status=500)
-
-        return HttpResponse('Guest signed in.', status=200)
-    else:
+    if request.method != 'POST':
         return HttpResponse('Endpoint supports POST method only.', status=405)
+    try:
+        party_guest = PartyGuest.objects.get(pk=party_guest_id)
+    except PartyGuest.DoesNotExist:
+        return HttpResponse(
+            'Error signing in guest.' +
+            ' Contact webmaster.',
+            status=500,
+        )
+    party_guest.signedIn = True
+    if party_guest.everSignedIn is False:
+        party_guest.everSignedIn = True
+        party_guest.timeFirstSignedIn = datetime.now()
+    party_guest.save()
+    return HttpResponse('Guest signed in.', status=200)
+
 
 @login_required
 @csrf_exempt
-def signout(request, party, guestID):
+def sign_out(
+        request,
+        party_id,  # pylint: disable=unused-argument
+        party_guest_id,
+):
     """
-        Sign out a guest with given id
+    Sign out a guest with given id
     """
-    if request.method == 'POST':
-        try:
-            partyGuest = PartyGuest.objects.get(pk=guestID)
-            partyGuest.signedIn = False
-            partyGuest.save()
-        except:
-            return HttpResponse('Error signing out guest. Contact webmaster.', status=500)
-
-        return HttpResponse('Guest signed out.', status=200)
-    else:
+    if request.method != 'POST':
         return HttpResponse('Endpoint supports POST method only.', status=405)
+    try:
+        party_guest = PartyGuest.objects.get(pk=party_guest_id)
+    except PartyGuest.DoesNotExist:
+        return HttpResponse(
+            'Error signing out guest.' +
+            ' Contact webmaster.',
+            status=500,
+        )
+    party_guest.signedIn = False
+    party_guest.save()
+    return HttpResponse('Guest signed out.', status=200)
+
 
 @login_required
 @csrf_exempt
-def destroy(request, party, guestID):
+def destroy(
+        request,
+        party_id,  # pylint: disable=unused-argument
+        party_guest_id,
+):
     """
-        Delete a guest (keyd by the supplied id), so long as the current user has domain over them
+        Delete a guest (keyd by the supplied id),
+        so long as the current user has domain over them
     """
-    if request.method == 'DELETE':
-        try:
-            partyGuest = PartyGuest.objects.get(pk=guestID)
-        except:
-            return HttpResponse('Error deleting guest: guest does not exist.', status=409)
-
-        if userCanEdit(user=request.user, pg=partyGuest):
-            partyGuest.delete()
-
-            return HttpResponse("Guest deleted", status=200)
-        else:
-            return HttpResponse('Error deleting guest: permission denied.', status=401)
-    else:
-        return HttpResponse('Endpoint supports DELETE method only.', status=405)
+    if request.method != 'DELETE':
+        return HttpResponse(
+            'Endpoint supports DELETE method only.',
+            status=405
+        )
+    try:
+        party_guest = PartyGuest.objects.get(pk=party_guest_id)
+    except PartyGuest.DoesNotExist:
+        return HttpResponse(
+            'Error deleting guest: guest does not exist.',
+            status=409,
+        )
+    if user_can_edit(user=request.user, party_guest=party_guest):
+        party_guest.delete()
+        return HttpResponse('Guest deleted', status=200)
+    return HttpResponse(
+        'Error deleting guest: permission denied.',
+        status=401
+    )
 
 
 @login_required
-def export_list(request, party):
+def export_list(_request, party_id):
     """
-    export the guest list as a csv file. This uses the native csv module
-    that comes bundled with python. Using excel would require a 3rd party
-    module, and hardly provides benefits over a standard csv format
+    Export the guest list as a csv file.
+
+    This uses the native csv module that comes bundled with python.
+    Using excel would require a 3rd party module, and hardly provides benefits
+    over a standard csv format.
     """
-
-    requested_party = Party.objects.get(pk=party)
-
-    partyguests = PartyGuest.objects.filter(party__exact=requested_party).order_by('guest__name')
-
-    femaleGuests = partyguests.filter(guest__gender__exact="F")
-    maleGuests = partyguests.filter(guest__gender__exact="M")
+    requested_party = Party.objects.get(pk=party_id)
+    party_guests = PartyGuest.objects.filter(
+        party__exact=requested_party
+    ).order_by('guest__name')
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="guests.csv"'
-
     writer = csv.writer(response)
 
     writer.writerow(['Female Guests'])
     writer.writerow(['Name', 'Signed In'])
-
-    for pg in femaleGuests:
-        writer.writerow([pg.guest.name, str(pg.signedIn)])
+    female_guests = party_guests.filter(guest__gender__exact='F')
+    for party_guest in female_guests:
+        writer.writerow([party_guest.guest.name, str(party_guest.signedIn)])
 
     writer.writerow(['Male Guests'])
     writer.writerow(['Name', 'Signed In'])
-
-    for pg in maleGuests:
-        writer.writerow([pg.guest.name, str(pg.signedIn)])
+    male_guests = party_guests.filter(guest__gender__exact='M')
+    for party_guest in male_guests:
+        writer.writerow([party_guest.guest.name, str(party_guest.signedIn)])
 
     return response
 
-@login_required
-def poll(request, party):
-    """
-    called by the client to check for guests added after a given time.
-    This allows each clients guest list to be updated in partial real time
 
-        Checks the guests object for new guests added
-        after a supplied time (unix format) and sends
-        a json object of those guests back
+@login_required
+def poll(request, party_id):
+    """
+    Called by the client to check for guests added after a given time.
+
+    This allows each clients guest list to be updated in partial real time.
+    Checks the guests object for new guests added after a supplied time
+    (unix format) and sends a JSON object of those guests back.
     """
     last_stamp = float(request.GET.get('last'))
-    last = datetime.fromtimestamp(last_stamp/1000.0) # js timestamp is in milliseconds, time_t is in seconds.
-
+    # JS timestamp is in milliseconds, time_t is in seconds.
+    last = datetime.fromtimestamp(last_stamp / 1000.0)
     gender = request.GET.get('gender')
-
-    guests = PartyGuest.objects.filter(createdAt__gte=last, guest__gender__exact=gender, party__id__exact=party)
-
+    guests = PartyGuest.objects.filter(
+        createdAt__gte=last,
+        guest__gender__exact=gender,
+        party__id__exact=party_id,
+    )
     response = {}
-    response['guests'] = [guest.toJSON() for guest in guests]
-
+    response['guests'] = [guest.to_json() for guest in guests]
     return HttpResponse(json.dumps(response), content_type="application/json")
 
+
 @login_required
-def initPulse(request, party):
+def init_pulse(request, party_id):
     """
-        Returns to the caller the current user ID and whether or not it is party mode
+    Return to the caller the current user ID and whether it's in party mode.
     """
-
-    requested_party = Party.objects.get(pk=party)
-
+    requested_party = Party.objects.get(pk=party_id)
     response = {}
-    response['partymode'] = requested_party.isPartyMode()
+    response['partymode'] = requested_party.is_party_mode()
     response['userID'] = request.user.id
-    response['canDestroyAnyGuest'] = request.user.has_perm('PartyList.can_destroy_any_party_guest')
-
+    response['canDestroyAnyGuest'] = request.user.has_perm(
+        'PartyList.can_destroy_any_party_guest'
+    )
     return HttpResponse(json.dumps(response), content_type="application/json")

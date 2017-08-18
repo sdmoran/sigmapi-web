@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 ('date', models.DateField()),
                 ('guycount', models.IntegerField(default=0)),
                 ('girlcount', models.IntegerField(default=0)),
-                ('jobs', models.FileField(null=True, upload_to=mymodels.partyjobspath, blank=True)),
+                ('jobs', models.FileField(null=True, upload_to=mymodels.get_party_jobs_path, blank=True)),
             ],
             options={
                 'verbose_name': 'Party',

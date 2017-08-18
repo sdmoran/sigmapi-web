@@ -1,8 +1,19 @@
-from common.utils import register_model_admin
-from .models import TrackedUser, StudyHoursRecord, AcademicResource, LibraryItem
+"""
+Admin config for Scholarship app.
+"""
+from common.utils import register_model_admins
 
-# Register models to appear in the Django Admin DB Site
-register_model_admin(TrackedUser)
-register_model_admin(StudyHoursRecord)
-register_model_admin(AcademicResource)
-register_model_admin(LibraryItem)
+from .models import (
+    AcademicResource,
+    LibraryItem,
+    StudyHoursRecord,
+    TrackedUser
+)
+
+
+register_model_admins(
+    AcademicResource,
+    LibraryItem,
+    StudyHoursRecord,
+    TrackedUser,
+)

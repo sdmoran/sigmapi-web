@@ -1,13 +1,13 @@
-from common.utils import register_model_admin
-from .models import Guide, HouseRules, Bylaws
+"""
+Admin config for Secure app.
+"""
+from common.utils import register_model_admins
 
-# I'm commenting this stuff out because it doesn't do anything necessary,
-# and is mildly confusing. Will remove later if nothing breaks.
-# class GuideAdmin(admin.ModelAdmin):
-    # prepopulated_fields = {"path": ("name",)}
-# admin.site.register(Guide, GuideAdmin)
+from .models import Bylaws, Guide, HouseRules
 
-# Register models to appear in the Django Admin DB Site
-register_model_admin(Guide)
-register_model_admin(HouseRules)
-register_model_admin(Bylaws)
+
+register_model_admins(
+    Bylaws,
+    Guide,
+    HouseRules,
+)

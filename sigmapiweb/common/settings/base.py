@@ -3,7 +3,6 @@ Base settings for Sigma Pi, Gamma Iota chapter website.
 """
 
 import os
-import sys
 
 
 BASE_DIR = os.getcwd()
