@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django import forms
 
+from common.mixins import ModelMixin
 from common.utils import get_id_or_sentinel, get_full_name_or_deleted
 
 
@@ -22,7 +23,7 @@ def partyjobspath(_, filename):
     return "parties/partyjobs/" + timeStamped(filename)
 
 
-class Party(models.Model):
+class Party(ModelMixin, models.Model):
     """
         Model to represent a party.
     """
@@ -56,7 +57,7 @@ class Party(models.Model):
         )
 
 
-class BlacklistedGuest(models.Model):
+class BlacklistedGuest(ModelMixin, models.Model):
     #TODO- DOC_UPDATE!
     name = models.CharField(max_length=100, db_index=True)
     details = models.TextField()
@@ -82,7 +83,7 @@ class BlacklistedGuest(models.Model):
         )
 
 
-class Guest(models.Model):
+class Guest(ModelMixin, models.Model):
     """
         Model to represent a party guest
     """
@@ -110,7 +111,7 @@ class Guest(models.Model):
         verbose_name_plural = "Guests"
         verbose_name = "Guest"
 
-class PartyGuest(models.Model):
+class PartyGuest(ModelMixin, models.Model):
     """
         Model to represent a guest for a specific party.
     """

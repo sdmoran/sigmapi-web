@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from common.mixins import ModelMixin
 from common.utils import get_formal_name_or_deleted
 
 
-class SummonsRequest(models.Model):
+class SummonsRequest(ModelMixin, models.Model):
     """
         Model for a request to summons a user.
     """
@@ -36,7 +37,7 @@ class SummonsRequest(models.Model):
         verbose_name_plural = "Summons Requests"
 
 
-class Summons(models.Model):
+class Summons(ModelMixin, models.Model):
     """
         Model for a summons that is given to a User.
     """
@@ -66,7 +67,7 @@ class Summons(models.Model):
         verbose_name_plural = "Summonses"
 
 
-class SummonsHistoryRecord(models.Model):
+class SummonsHistoryRecord(ModelMixin, models.Model):
     """
         Model for a summons history record.
     """

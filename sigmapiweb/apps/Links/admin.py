@@ -1,5 +1,5 @@
-from django.contrib import admin
+from common.utils import register_model_admin
 from .models import Link
 
 
-admin.site.register(Link)
+register_model_admin(Link)

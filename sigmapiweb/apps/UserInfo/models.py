@@ -3,13 +3,16 @@ from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.models import User
 
+from common.mixins import ModelMixin
+
+
 def filepath(self, filename):
     """
         Defines where files uploaded by the user should be stored
     """
     return "users/" + self.user.username + "/" + filename
 
-class PledgeClass(models.Model):
+class PledgeClass(ModelMixin, models.Model):
     """
         Model for user pledge class relationship.
     """
@@ -25,7 +28,7 @@ class PledgeClass(models.Model):
         verbose_name = "Pledge Class"
         ordering = ['dateInitiated']
 
-class UserInfo(models.Model):
+class UserInfo(ModelMixin, models.Model):
     """
         Model for site-specific user info.
         Complements the built in User models

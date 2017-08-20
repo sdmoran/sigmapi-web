@@ -1,6 +1,6 @@
-from django.contrib import admin
+from common.utils import register_model_admin
 from .models import UserInfo, PledgeClass
 
 # Register your models here.
-admin.site.register(UserInfo)
-admin.site.register(PledgeClass)
+register_model_admin(UserInfo)
+register_model_admin(PledgeClass)
