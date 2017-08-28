@@ -3,7 +3,10 @@ from django.contrib.auth.models import User
 from django import forms
 from django.forms import ModelForm
 
-class Link(models.Model):
+from common.mixins import ModelMixin
+
+
+class Link(ModelMixin, models.Model):
     """
         Model for a single link that a person may submit
     """

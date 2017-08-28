@@ -1,10 +1,35 @@
 """
-General utility functions to be used across the sigmapi-web project.
+General utility functions to be used across project.
 """
+from django.contrib import admin
 
 
 DELETED_STRING = '[deleted]'
 NONE_SENTINEL_ID = -1
+
+
+def register_model_admin(model_class):
+    """
+    Register a model with the admin site with a default list display.
+
+    The default list display is specified by setting
+    `admin_display_fields` on the model class.
+
+    Arguments:
+        model_class (class): A class that inherits from
+            common.mixins.ModelMixin
+    """
+    display_fields = [
+        field.name
+        for field in model_class._meta.fields
+        if field.name not in model_class.admin_display_excluded_fields
+    ]
+    model_admin_class = type(
+        model_class.__name__ + 'Admin',
+        (admin.ModelAdmin,),
+        {'list_display': tuple(display_fields)},
+    )
+    admin.site.register(model_class, model_admin_class)
 
 
 def get_full_name_or_deleted(user):

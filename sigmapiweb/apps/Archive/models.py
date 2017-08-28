@@ -3,6 +3,9 @@ from django.forms import ModelForm
 from django import forms
 import datetime
 
+from common.mixins import ModelMixin
+
+
 def timeStamped(fname, fmt='%Y-%m-%d_{fname}'):
     """
         Utility function to add a timestamp to uploaded files.
@@ -30,7 +33,7 @@ def houserules_path(_, filename):
     return "protected/houserules/" + timeStamped(filename)
 
 
-class Bylaws(models.Model):
+class Bylaws(ModelMixin, models.Model):
     """
         Model for a single document of house bylaws.
     """
@@ -64,7 +67,7 @@ class BylawsForm(ModelForm):
         exclude = ['date']
 
 
-class HouseRules(models.Model):
+class HouseRules(ModelMixin, models.Model):
     """
         Model for a single document of house rules.
     """
@@ -97,7 +100,7 @@ class HouseRulesForm(ModelForm):
         model = HouseRules
         exclude = ['date']
 
-class Guide(models.Model):
+class Guide(ModelMixin, models.Model):
     """
         Model for a single document of a house guide.
     """

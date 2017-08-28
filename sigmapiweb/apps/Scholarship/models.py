@@ -6,6 +6,9 @@ from django import forms
 import datetime
 import re
 
+from common.mixins import ModelMixin
+
+
 def validate_date(date):
     if date > datetime.date.today():
         raise ValidationError("The date given cannot be in the future.")
@@ -25,7 +28,7 @@ def occurred_this_week(date):
 
     return beginning_of_week_monday <= date < next_monday
 
-class TrackedUser(models.Model):
+class TrackedUser(ModelMixin, models.Model):
     """
         Model for a user who currently has their study hours tracked.
     """
@@ -61,7 +64,7 @@ class TrackedUser(models.Model):
             ("scholarship_head", "Can modify study hours."),
         )
 
-class StudyHoursRecord(models.Model):
+class StudyHoursRecord(ModelMixin, models.Model):
     """
         Model for a record of study hours made by one tracked user for one day.
     """
@@ -79,7 +82,7 @@ class StudyHoursRecord(models.Model):
     time_stamp = models.DateTimeField(auto_now_add=True, editable=False)
 
 
-class AcademicResource(models.Model):
+class AcademicResource(ModelMixin, models.Model):
     """
         Model for an academic resource.
     """
@@ -107,7 +110,8 @@ class AcademicResource(models.Model):
                                         ('D','D Term'), \
                                         ('E','E Term')))
 
-class LibraryItem(models.Model):
+
+class LibraryItem(ModelMixin, models.Model):
     """
         Model for a library item.
     """
