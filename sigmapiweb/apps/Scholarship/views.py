@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib import messages
+from django.http import HttpResponse
 
 from django_downloadview import sendfile
 
@@ -13,6 +14,7 @@ from . import notify
 from django.http import HttpResponse
 import json
 import os
+import csv
 
 def request_is_from_tracked_user(request):
     """
@@ -35,6 +37,36 @@ def get_currently_tracked_users():
         0 study hours per week.
     """
     return TrackedUser.objects.filter(number_of_hours__gt=0)
+
+
+@permission_required(
+    'Scholarship.scholarship_head',
+    login_url='pub-permission_denied',
+)
+def download_hours(request):
+    """
+    Export hours from the db as a csv
+    """
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment;filename=study_hours.csv'
+    records = StudyHoursRecord.objects.all()
+    writer = csv.writer(response)
+    writer.writerow([
+        "Username",
+        "Name",
+        "# of Hours",
+        "Reported Date",
+        "Submission Timestamp",
+    ])
+    for record in records:
+        writer.writerow([
+            record.user.username,
+            record.user.first_name + " " + record.user.last_name,
+            record.number_of_hours,
+            record.date,
+            record.time_stamp,
+        ])
+    return response 
 
 
 @login_required

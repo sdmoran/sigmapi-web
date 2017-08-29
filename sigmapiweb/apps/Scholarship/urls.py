@@ -24,6 +24,7 @@ urlpatterns = [
     # Download pages
     url(r'^resources/(?P<resource>[\d]+)/$', views.download_resource, name='scholarship-download_resource'),
     url(r'^library/(?P<item>[\d]+)/$', views.download_libraryitem, name='scholarship-download_libraryitem'),
+    url(r'^study_hours/export$', views.download_hours, name='scholarship-export_hours'),
 
     # Delete pages
     url(r'^library/(?P<item>[\d]+)/delete$', views.delete_libraryitem, name='scholarship-delete_libraryitem'),
