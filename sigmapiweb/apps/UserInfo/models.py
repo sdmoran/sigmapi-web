@@ -63,9 +63,21 @@ class EditUserInfoForm(ModelForm):
     phoneNumber = forms.CharField(max_length=100, required=False)
     major = forms.CharField(max_length=100, required=False)
     hometown = forms.CharField(max_length=100, required=False)
-    activities = forms.CharField(widget=forms.Textarea, required=False)
-    interests = forms.CharField(widget=forms.Textarea, required=False)
-    favoriteMemory = forms.CharField(widget=forms.Textarea, required=False)
+    activities = forms.CharField(
+        widget=forms.Textarea,
+        required=False,
+        max_length=450,
+    )
+    interests = forms.CharField(
+        widget=forms.Textarea,
+        required=False,
+        max_length=450
+    )
+    favoriteMemory = forms.CharField(
+        widget=forms.Textarea,
+        required=False,
+        max_length=450,
+    )
     pledgeClass = forms.ModelChoiceField(
         queryset=PledgeClass.objects.all(), widget=forms.Select,
         empty_label=None
