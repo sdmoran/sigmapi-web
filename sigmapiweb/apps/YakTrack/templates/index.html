@@ -1,0 +1,38 @@
+{% extends 'yaktrack/_base.html' %}
+
+{% block title %}Sigma Pi Secure - YakTrack {% endblock %}
+
+{% block module_includes %}
+    {% load staticfiles %}
+    <script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+    <script type='text/javascript' src='{% static "js/secure/simpleheat.js" %}'></script>
+{% endblock %}
+
+{% block content %}
+    <h3>YakTrack</h3>
+    <div>
+        <canvas id="yaktrack">
+
+        </canvas>
+    </div>
+
+
+{% endblock %}
+
+{% block embedded_js %}
+    <script type="text/javascript">
+    $(document).ready(function() {
+        var heat = simpleheat("yaktrack");
+        var yak_data = null;
+        $.ajax({
+            url: "{% url 'yaktrack/fetch_data_ajax' %}",
+            type: "post",
+            success: function(data) {
+                yak_data = data.yaks;
+            }
+        });
+        heat.data(yak_data);
+    })
+    </script>
+
+{% endblock %}

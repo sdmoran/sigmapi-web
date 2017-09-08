@@ -110,6 +110,7 @@ PROJECT_APPS = (
     'apps.Links',
     'apps.Standards',
     'apps.Scholarship',
+    # 'apps.YakTrack',
 )
 INSTALLED_APPS = PREREQ_APPS + PROJECT_APPS
 
