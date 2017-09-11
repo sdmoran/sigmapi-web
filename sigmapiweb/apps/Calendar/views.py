@@ -15,7 +15,10 @@ def manage_subscriptions(request):
     context_calendars = []
     user_groups = set(request.user.groups.all())
     for calendar in Calendar.objects.all():
-        receive_access, send_access = _can_receive_and_send(request.user)
+        receive_access, send_access = _can_receive_and_send(
+            calendar,
+            request.user,
+        )
         if not receive_access:
             continue
         subscribed = bool(
@@ -49,7 +52,7 @@ def subscribe(request, calendar_name):
         calendar = Calendar.objects.get(name=calendar_name.lower())
     except Calendar.DoesNotExist:
         raise Http404('Calendar not found: ' + calendar_name)
-    receive_access, _ = _can_receive_and_send(request.user)
+    receive_access, _ = _can_receive_and_send(calendar, request.user)
     if not receive_access:
         return HttpResponse(
             'User ' + request.user.username + ' cannot access calendar ' +
@@ -90,7 +93,7 @@ def unsubscribe(request, calendar_name):
     return redirect('calendar-manage_subscriptions')
 
 
-def _can_receive_and_send(user):
+def _can_receive_and_send(calendar, user):
     """
     TODO docstring
     """
@@ -99,7 +102,12 @@ def _can_receive_and_send(user):
     else:
         accesses = calendar.calendaraccess_set.all()
         groups = set(access.group for access in accesses)
-        intersection = user_groups & groups
+        intersection = set(user.groups.all()) & groups
         receive_access = bool(intersection)
-        send_access = any(access.can_send for access in intersection)
+        accesses_intersection = (
+            access
+            for access in accesses
+            if access.group in intersection
+        )
+        send_access = any(access.can_send for access in accesses_intersection)
         return receive_access, send_access
