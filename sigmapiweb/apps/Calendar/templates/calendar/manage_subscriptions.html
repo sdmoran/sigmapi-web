@@ -6,12 +6,13 @@
 
 {% if calendars %}
 <div class="table-responsive">
-	<table class="table blacklist-table">
+	<table class="table">
 		<thead>
 			<tr>
-				<th class="two wide">Name</th>
+				<th class="one wide">Name</th>
 				<th class="eight wide">Description</th>
-				<th class="two wide">Subscribe/Unsubscribe</th>
+				<th class="one wide">Can Send?</th>
+				<th class="one wide">Sub/Unsub</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -19,7 +20,25 @@
 			<tr>
 				<td>{{ cal.name }}</td>
 				<td>{{ cal.description }}</td>
-				<td>{{ cal.subscribed }}</td>
+				<td>
+					{% if cal.can_send %}
+					Yes
+					{% else %}
+					No
+					{% endif %}
+				<td>
+					{% if cal.subscribed %}
+						<form method="POST" action="{% url 'calendar-unsubscribe' cal.name %}">
+							{% csrf_token %}
+							<a href="#" onclick="$(this).closest('form').submit()">Unubscribe</a>
+						</form>
+					{% else %}
+						<form method="POST" action="{% url 'calendar-subscribe' cal.name %}">
+							{% csrf_token %}
+							<a href="#" onclick="$(this).closest('form').submit()">Subscribe</a>
+						</form>
+					{% endif %}
+				</td>
 			</tr>
 		{% endfor %}
 		</tbody>

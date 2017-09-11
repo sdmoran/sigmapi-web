@@ -20,4 +20,14 @@ urlpatterns = [
         view=views.manage_subscriptions,
         name='calendar-manage_subscriptions',
     ),
+    url(
+        regex=r'^subscribe/(?P<calendar_name>[\w]+)$',
+        view=views.subscribe,
+        name='calendar-subscribe',
+    ),
+    url(
+        regex=r'^unsubscribe/(?P<calendar_name>[\w]+)$',
+        view=views.unsubscribe,
+        name='calendar-unsubscribe',
+    ),
 ]

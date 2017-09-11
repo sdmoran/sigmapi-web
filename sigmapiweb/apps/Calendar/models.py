@@ -24,6 +24,7 @@ class CalendarAccess(ModelMixin, models.Model):
     """
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    can_send = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('calendar', 'group')
