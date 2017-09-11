@@ -22,17 +22,27 @@
 				</a>
 			</li>
 
-	  {% if perms.Archive.access_guide %}
-	  {% if '/secure/archives' in request.path %}
-	  <li class="active">
-	  {% else %}
-	  <li>
-	  {% endif %}
-	  <a id="archives" href="{{ '/secure/archives' }}">
-			  Archives
-	  </a>
-	  </li>
-	  {% endif %}
+			{% if '/secure/calendar' in request.path %}
+			<li class="active">
+			{% else %}
+			<li>
+			{% endif %}
+			<a id="calendar" href="{{ '/secure/calendar' }}">
+				  Calendar
+			</a>
+			</li>
+
+			{% if perms.Archive.access_guide %}
+			{% if '/secure/archives' in request.path %}
+			<li class="active">
+			{% else %}
+			<li>
+			{% endif %}
+			<a id="archives" href="{{ '/secure/archives' }}">
+				  Archives
+			</a>
+			</li>
+			{% endif %}
 
 			{% if '/secure/scholarship' in request.path %}
 			<li class="active">
@@ -87,7 +97,7 @@
 				</a>
 				</li>
 			{% endif %}
-		</ul>
+			</ul>
 
 		<ul class="nav navbar-nav navbar-right">
 			<li class="dropdown">

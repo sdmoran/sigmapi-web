@@ -105,6 +105,7 @@ PROJECT_APPS = (
     'apps.PubSite',
     'apps.UserInfo',
     'apps.Archive',
+    'apps.Calendar',
     'apps.PartyList',
     'apps.Secure',
     'apps.Links',

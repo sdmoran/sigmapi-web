@@ -21,6 +21,7 @@ class EditUserInfoForm(ModelForm):
         queryset=PledgeClass.objects.all(), widget=forms.Select,
         empty_label=None
     )
+    calendarEmail = forms.CharField(max_length=64, required=False)
 
     class Meta:
         model = UserInfo
