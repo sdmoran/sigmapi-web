@@ -4,16 +4,21 @@ Models for Calendar app.
 from django.contrib.auth.models import Group, User
 from django.db import models
 
+from common.mixins import ModelMixin
 
-class Calendar(models.Model):
+
+class Calendar(ModelMixin, models.Model):
     """
     TODO docstring
     """
     name = models.CharField(max_length=16, unique=True)
-    manager = models.ForeignKey(Group, on_delete=models.CASCADE)
+    description = models.CharField(max_length=128, default='')
+
+    def __str__(self):
+        return self.name
 
 
-class CalendarAccess(models.Model):
+class CalendarAccess(ModelMixin, models.Model):
     """
     TODO docstring
     """
@@ -24,7 +29,7 @@ class CalendarAccess(models.Model):
         unique_together = ('calendar', 'group')
 
 
-class CalendarSubscription(models.Model):
+class CalendarSubscription(ModelMixin, models.Model):
     """
     TODO docstring
     """

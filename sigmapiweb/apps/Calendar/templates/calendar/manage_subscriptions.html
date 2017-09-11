@@ -1,2 +1,36 @@
 {% extends 'calendar/_base.html' %}
 {% block title %}Sigma Pi Secure - Calendar Subscriptions {% endblock %}
+
+{% block content %}
+<h3>Available Calendars</h3>
+
+{% if calendars %}
+<div class="table-responsive">
+	<table class="table blacklist-table">
+		<thead>
+			<tr>
+				<th class="two wide">Name</th>
+				<th class="eight wide">Description</th>
+				<th class="two wide">Subscribe/Unsubscribe</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for cal in calendars %}
+			<tr>
+				<td>{{ cal.name }}</td>
+				<td>{{ cal.description }}</td>
+				<td>{{ cal.subscribed }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+{% else %}
+<p>
+	You do not have access to any calendars.
+</p>
+
+{% endif %}
+
+{% endblock %}
