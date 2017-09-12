@@ -2,6 +2,7 @@
 API for MailingList invites.
 """
 from email import message_from_string
+from email.utils import getaddresses
 from smtplib import SMTP, SMTPException
 
 from django.conf import settings
@@ -9,6 +10,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import MultipleObjectsReturned
 from django.core.mail import EmailMessage
 from django.http import HttpResponse, Http404
+from django.conf import settings
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
@@ -22,161 +24,112 @@ def send_mail(request):
     """
     TODO docstring
     """
+    # Validate request
     if request.method != 'POST':
         return HttpResponse(
             'Only POST method allowed',
             status=405,
         )
-
     key = request.POST.get('key')
-    if key != settings.EMAIL_API_KEY:
+    if key != settings.MAILING_LISTS_EMAIL_API_KEY:
         return HttpResponse('Invalid API key.', status=401)
+
+    # Parse email
     email_data = request.POST.get('data')
     if not (email_data and isinstance(email_data, str)):
         return HttpResponse(
             '\'data\' parameter missing, empty, or not a string',
             status=422,
         )
-
-    subject_line = None
-    from_line = None
-    for line in email_data.splitlines():
-        if line.startswith('Subject: '):
-            subject_line = line[len('Subject: '):]
-        elif line.startswith('From: '):
-            from_line = line[len('From: '):]
-    if not (from_line and subject_line):
-        return HttpResponse(
-            'Data does not have Subject and/or From',
-            status=422,
-        )
-
+    email = message_from_string(email_data)
+    addr_headers = frozenset(['from', 'to', 'resent-to', 'cc', 'resent-cc'])
     try:
-        mailing_list = _get_mailing_list_from_subject_line(subject_line)
-        user = _get_user_from_from_line(from_line)
-    except RuntimeError as e:
-        return HttpResponse(str(e), status=500)
-    if not mailing_list.has_access(user, ACCESS_SEND):
-        fmt = 'User \'{0}\' does not have permission to send to \'{1}\''
-        return HttpResponse(
-            fmt.format(user.username, mailing_list.name),
-            status=403,
-        )
+        addrs_by_header = {
+            header: set(
+                pair[1] for pair in getaddresses(msg.get_all(header, []))
+            )
+            for header in addr_headers
+        }
+    except Exception:  # pylint: disable=broad-except
+        return HttpResponse('Failed to parse from/to/cc fields', status=422)
 
+    # Extract from address and user
+    from_addrs = addrs_by_header['from']
+    if not (from_addrs and len(from_addrs) == 1):
+        return HttpResponse('Expected exactly one From address', status=422)
+    from_addr = from_addrs[0]
     try:
-        _forward_email(mailing_list, subject_line, email_data)
-    except SMTPException:
-        return HttpResponse(
-            'Error occured while sending invite to \'{0}\''.format(
-                mailing_list.name,
-            ),
-            status=500,
-        )
-    except ValueError:
-        return HttpResponse(
-            'MailingList has no subscribers',
-            status=204,
-        )
-    return HttpResponse('Message sent.', status=204)
-
-
-def _get_mailing_list_from_subject_line(subject_line):
-    """
-    Parse a MailingList instance out of an email subject line.
-
-    Arguments:
-        subject_line (str): Subject not including "Subject: "
-
-    Returns: MailingList
-
-    Raises: Http404 if MailingList does not exist
-    """
-    mailing_list_name = subject_line[:subject_line.index(':')]
-    try:
-        return MailingList.objects.get(name=mailing_list_name)
-    except MailingList.DoesNotExist:
-        raise Http404(
-            'MailingList \'{0}\' does not exist.'.format(mailing_list_name)
-        )
-
-
-def _get_user_from_from_line(from_line):
-    """
-    Parse a User out of an email "From" line.
-
-    Arguments:
-        from_line (str): From line not including "From: "
-
-    Returns: User
-
-    Raises:
-        Http404: if User does not exist
-        RuntimeError: multiple matching Users found
-    """
-    start_index = from_line.index('<')
-    end_index = from_line.index('>')
-    if start_index < 0 or end_index < 1:
-        return HttpResponse(
-            'From header is malformed',
-            status=422,
-        )
-    from_email = from_line[(start_index + 1):end_index]
-    try:
-        return User.objects.get(email=from_email.lower).user
+        user = User.objects.get(email=from_email.lower())
     except User.DoesNotExist:
         raise Http404(
             'User with email \'{0}\' does not exist.'.format(from_email)
         )
-    except MultipleObjectsReturned:
-        raise RuntimeError(
-            'Multiple users exist with email \'{0}\''.format(from_email)
+
+    # Filter out addresses not in our domain; remove @domain part of addrs
+    list_names_by_header = {
+        header: frozenset(
+            addr.split('@')
+            for addr in addrs_dict[header]
+            if addr.lower().endswith(
+                '@' + settings.MAILING_LISTS_EMAIL_DOMAIN
+            )
         )
+        for header in addr_headers - {'from'}
+    }
 
+    # Turn list names into mailing lists; throw away ones that are
+    # invalid or the user doesn't have send access to
+    mailing_lists_by_header = {}
+    for header in list_names_by_header.keys():
+        mailing_lists_by_header[header] = set()
+        for list_name in list_names_by_header[addr]:
+            try:
+                mailing_list = MailingList.objects.get(name=list_name.lower())
+            except MailingList.DoesNotExist:
+                continue  # Throw out non-existent mailing list
+            can_send = user_can_access_mailing_list(
+                user, mailing_list, ACCESS_SEND,
+            )
+            if not can_send:
+                continue
+            mailing_lists_by_header[header].add(mailing_list)
 
-def _forward_email(mailing_list, subject, email_data):
-    """
-    Forward an email to all subscribers of a mailing_list.
-
-    Arguments:
-        mailing_list (MailingList)
-        email_data (str)
-        from_addr (str)
-
-    Raises:
-        ValueError: MailingList has no subscribers
-        SMTPExcpetion: Message failed to send
-
-    """
-    from_addr = 'kylemccorspam@gmail.com'
-
-    to_addrs = (
-        sub.user.email
-        for sub in MailingListSubscription.objects.filter(
-            mailing_list=mailing_list
+    # Expand mailing lists into their subscribers' email addresses
+    new_addrs_by_header = {
+        header: frozenset.union(
+            (
+                subscriber.email
+                for subscriber in mailing_list.mailinglistsubscription_set
+                if subscriber.email
+            )
+            for mailing_list in mailing_lists
         )
-    )
-    email = message_from_string(email_data)
-    to_addrs_joined = ';'.join(to_addrs)
-    _set_header(email, 'to', to_addrs_joined)
-    _set_header(email, 'from', from_addr)
+        for header, mailing_lists in mailing_lists_by_header.items()
+    }
 
-    #s = SMTP('localhost')
-    #s.send_message(email, from_addr=from_addr, to_addrs=to_addrs)
-    #s.quit()
-    #import pdb;pdb.set_trace()
-    smtp = SMTP('smtp.gmail.com', 587)
+    # If we have no To addresses, return 400
+    if not new_addrs_by_header['to']:
+        return HttpResponse('No addresses to send mail to', status=400)
+
+    # Turn address sets into header strings
+    new_headers = {
+        header: ';'.join(addrs)
+        for header, addrs in new_addrs_by_header.items()
+    }
+    email.update(new_headers)
+    email['from'] = MAILING_LISTS_FROM_EMAIL
+
+    # Send mail
+    smtp = SMTP(MAILING_LISTS_FROM_SERVER)
     smtp.ehlo()
     smtp.starttls()
-    smtp.login(from_addr, 'REDACTED')
-    smtp.sendmail(from_addr, to_addrs, email.as_string())
+    smtp.login(MAILING_LISTS_FROM_EMAIL, MAILING_LISTS_FROM_PASSWORD)
+    smtp.sendmail(
+        from_addr=new_headers['from'],
+        to_addrs=new_headers['to'],
+        msg=email.as_string(),
+    )
     smtp.quit()
 
-
-def _set_header(email, header, value):
-    """
-    TODO docstring
-    """
-    try:
-        email.replace_header(header, value)
-    except KeyError:
-        email[header] = value
+    # Return 204 (Success, No Content)
+    return HttpResponse('Message sent.', status=204)
