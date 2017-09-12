@@ -11,23 +11,23 @@ urlpatterns = [
     url(
         regex=r'^$',
         view=RedirectView.as_view(
-            pattern_name='calendar-manage_subscriptions',
+            pattern_name='mailinglists-manage_subscriptions',
             permanent=False,
         ),
     ),
     url(
         regex=r'^subscriptions/$',
         view=views.manage_subscriptions,
-        name='calendar-manage_subscriptions',
+        name='mailinglists-manage_subscriptions',
     ),
     url(
-        regex=r'^set_subscribed/(?P<calendar_name>[\w]+)$',
+        regex=r'^set_subscribed/(?P<mailing_list_name>[\w]+)$',
         view=views.set_subscribed,
-        name='calendar-set_subscribed',
+        name='mailinglists-set_subscribed',
     ),
     url(
-        regex=r'^sendinvite/$',
-        view=api.send_invite,
-        name='calendar-sendinvite',
+        regex=r'^sendmail/$',
+        view=api.send_mail,
+        name='mailinglists-sendmail',
     ),
 ]

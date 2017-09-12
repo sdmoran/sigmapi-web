@@ -1,13 +1,13 @@
 #!/usr/bin/python3.6
 """
-Forward calendar invites to the web app.
+Forward email to the web app.
 """
 import fileinput
 import requests
 
 
-_CALANDAR_INVITE_FORWARD_URL = (
-    'http://localhost:8000/secure/calendar/sendinvite/'
+_API_URL = (
+    'http://localhost:8000/secure/mailinglists/sendmail/'
 )
 
 
@@ -17,7 +17,7 @@ def main():
         'key': None,
         'data': all_input,
     }
-    response = requests.post(_CALANDAR_INVITE_FORWARD_URL, data=data)
+    response = requests.post(_API_URL, data=data)
     return 0 if 200 < response.status_code < 299 else 1
 
 

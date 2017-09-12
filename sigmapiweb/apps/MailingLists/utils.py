@@ -3,22 +3,22 @@ Utility functions for MailingList app.
 """
 
 
-def can_user_access_calendar(calendar, user):
+def can_user_access_mailing_list(mailing_list, user):
     """
-    Check a user's permissions with respect to a calendar.
+    Check a user's permissions with respect to a mailing list.
 
     Arguments:
-        calendar (Calendar)
+        mailing_list (MailingList)
         user (User)
 
     Returns: bool, bool
         Whether the user can receive and send invite,
-        respectively, to the calendar.
+        respectively, to the mailing list.
     """
     if user.is_staff:
         return True, True
     else:
-        accesses = calendar.calendaraccess_set.all()
+        accesses = mailing_list.mailinglistaccess_set.all()
         groups = set(access.group for access in accesses)
         intersection = set(user.groups.all()) & groups
         receive_access = bool(intersection)

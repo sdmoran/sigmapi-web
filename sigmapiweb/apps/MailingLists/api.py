@@ -15,11 +15,11 @@ from django.views.decorators.csrf import csrf_exempt
 from apps.UserInfo.models import UserInfo
 
 from .models import MailingList, MailingListSubscription
-from .utils import can_user_access_calendar
+from .utils import can_user_access_mailing_list
 
 
 @csrf_exempt
-def send_invite(request):
+def send_mail(request):
     """
     TODO docstring
     """
@@ -30,7 +30,7 @@ def send_invite(request):
         )
 
     key = request.POST.get('key')
-    if key != settings.CALENDAR_INVITE_API_KEY:
+    if key != settings.EMAIL_API_KEY:
         return HttpResponse('Invalid API key.', status=401)
     email_data = request.POST.get('data')
     if not (email_data and isinstance(email_data, str)):
@@ -53,24 +53,24 @@ def send_invite(request):
         )
 
     try:
-        calendar = _get_calendar_from_subject_line(subject_line)
+        mailing_list = _get_mailing_list_from_subject_line(subject_line)
         user = _get_user_from_from_line(from_line)
     except RuntimeError as e:
         return HttpResponse(str(e), status=500)
-    _, can_send = can_user_access_calendar(calendar, user)
+    _, can_send = can_user_access_mailing_list(mailing_list, user)
     if not can_send:
         fmt = 'User \'{0}\' does not have permission to send to \'{1}\''
         return HttpResponse(
-            fmt.format(user.username, calendar.name),
+            fmt.format(user.username, mailing_list.name),
             status=403,
         )
 
     try:
-        _forward_email(calendar, subject_line, email_data)
+        _forward_email(mailing_list, subject_line, email_data)
     except SMTPException:
         return HttpResponse(
             'Error occured while sending invite to \'{0}\''.format(
-                calendar.name,
+                mailing_list.name,
             ),
             status=500,
         )
@@ -82,7 +82,7 @@ def send_invite(request):
     return HttpResponse('Message sent.', status=204)
 
 
-def _get_calendar_from_subject_line(subject_line):
+def _get_mailing_list_from_subject_line(subject_line):
     """
     Parse a MailingList instance out of an email subject line.
 
@@ -93,12 +93,12 @@ def _get_calendar_from_subject_line(subject_line):
 
     Raises: Http404 if MailingList does not exist
     """
-    calendar_name = subject_line[:subject_line.index(':')]
+    mailing_list_name = subject_line[:subject_line.index(':')]
     try:
-        return MailingList.objects.get(name=calendar_name)
+        return MailingList.objects.get(name=mailing_list_name)
     except MailingList.DoesNotExist:
         raise Http404(
-            'MailingList \'{0}\' does not exist.'.format(calendar_name)
+            'MailingList \'{0}\' does not exist.'.format(mailing_list_name)
         )
 
 
@@ -135,12 +135,12 @@ def _get_user_from_from_line(from_line):
         )
 
 
-def _forward_email(calendar, subject, email_data):
+def _forward_email(mailing_list, subject, email_data):
     """
-    Forward an email to all subscribers of a calendar.
+    Forward an email to all subscribers of a mailing_list.
 
     Arguments:
-        calendar (MailingList)
+        mailing_list (MailingList)
         email_data (str)
         from_addr (str)
 
@@ -154,7 +154,7 @@ def _forward_email(calendar, subject, email_data):
     to_addrs = (
         sub.user.email
         for sub in MailingListSubscription.objects.filter(
-            calendar=calendar
+            mailing_list=mailing_list
         )
     )
     email = message_from_string(email_data)

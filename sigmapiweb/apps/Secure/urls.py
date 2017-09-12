@@ -4,7 +4,7 @@ URLs for Secure app.
 from django.conf.urls import include, url
 
 from apps.Archive import urls as archive_urls
-from apps.Calendar import urls as calendar_urls
+from apps.MailingLists import urls as mailinglists_urls
 from apps.Links import urls as links_urls
 from apps.PartyList import urls as parties_urls
 from apps.Scholarship import urls as scholarship_urls
@@ -21,8 +21,8 @@ urlpatterns = [
         name='secure-index',
     ),
     url(
-        regex=r'^calendar/',
-        view=include(calendar_urls),
+        regex=r'^mailinglists/',
+        view=include(mailinglists_urls),
     ),
     url(
         regex=r'^archives/',

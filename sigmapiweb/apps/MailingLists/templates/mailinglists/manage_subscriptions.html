@@ -1,10 +1,10 @@
-{% extends 'calendar/_base.html' %}
-{% block title %}Sigma Pi Secure - Calendar Subscriptions {% endblock %}
+{% extends 'mailinglists/_base.html' %}
+{% block title %}Sigma Pi Secure - Email Subscriptions {% endblock %}
 
 {% block content %}
-<h3>Available Calendars</h3>
+<h3>Available Mailing Lists</h3>
 
-{% if calendars %}
+{% if mailing_lists %}
 <div class="table-responsive">
 	<table class="table">
 		<thead>
@@ -16,23 +16,23 @@
 			</tr>
 		</thead>
 		<tbody>
-		{% for cal in calendars %}
+		{% for ml in mailing_lists %}
 			<tr>
-				<td>{{ cal.name }}</td>
-				<td>{{ cal.description }}</td>
+				<td>{{ ml.name }}</td>
+				<td>{{ ml.description }}</td>
 				<td>
-					{% if cal.can_send %}
+					{% if ml.can_send %}
 					Yes
 					{% else %}
 					No
 					{% endif %}
 				<td>
-					<form method="POST" action="{% url 'calendar-set_subscribed' cal.name %}">
+					<form method="POST" action="{% url 'mailinglists-set_subscribed' ml.name %}">
 						{% csrf_token %}
 						<input  type="checkbox"
 								name="subscribe"
 								onchange="$(this).closest('form').submit()"
-						{% if cal.subscribed %}
+						{% if ml.subscribed %}
 						checked
 						{% else %}
 						{% endif %}
@@ -48,7 +48,7 @@
 
 {% else %}
 <p>
-	You do not have access to any calendars.
+	You do not have access to any mailing lists.
 </p>
 
 {% endif %}

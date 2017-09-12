@@ -5,87 +5,89 @@ from django.contrib.auth.models import Group
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 
-from .models import Calendar, CalendarAccess, CalendarSubscription
-from .utils import can_user_access_calendar
+from .models import MailingList, MailingListAccess, MailingListSubscription
+from .utils import can_user_access_mailing_list
 
 
 def manage_subscriptions(request):
     """
-    A view for users to see all calendars they have access to
+    A view for users to see all mailing lists they have access to
     and subscribe/unsubscribe from them.
     """
-    context_calendars = []
+    context_mailing_lists = []
     user_groups = set(request.user.groups.all())
-    for calendar in Calendar.objects.all():
-        receive_access, send_access = can_user_access_calendar(
-            calendar,
+    for mailing_list in MailingList.objects.all().order_by('name'):
+        receive_access, send_access = can_user_access_mailing_list(
+            mailing_list,
             request.user,
         )
         if not receive_access:
             continue
         subscribed = bool(
-            CalendarSubscription.objects.filter(
-                calendar=calendar,
+            MailingListSubscription.objects.filter(
+                mailing_list=mailing_list,
                 user=request.user,
             ).count()
         )
-        context_calendars.append({
-            'name': calendar.name,
-            'description': calendar.description,
+        context_mailing_lists.append({
+            'name': mailing_list.name,
+            'description': mailing_list.description,
             'can_send': send_access,
             'subscribed': subscribed,
 
         })
-    context = {'calendars': context_calendars}
-    return render(request, 'calendar/manage_subscriptions.html', context)
+    context = {'mailing_lists': context_mailing_lists}
+    return render(request, 'mailinglists/manage_subscriptions.html', context)
 
 
-def set_subscribed(request, calendar_name):
+def set_subscribed(request, mailing_list_name):
     """
-    POST endpoint for subscribing the logged-in user to a calendar.
+    POST endpoint for subscribing the logged-in user to a mailing list.
     """
 
     # Validate request
     if request.method != 'POST':
         return HttpResponse('Only POST method allowed', status=405)
     subscribe = request.POST.get('subscribe') == 'on'
-    if not (calendar_name and isinstance(calendar_name, str)):
+    if not (mailing_list_name and isinstance(mailing_list_name, str)):
         return HttpResponse(
-            'Request missing \'calendar_name\' parameter',
+            'Request missing \'mailing_list_name\' parameter',
             status_code=422,
         )
 
-    # Load calendar; if subscribing, see if we have access
+    # Load mailing list; if subscribing, see if we have access
     try:
-        calendar = Calendar.objects.get(name=calendar_name.lower())
-    except Calendar.DoesNotExist:
-        raise Http404('Calendar not found: ' + calendar_name)
+        mailing_list = MailingList.objects.get(name=mailing_list_name.lower())
+    except MailingList.DoesNotExist:
+        raise Http404('MailingList not found: ' + mailing_list_name)
     if subscribe:
-        receive_access, _ = can_user_access_calendar(calendar, request.user)
+        receive_access, _ = can_user_access_mailing_list(
+            mailing_list, request.user,
+        )
         if not receive_access:
             return HttpResponse(
-                'User ' + request.user.username + ' cannot access calendar ' +
-                calendar.name
+                'User ' + request.user.username +
+                ' cannot access mailing list ' + mailing_list.name
             )
 
     # Modify subscription
     if subscribe:
         try:
-            subscription = CalendarSubscription(
-                calendar=calendar,
+            subscription = MailingListSubscription(
+                mailing_list=mailing_list,
                 user=request.user,
             )
             subscription.save()
-        except CalendarSubscription.IntegrityError:
+        except MailingListSubscription.IntegrityError:
             pass # No problem if we're already subscribed
     else:
         try:
-            CalendarSubscription.objects.get(
-                calendar=calendar,
+            MailingListSubscription.objects.get(
+                mailing_list=mailing_list,
                 user=request.user,
             ).delete()
-        except CalendarSubscription.DoesNotExist:
+        except MailingListSubscription.DoesNotExist:
             pass  # No problem if we're not subscribed
 
     # Redirect to manage subscriptions page
-    return redirect('calendar-manage_subscriptions')
+    return redirect('mailinglists-manage_subscriptions')
