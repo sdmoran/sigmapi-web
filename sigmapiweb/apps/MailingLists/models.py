@@ -4,7 +4,14 @@ Models for MailingList app.
 from django.contrib.auth.models import Group, User
 from django.db import models
 
+from apps.UserInfo.models import PledgeClass
 from common.mixins import ModelMixin
+
+from .access_constants import (
+    ACCESS_CHOICES,
+    ACCESS_CHOICE_LEN,
+    ACCESS_SEND,
+)
 
 
 class MailingList(ModelMixin, models.Model):
@@ -18,18 +25,55 @@ class MailingList(ModelMixin, models.Model):
         return self.name
 
 
-class MailingListAccess(ModelMixin, models.Model):
+class GroupMailingListAccess(ModelMixin, models.Model):
     """
-    Model whose existence indicates that members of the contained
-    group have "receive" access to the contained mailing list. If can_send
-    is True, the group members can also send to the mailing_list.
+    Model granting access to a mailing list to users
+    in a specific group.
     """
     mailing_list = models.ForeignKey(MailingList, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    can_send = models.BooleanField(default=False)
+    access_type = models.CharField(
+        max_length=ACCESS_CHOICE_LEN,
+        choices=ACCESS_CHOICES,
+        default=ACCESS_SEND,
+    )
 
     class Meta:
-        unique_together = ('mailing_list', 'group')
+        unique_together = ('mailing_list', 'group', 'access_type')
+
+
+class PledgeClassMailingListAccess(ModelMixin, models.Model):
+    """
+    Model granting a type of access to a mailing list to users
+    in a specific pledge class.
+    """
+    mailing_list = models.ForeignKey(MailingList, on_delete=models.CASCADE)
+    pledge_class = models.ForeignKey(PledgeClass, on_delete=models.CASCADE)
+    access_type = models.CharField(
+        max_length=ACCESS_CHOICE_LEN,
+        choices=ACCESS_CHOICES,
+        default=ACCESS_SEND,
+    )
+
+    class Meta:
+        unique_together = ('mailing_list', 'pledge_class', 'access_type')
+
+
+class ClassYearMailingListAccess(ModelMixin, models.Model):
+    """
+    Model granting receive and/or send access to a mailing list to users
+    in a specific class year.
+    """
+    mailing_list = models.ForeignKey(MailingList, on_delete=models.CASCADE)
+    class_year = models.IntegerField(default=2018)
+    access_type = models.CharField(
+        max_length=ACCESS_CHOICE_LEN,
+        choices=ACCESS_CHOICES,
+        default=ACCESS_SEND,
+    )
+
+    class Meta:
+        unique_together = ('mailing_list', 'class_year', 'access_type')
 
 
 class MailingListSubscription(ModelMixin, models.Model):

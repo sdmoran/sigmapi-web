@@ -5,13 +5,17 @@ from common.utils import register_model_admins
 
 from .models import (
     MailingList,
-    MailingListAccess,
+    GroupMailingListAccess,
+    PledgeClassMailingListAccess,
+    ClassYearMailingListAccess,
     MailingListSubscription,
 )
 
 
 register_model_admins(
     MailingList,
-    MailingListAccess,
+    GroupMailingListAccess,
+    PledgeClassMailingListAccess,
+    ClassYearMailingListAccess,
     MailingListSubscription,
 )

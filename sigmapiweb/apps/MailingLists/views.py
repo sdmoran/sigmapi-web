@@ -5,8 +5,9 @@ from django.contrib.auth.models import Group
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 
-from .models import MailingList, MailingListAccess, MailingListSubscription
-from .utils import can_user_access_mailing_list
+from .access import user_can_access_mailing_list
+from .access_constants import ACCESS_SEND, ACCESS_SUBSCRIBE
+from .models import MailingList, MailingListSubscription
 
 
 def manage_subscriptions(request):
@@ -17,11 +18,10 @@ def manage_subscriptions(request):
     context_mailing_lists = []
     user_groups = set(request.user.groups.all())
     for mailing_list in MailingList.objects.all().order_by('name'):
-        receive_access, send_access = can_user_access_mailing_list(
-            mailing_list,
-            request.user,
+        can_sub = user_can_access_mailing_list(
+            request.user, mailing_list, ACCESS_SUBSCRIBE,
         )
-        if not receive_access:
+        if not can_sub:
             continue
         subscribed = bool(
             MailingListSubscription.objects.filter(
@@ -32,7 +32,9 @@ def manage_subscriptions(request):
         context_mailing_lists.append({
             'name': mailing_list.name,
             'description': mailing_list.description,
-            'can_send': send_access,
+            'can_send': user_can_access_mailing_list(
+                request.user, mailing_list, ACCESS_SEND,
+            ),
             'subscribed': subscribed,
 
         })
@@ -61,10 +63,10 @@ def set_subscribed(request, mailing_list_name):
     except MailingList.DoesNotExist:
         raise Http404('MailingList not found: ' + mailing_list_name)
     if subscribe:
-        receive_access, _ = can_user_access_mailing_list(
-            mailing_list, request.user,
+        can_sub = user_can_access_mailing_list(
+            request.user, mailing_list, ACCESS_SUBSCRIBE,
         )
-        if not receive_access:
+        if not can_sub:
             return HttpResponse(
                 'User ' + request.user.username +
                 ' cannot access mailing list ' + mailing_list.name

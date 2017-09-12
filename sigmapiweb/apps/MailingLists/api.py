@@ -15,7 +15,6 @@ from django.views.decorators.csrf import csrf_exempt
 from apps.UserInfo.models import UserInfo
 
 from .models import MailingList, MailingListSubscription
-from .utils import can_user_access_mailing_list
 
 
 @csrf_exempt
@@ -57,8 +56,7 @@ def send_mail(request):
         user = _get_user_from_from_line(from_line)
     except RuntimeError as e:
         return HttpResponse(str(e), status=500)
-    _, can_send = can_user_access_mailing_list(mailing_list, user)
-    if not can_send:
+    if not mailing_list.has_access(user, ACCESS_SEND):
         fmt = 'User \'{0}\' does not have permission to send to \'{1}\''
         return HttpResponse(
             fmt.format(user.username, mailing_list.name),
