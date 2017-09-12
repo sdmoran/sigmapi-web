@@ -1,5 +1,5 @@
 """
-URLs for Calendar app.
+URLs for MailingList app.
 """
 from django.conf.urls import url
 from django.views.generic import RedirectView
@@ -21,13 +21,13 @@ urlpatterns = [
         name='calendar-manage_subscriptions',
     ),
     url(
-        regex=r'^subscribe/(?P<calendar_name>[\w]+)$',
-        view=views.subscribe,
-        name='calendar-subscribe',
+        regex=r'^set_subscribed/(?P<calendar_name>[\w]+)$',
+        view=views.set_subscribed,
+        name='calendar-set_subscribed',
     ),
     url(
-        regex=r'^unsubscribe/(?P<calendar_name>[\w]+)$',
-        view=views.unsubscribe,
-        name='calendar-unsubscribe',
+        regex=r'^sendinvite/$',
+        view=api.send_invite,
+        name='calendar-sendinvite',
     ),
 ]

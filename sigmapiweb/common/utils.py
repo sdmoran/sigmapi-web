@@ -75,3 +75,27 @@ def get_id_or_sentinel(model):
     Returns: int
     """
     return model.id if model else NONE_SENTINEL_ID
+
+
+def get_user_email(user):
+    """
+    Gets the email for a user, falling back to default.
+
+    Arguments:
+        user (User)
+
+    Returns: str
+    """
+    return user.email or get_default_email(user.username)
+
+
+def get_default_email(username):
+    """
+    Gets default email for a username.
+
+    Arguments:
+        username (str)
+
+    Returns: str
+    """
+    return username + '@wpi.edu'

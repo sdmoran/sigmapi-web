@@ -10,9 +10,9 @@
 		<thead>
 			<tr>
 				<th class="one wide">Name</th>
-				<th class="eight wide">Description</th>
-				<th class="one wide">Can Send?</th>
-				<th class="one wide">Sub/Unsub</th>
+				<th class="seven wide">Description</th>
+				<th class="two wide">Can Send?</th>
+				<th class="one wide">Subcribe?</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -27,17 +27,18 @@
 					No
 					{% endif %}
 				<td>
-					{% if cal.subscribed %}
-						<form method="POST" action="{% url 'calendar-unsubscribe' cal.name %}">
-							{% csrf_token %}
-							<a href="#" onclick="$(this).closest('form').submit()">Unubscribe</a>
-						</form>
-					{% else %}
-						<form method="POST" action="{% url 'calendar-subscribe' cal.name %}">
-							{% csrf_token %}
-							<a href="#" onclick="$(this).closest('form').submit()">Subscribe</a>
-						</form>
-					{% endif %}
+					<form method="POST" action="{% url 'calendar-set_subscribed' cal.name %}">
+						{% csrf_token %}
+						<input  type="checkbox"
+								name="subscribe"
+								onchange="$(this).closest('form').submit()"
+						{% if cal.subscribed %}
+						checked
+						{% else %}
+						{% endif %}
+						>
+						</input>
+					</form>
 				</td>
 			</tr>
 		{% endfor %}

@@ -13,6 +13,11 @@ urlpatterns = [
         name='userinfo-users',
     ),
     url(
+        regex=r'^email/',
+        view=views.change_email,
+        name='userinfo-change_email',
+    ),
+    url(
         regex=r'^password/',
         view=views.change_password,
         name='userinfo-change_password',

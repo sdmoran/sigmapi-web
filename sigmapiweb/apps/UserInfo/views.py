@@ -4,6 +4,8 @@ Views for UserInfo app.
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.shortcuts import render, redirect
 from django.template.defaultfilters import stringfilter, register
 from django.utils.html import strip_tags
@@ -240,12 +242,34 @@ def edit_user(request, user):
 
 
 @login_required
-def change_password(request):
+def change_email(request):
     """
-    Provides a view where a user can change their change_password.
+    Provides a view where a user can change their email address.
     """
     context = {
-        'message': []
+        'message': [],
+    }
+    if request.method == 'POST':
+        try:
+            new_email = request.POST.get('new_email')
+            validate_email(new_email)
+        except (KeyError, TypeError, ValidationError):
+            context['message'].append('Error changing email address.')
+        else:
+            request.user.email = new_email
+            request.user.save()
+            context['message'].append('Email address successfully changed.')
+    context['current_email'] = request.user.email
+    return render(request, 'userinfo/secure/change_email.html', context)
+
+
+@login_required
+def change_password(request):
+    """
+    Provides a view where a user can change their password.
+    """
+    context = {
+        'message': [],
     }
     if request.method == 'POST':
         form = PasswordChangeForm(user=request.user, data=request.POST)

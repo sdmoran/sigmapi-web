@@ -9,6 +9,8 @@ from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.db import IntegrityError
 
+from common.utils import get_default_email
+
 from .models import UserInfo
 
 
@@ -53,7 +55,7 @@ def create_user(username, first_name, last_name, major, year):
         raise CreateUserError('Invalid username')
 
     try:
-        user_obj.email = username + "@wpi.edu"
+        user_obj.email = get_default_email(username)
         user_obj.first_name = first_name
         user_obj.last_name = last_name
         password = User.objects.make_random_password()

@@ -57,7 +57,6 @@ class UserInfo(ModelMixin, models.Model):
         default=1,
         on_delete=models.SET_DEFAULT
     )
-    calendarEmail = models.CharField(max_length=64, blank=True, null=True)
 
     def __str__(self):
         return self.user.username
