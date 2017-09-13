@@ -47,6 +47,8 @@ class Party(ModelMixin, models.Model):
     girlcount = models.IntegerField(default=0)
     guy_delta = models.IntegerField(default=0)
     girl_delta = models.IntegerField(default=0)
+    guys_ever_signed_in = models.IntegerField(default=0)
+    girls_ever_signed_in = models.IntegerField(default=0)
 
     # TODO: In the future, this path should be changed to be in
     # protected file space so it is not accessible to the public.

@@ -1,7 +1,7 @@
 // Define party module namespace
 var PartyModule = PartyModule || {};
 
-PartyModule.POLLING_TIMEOUT = 10000; // 10 seconds
+PartyModule.POLLING_TIMEOUT = 1000; // 1 second
 
 PartyModule.MESSAGE_UX_TIMEOUT = 5000; // 5 seconds
 
@@ -71,7 +71,7 @@ PartyModule.Guest.prototype.toggleSignedIn = function()
 	$.ajax({
 		type: "POST",
 		url: url + this.id + "/",
-	}).done(function( data ) {
+	}).done(function(data) {
 		// If succeeded, change the status accordingly
 		thisOuter.signedIn = !thisOuter.signedIn;
 
@@ -494,13 +494,13 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 
 	// Initialize guest lists
 	this.maleList = new PartyModule.GuestList(this.userID, this.partyMode, this.canDestroyAnyGuest, "M",
-		function() { outerThis.updateCount("M", 1); },
-		function() { outerThis.updateCount("M", -1); },
+		function() {},
+		function() {},
 		function() { outerThis.updateListCounts() });
 
 	this.femaleList = new PartyModule.GuestList(this.userID, this.partyMode, this.canDestroyAnyGuest, "F",
-		function() { outerThis.updateCount("F", 1); },
-		function() { outerThis.updateCount("F", -1); },
+		function() {},
+		function() {},
 		function() { outerThis.updateListCounts() });
 
 	// Poll server continuously for more information.
@@ -666,6 +666,8 @@ PartyModule.PartyList.prototype.pollCount = function()
 		$(".count#M").html(data.guycount);
 		$(".count#F").html(data.girlcount);
 		$(".count#total").html(data.guycount + data.girlcount);
+		$(".count#guysEverCheckedIn").html(data.guys_ever_signed_in);
+		$(".count#girlsEverCheckedIn").html(data.girls_ever_signed_in);
 
 		setTimeout(
 			function(){

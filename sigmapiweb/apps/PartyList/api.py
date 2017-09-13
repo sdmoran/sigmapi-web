@@ -153,10 +153,8 @@ def update_manual_delta(request, party_id):
 
     if gender == 'M':
         party.guy_delta += delta
-        party.guycount += delta
     elif gender == 'F':
         party.girl_delta += delta
-        party.girlcount += delta
     else:
         return HttpResponse(
             'Error: Invalid gender parameter.' +
@@ -167,8 +165,8 @@ def update_manual_delta(request, party_id):
     party.save()
 
     response = {}
-    response['guycount'] = party.guycount
-    response['girlcount'] = party.girlcount
+    response['guycount'] = party.guycount + party.guy_delta
+    response['girlcount'] = party.girlcount + party.girl_delta
 
     return HttpResponse(
         json.dumps(response),
@@ -186,10 +184,12 @@ def poll_count(_request, party_id):
     except Party.DoesNotExist:
         return HttpResponse("Error: Party not found.", status=500)
 
-    response = {}
-    response['guycount'] = party.guycount
-    response['girlcount'] = party.girlcount
-
+    response = {
+        'guycount': party.guycount + party.guy_delta,
+        'girlcount': party.girlcount + party.girl_delta,
+        'guys_ever_signed_in': party.guys_ever_signed_in,
+        'girls_ever_signed_in': party.girls_ever_signed_in,
+    }
     return HttpResponse(json.dumps(response), content_type="application/json")
 
 
@@ -206,19 +206,32 @@ def sign_in(
     if request.method != 'POST':
         return HttpResponse('Endpoint supports POST method only.', status=405)
     try:
+        party = Party.objects.get(pk=party_id)
         party_guest = PartyGuest.objects.get(pk=party_guest_id)
-    except PartyGuest.DoesNotExist:
+    except (Party.DoesNotExist, PartyGuest.DoesNotExist):
         return HttpResponse(
             'Error signing in guest.' +
             ' Contact webmaster.',
             status=500,
         )
-    party_guest.signedIn = True
-    if party_guest.everSignedIn is False:
-        party_guest.everSignedIn = True
-        party_guest.timeFirstSignedIn = datetime.now()
-    party_guest.save()
-    return HttpResponse('Guest signed in.', status=200)
+    if not party_guest.signedIn:
+        party_guest.signedIn = True
+        _modify_count(party, party_guest.guest.gender, 1)
+        if party_guest.everSignedIn is False:
+            party_guest.everSignedIn = True
+            party_guest.timeFirstSignedIn = datetime.now()
+            if party_guest.guest.gender == 'M':
+                party.guys_ever_signed_in += 1
+            elif party_guest.guest.gender == 'F':
+                party.girls_ever_signed_in += 1
+            party.save()
+        party_guest.save()
+        return HttpResponse('Guest signed in.', status=200)
+    else:
+        return HttpResponse(
+            'Guest already signed in. Refresh to see updated list.',
+            status=409
+        )
 
 
 @login_required
@@ -234,16 +247,23 @@ def sign_out(
     if request.method != 'POST':
         return HttpResponse('Endpoint supports POST method only.', status=405)
     try:
+        party = Party.objects.get(pk=party_id)
         party_guest = PartyGuest.objects.get(pk=party_guest_id)
-    except PartyGuest.DoesNotExist:
+    except (Party.DoesNotExist, PartyGuest.DoesNotExist):
         return HttpResponse(
             'Error signing out guest.' +
             ' Contact webmaster.',
             status=500,
         )
-    party_guest.signedIn = False
-    party_guest.save()
-    return HttpResponse('Guest signed out.', status=200)
+    if party_guest.signedIn:
+        party_guest.signedIn = False
+        _modify_count(party, party_guest.guest.gender, -1)
+        party_guest.save()
+        return HttpResponse('Guest signed out.', status=200)
+    return HttpResponse(
+        'Guest already signed out. Refresh to see updated list.',
+        status=409,
+    )
 
 
 @login_required
@@ -263,13 +283,16 @@ def destroy(
             status=405
         )
     try:
+        party = Party.objects.get(pk=party_id)
         party_guest = PartyGuest.objects.get(pk=party_guest_id)
-    except PartyGuest.DoesNotExist:
+    except (Party.DoesNotExist, PartyGuest.DoesNotExist):
         return HttpResponse(
-            'Error deleting guest: guest does not exist.',
+            'Error deleting guest: guest or party does not exist.',
             status=409,
         )
     if user_can_edit(user=request.user, party_guest=party_guest):
+        if party_guest.signedIn:
+            _modify_count(party, party_guest.guest.gender, -1)
         party_guest.delete()
         return HttpResponse('Guest deleted', status=200)
     return HttpResponse(
@@ -347,3 +370,19 @@ def init_pulse(request, party_id):
         'PartyList.can_destroy_any_party_guest'
     )
     return HttpResponse(json.dumps(response), content_type="application/json")
+
+
+def _modify_count(party, gender, delta):
+    """
+    Modify the guycount or girlcount of a party.
+
+    Arguments:
+        party (Party)
+        gender (str): 'M' or 'F'
+        delta (int)
+    """
+    if gender == 'M':
+        party.guycount += delta
+    elif gender == 'F':
+        party.girlcount += delta
+    party.save()
