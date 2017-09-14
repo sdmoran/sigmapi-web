@@ -11,7 +11,7 @@ from django.http import HttpResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 
 from .access import user_can_access_mailing_list
-from .access_constants import ACCESS_SEND
+from .access_constants import ACCESS_SEND, ACCESS_SUBSCRIBE
 from .models import MailingList
 
 
@@ -115,7 +115,12 @@ def _get_forward_addresses(original_addrs, user):
             subscription.user.email
             for subscription
             in mailing_list.mailinglistsubscription_set.all()
-            if subscription.user.email
+            if (
+                subscription.user.email and
+                user_can_access_mailing_list(
+                    subscription.user, mailing_list, ACCESS_SUBSCRIBE
+                )
+            )
         )
         for mailing_list in mailing_lists
     ))

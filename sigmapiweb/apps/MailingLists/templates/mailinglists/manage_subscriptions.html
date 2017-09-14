@@ -27,6 +27,7 @@
 					No
 					{% endif %}
 				<td>
+					{% if ml.can_subscribe %}
 					<form method="POST" action="{% url 'mailinglists-set_subscribed' ml.name %}">
 						{% csrf_token %}
 						<input  type="checkbox"
@@ -39,6 +40,7 @@
 						>
 						</input>
 					</form>
+					{% endif %}
 				</td>
 			</tr>
 		{% endfor %}

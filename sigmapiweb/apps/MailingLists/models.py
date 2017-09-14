@@ -7,11 +7,18 @@ from django.db import models
 from apps.UserInfo.models import PledgeClass
 from common.mixins import ModelMixin
 
-from .access_constants import (
-    ACCESS_CHOICES,
-    ACCESS_CHOICE_LEN,
-    ACCESS_SEND,
-)
+ACCESS_SUBSCRIBE = 'sub'
+ACCESS_SEND = 'snd'
+
+
+# Meta
+ACCESS_CHOICE_LEN = 3
+ACCESS_DICT = {
+    ACCESS_SUBSCRIBE: 'Subscribe',
+    ACCESS_SEND: 'Send',
+}
+ACCESS_CHOICES = tuple(ACCESS_DICT.items())
+
 
 
 class MailingList(ModelMixin, models.Model):

@@ -1,6 +1,7 @@
 """
 Views for MailingList app.
 """
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 
@@ -9,6 +10,7 @@ from .access_constants import ACCESS_SEND, ACCESS_SUBSCRIBE
 from .models import MailingList, MailingListSubscription
 
 
+@login_required
 def manage_subscriptions(request):
     """
     A view for users to see all mailing lists they have access to
@@ -19,7 +21,10 @@ def manage_subscriptions(request):
         can_sub = user_can_access_mailing_list(
             request.user, mailing_list, ACCESS_SUBSCRIBE,
         )
-        if not can_sub:
+        can_send = user_can_access_mailing_list(
+            request.user, mailing_list, ACCESS_SEND,
+        )
+        if not (can_sub or can_send):
             continue
         subscribed = bool(
             MailingListSubscription.objects.filter(
@@ -30,9 +35,8 @@ def manage_subscriptions(request):
         context_mailing_lists.append({
             'name': mailing_list.name,
             'description': mailing_list.description,
-            'can_send': user_can_access_mailing_list(
-                request.user, mailing_list, ACCESS_SEND,
-            ),
+            'can_subscribe': can_sub,
+            'can_send': can_send,
             'subscribed': subscribed,
 
         })
@@ -40,6 +44,7 @@ def manage_subscriptions(request):
     return render(request, 'mailinglists/manage_subscriptions.html', context)
 
 
+@login_required
 def set_subscribed(request, mailing_list_name):
     """
     POST endpoint for subscribing the logged-in user to a mailing list.
