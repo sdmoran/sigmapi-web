@@ -1,7 +1,6 @@
 """
 Views for MailingList app.
 """
-from django.contrib.auth.models import Group
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 
@@ -16,7 +15,6 @@ def manage_subscriptions(request):
     and subscribe/unsubscribe from them.
     """
     context_mailing_lists = []
-    user_groups = set(request.user.groups.all())
     for mailing_list in MailingList.objects.all().order_by('name'):
         can_sub = user_can_access_mailing_list(
             request.user, mailing_list, ACCESS_SUBSCRIBE,
@@ -81,7 +79,7 @@ def set_subscribed(request, mailing_list_name):
             )
             subscription.save()
         except MailingListSubscription.IntegrityError:
-            pass # No problem if we're already subscribed
+            pass  # No problem if we're already subscribed
     else:
         try:
             MailingListSubscription.objects.get(

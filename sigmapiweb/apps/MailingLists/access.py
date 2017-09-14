@@ -1,7 +1,7 @@
 """
 Function(s) for checking access to mailing lists.
 """
-from apps.UserInfo.models import PledgeClass, UserInfo
+from apps.UserInfo.models import UserInfo
 
 from .access_constants import ACCESS_DICT
 
@@ -62,7 +62,7 @@ def user_can_access_mailing_list(user, mailing_list, access_type):
             access_type=access_type
         )
     )
-    if user_info.graduationYear in pledge_classes:
+    if user_info.graduationYear in class_years:
         return True
 
     # Access denied

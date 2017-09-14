@@ -109,9 +109,9 @@
 				<li><a href="/admin/">Admin Panel</a>
 							{% else %}
 					<li><a href="{% url 'userinfo-edit_user' user.username %}">Edit Profile</a></li>
-					<li><a href="{% url 'userinfo-change_email' %}">Change Email</a></li>
 					<li><a href="{% url 'userinfo-change_password' %}">Change Password</a></li>
 			  {% endif %}
+					<li><a href="{% url 'userinfo-change_email' %}">Change Email</a></li>
 					<li class="divider"></li>
 					<li><a href="/logout/">Logout</a></li>
 				</ul>

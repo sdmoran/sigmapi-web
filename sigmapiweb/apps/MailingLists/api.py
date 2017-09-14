@@ -7,24 +7,18 @@ from smtplib import SMTP, SMTPException
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import MultipleObjectsReturned
-from django.core.mail import EmailMessage
 from django.http import HttpResponse, Http404
-from django.conf import settings
-from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-from apps.UserInfo.models import UserInfo
-
-from .models import MailingList, MailingListSubscription
+from .models import ACCESS_SEND, MailingList
+from .access import user_can_access_mailing_list
 
 
 @csrf_exempt
 def send_mail(request):
     """
-    TODO docstring
+    View that receives raw email data and forwards it based on mailing lists.
     """
-    # Validate request
     if request.method != 'POST':
         return HttpResponse(
             'Only POST method allowed',
@@ -33,8 +27,6 @@ def send_mail(request):
     key = request.POST.get('key')
     if key != settings.MAILING_LISTS_EMAIL_API_KEY:
         return HttpResponse('Invalid API key.', status=401)
-
-    # Parse email
     email_data = request.POST.get('data')
     if not (email_data and isinstance(email_data, str)):
         return HttpResponse(
@@ -42,94 +34,140 @@ def send_mail(request):
             status=422,
         )
     email = message_from_string(email_data)
+    return _forward_email(email)
+
+
+def _forward_email(email):
+    """
+    Forward email based on mailing lists.
+    """
     addr_headers = frozenset(['from', 'to', 'resent-to', 'cc', 'resent-cc'])
     try:
         addrs_by_header = {
             header: set(
-                pair[1] for pair in getaddresses(msg.get_all(header, []))
+                pair[1] for pair in getaddresses(email.get_all(header, []))
             )
             for header in addr_headers
         }
     except Exception:  # pylint: disable=broad-except
         return HttpResponse('Failed to parse from/to/cc fields', status=422)
-
-    # Extract from address and user
     from_addrs = addrs_by_header['from']
     if not (from_addrs and len(from_addrs) == 1):
         return HttpResponse('Expected exactly one From address', status=422)
-    from_addr = from_addrs[0]
+    from_addr = list(from_addrs)[0]
     try:
-        user = User.objects.get(email=from_email.lower())
+        user = User.objects.get(email=from_addr.lower())
     except User.DoesNotExist:
         raise Http404(
-            'User with email \'{0}\' does not exist.'.format(from_email)
+            'User with email \'{0}\' does not exist.'.format(from_addr)
         )
-
-    # Filter out addresses not in our domain; remove @domain part of addrs
-    list_names_by_header = {
-        header: frozenset(
-            addr.split('@')
-            for addr in addrs_dict[header]
-            if addr.lower().endswith(
-                '@' + settings.MAILING_LISTS_EMAIL_DOMAIN
-            )
-        )
+    new_addrs_by_header = {
+        header: _get_forward_addresses(addrs_by_header[header], user)
         for header in addr_headers - {'from'}
     }
-
-    # Turn list names into mailing lists; throw away ones that are
-    # invalid or the user doesn't have send access to
-    mailing_lists_by_header = {}
-    for header in list_names_by_header.keys():
-        mailing_lists_by_header[header] = set()
-        for list_name in list_names_by_header[addr]:
-            try:
-                mailing_list = MailingList.objects.get(name=list_name.lower())
-            except MailingList.DoesNotExist:
-                continue  # Throw out non-existent mailing list
-            can_send = user_can_access_mailing_list(
-                user, mailing_list, ACCESS_SEND,
-            )
-            if not can_send:
-                continue
-            mailing_lists_by_header[header].add(mailing_list)
-
-    # Expand mailing lists into their subscribers' email addresses
-    new_addrs_by_header = {
-        header: frozenset.union(
-            (
-                subscriber.email
-                for subscriber in mailing_list.mailinglistsubscription_set
-                if subscriber.email
-            )
-            for mailing_list in mailing_lists
-        )
-        for header, mailing_lists in mailing_lists_by_header.items()
-    }
-
-    # If we have no To addresses, return 400
-    if not new_addrs_by_header['to']:
+    to_addrs = list(new_addrs_by_header['to'])
+    if not to_addrs:
         return HttpResponse('No addresses to send mail to', status=400)
-
-    # Turn address sets into header strings
     new_headers = {
         header: ';'.join(addrs)
         for header, addrs in new_addrs_by_header.items()
     }
-    email.update(new_headers)
-    email['from'] = MAILING_LISTS_FROM_EMAIL
+    new_headers['from'] = settings.MAILING_LISTS_FROM_EMAIL
+    for header, value in new_headers.items():
+        try:
+            email.replace_header(header, value)
+        except KeyError:
+            email[header] = value
+    _strip_unwanted_headers(email)
+    return _send_email(email, from_addr, to_addrs)
 
-    # Send mail
-    smtp = SMTP(MAILING_LISTS_FROM_SERVER)
-    smtp.ehlo()
-    smtp.starttls()
-    smtp.login(MAILING_LISTS_FROM_EMAIL, MAILING_LISTS_FROM_PASSWORD)
-    smtp.sendmail(
-        from_addr=new_headers['from'],
-        to_addrs=new_headers['to'],
-        msg=email.as_string(),
+
+def _get_forward_addresses(original_addrs, user):
+    """
+    Given a list of email addresses, calculate who we should forward to.
+
+    Arguments:
+        original_addrs (frozenset[str])
+
+    Returns: frozenset(str)
+    """
+    mailing_list_names = frozenset(
+        addr.split('@')[0]
+        for addr in original_addrs
+        if addr.lower().endswith(
+            '@' + settings.MAILING_LISTS_EMAIL_DOMAIN
+        )
     )
-    smtp.quit()
+    mailing_lists = set()
+    for list_name in mailing_list_names:
+        try:
+            mailing_list = MailingList.objects.get(name=list_name.lower())
+        except MailingList.DoesNotExist:
+            continue  # Throw out non-existent mailing list
+        can_send = user_can_access_mailing_list(
+            user, mailing_list, ACCESS_SEND,
+        )
+        if not can_send:
+            continue
+        mailing_lists.add(mailing_list)
+    return frozenset.union(frozenset(), *(
+        frozenset(
+            subscription.user.email
+            for subscription
+            in mailing_list.mailinglistsubscription_set.all()
+            if subscription.user.email
+        )
+        for mailing_list in mailing_lists
+    ))
 
-    # Return 204 (Success, No Content)
+
+def _strip_unwanted_headers(email):
+    """
+    Remove headers from the email that prevent it from being forwarded.
+
+    Arguments:
+        email (email object)
+    """
+    strip_header_substrings = frozenset([
+        'arc-', 'return-path', 'signature', 'spam', 'x-',
+        'delivered-to', 'received', 'authentication',
+        'message-id',
+    ])
+    for key in email.keys():
+        for substring in strip_header_substrings:
+            if substring in key.lower():
+                del email[key]
+                break
+
+
+def _send_email(email, from_addr, to_addrs):
+    """
+    Try to send an email message and return an HTTP response.
+
+    Arguments:
+        email (emailobject)
+        from_addr (str)
+        to_addrs(list[str])
+
+    Returns: HttpResponse
+    """
+    try:
+        smtp = SMTP(settings.MAILING_LISTS_FROM_SERVER)
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.login(
+            settings.MAILING_LISTS_FROM_EMAIL,
+            settings.MAILING_LISTS_FROM_PASSWORD,
+        )
+        smtp.sendmail(
+            from_addr=from_addr,
+            to_addrs=to_addrs,
+            msg=email.as_string(),
+        )
+        smtp.quit()
+    except SMTPException:
+        return HttpResponse(
+            'An error occured while forwarding email',
+            status=500,
+        )
     return HttpResponse('Message sent.', status=204)
