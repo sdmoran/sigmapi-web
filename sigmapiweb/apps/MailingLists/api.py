@@ -10,8 +10,9 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import ACCESS_SEND, MailingList
 from .access import user_can_access_mailing_list
+from .access_constants import ACCESS_SEND
+from .models import MailingList
 
 
 @csrf_exempt
@@ -72,7 +73,6 @@ def _forward_email(email):
         header: ';'.join(addrs)
         for header, addrs in new_addrs_by_header.items()
     }
-    new_headers['from'] = settings.MAILING_LISTS_FROM_EMAIL
     for header, value in new_headers.items():
         try:
             email.replace_header(header, value)
