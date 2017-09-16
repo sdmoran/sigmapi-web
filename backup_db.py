@@ -76,7 +76,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '-c', '--compress',
-        help='NOT IMPLEMENTED: Flag indicating the backup should be compressed.'
+        help='Flag indicating the backup should be compressed.'
     )
     args = parser.parse_args()
     user, name = get_credentials(args)
