@@ -22,11 +22,11 @@ def backup(db_user, db_name, file_name=None, compressed=False):
 def auto_name(db_name):
     """ Generates a unique name for the file based on today's date """
     g_name = '%s_dump_%s' % (db_name, datetime.datetime.now())
-    i = 0
-    while os.path.isfile(g_name):
-        i += 1
-    if i > 0:
-        g_name = g_name + '%d' % i
+    if os.path.isfile(g_name):
+        i = 1
+        while os.path.isfile(g_name + '(%d)' % i):
+            i += 1
+        g_name = g_name + '(%d)' % i
     return g_name
 
 
