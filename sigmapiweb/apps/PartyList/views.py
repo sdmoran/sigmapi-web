@@ -1,6 +1,7 @@
 """
 Views for PartyList app.
 """
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, redirect
 
@@ -30,9 +31,17 @@ def guests(request, party_id):
     except Party.DoesNotExist:
         return redirect("partylist-index")
     party_mode = requested_party.is_party_mode()
+    vouchers = frozenset(
+        (user.username, user.get_full_name())
+        for user in
+        User.objects.filter(
+            groups__name__in=['Brothers', 'Pledges']
+        )
+    )
     context = {
         'party': requested_party,
         'partymode': party_mode,
+        'vouchers': vouchers,
     }
     return render(request, 'parties/guests.html', context)
 

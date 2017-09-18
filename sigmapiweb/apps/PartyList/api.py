@@ -5,6 +5,7 @@ import csv
 from datetime import datetime
 import json
 
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -63,53 +64,30 @@ def create(request, party_id):
     # See if the guest already exists
     guest_name = request.POST.get('name')
     guest_gender = request.POST.get('gender')
+    voucher_username = request.POST.get('vouchedForBy')
     guest = None
 
-    if request.POST.get("force") != "true":
-        # Check to see if guest is on the blacklist before creating it
-        for entry in BlacklistedGuest.objects.all():
-            match = entry.check_match(guest_name)
-            if not match:
-                continue
-            guest_dict = {
-                'maybe_blacklisted': True,
-                'blacklist_name': match.name,
-                'blacklist_details': match.details,
-                'attempted_name': guest_name,
-                'attempted_gender': guest_gender,
-            }
-            # Respond with the details on the party guest that was just added
-            return HttpResponse(
-                json.dumps(guest_dict),
-                content_type='application/json'
-            )
+    added_by_result = _get_added_by(party, request.user, voucher_username)
+    if isinstance(added_by_result, HttpResponse):
+        return added_by_result
+    added_by, was_vouched_for = added_by_result
+
+    blacklist_response = _check_blacklisting(
+        guest_name,
+        guest_gender,
+        request.POST.get('force'),
+        added_by,
+        was_vouched_for,
+    )
+    if blacklist_response:
+        return blacklist_response
+
     try:
         guest = Guest.objects.get(
             name__exact=guest_name,
             gender__exact=guest_gender,
         )
     except Guest.DoesNotExist:
-        pass  # Don't need to do anything if failed to find the guest
-
-    # If the guest already exists, check if it exists for the party already
-    if guest:
-        try:
-            party_guest = PartyGuest.objects.get(
-                party__exact=party,
-                guest__exact=guest,
-            )
-        except PartyGuest.DoesNotExist:
-            pass
-        else:
-            # if this guest is already on the list for this party
-            if party_guest:
-                return HttpResponse(
-                    'The guest you tried to add' +
-                    ' is already on the list.',
-                    status=409,
-                )
-    else:
-        # Otherwise, if the guest does not exist we create it for later
         form = GuestForm(request.POST)
         if form.is_valid():
             guest = form.save()
@@ -119,8 +97,27 @@ def create(request, party_id):
                 'Contact webmaster.',
                 status=500,
             )
+    try:
+        party_guest = PartyGuest.objects.get(
+            party__exact=party,
+            guest__exact=guest,
+        )
+    except PartyGuest.DoesNotExist:
+        pass
+    else:
+        # if this guest is already on the list for this party
+        if party_guest:
+            return HttpResponse(
+                'The guest you tried to add is already on the list.',
+                status=409,
+            )
 
-    party_guest = PartyGuest(party=party, guest=guest, addedBy=request.user)
+    party_guest = PartyGuest(
+        party=party,
+        guest=guest,
+        addedBy=added_by,
+        wasVouchedFor=was_vouched_for,
+    )
     party_guest.save()
 
     # Respond with the details on the party guest that was just added
@@ -128,6 +125,87 @@ def create(request, party_id):
         json.dumps(party_guest.to_json()),
         content_type="application/json",
     )
+
+
+def _get_added_by(party, requesting_user, voucher_username):
+    """
+    Calculate who a guest should be listed as "addedBy".
+
+    Arguments:
+        party (Party)
+        requesting_user (User): User that sent that HTTP request to add
+        voucher_username (str|NoneType): Username of voucher. Is ignored
+            if None or empty
+
+    Returns: ((User, bool)|HttpResponse)
+        - If not error, return pair of (
+                user who is adding guest,
+                whether they are a voucher
+            )
+        - If error, return HTTP response with error. Errors if we try
+          to vouch while not in party mode or voucher username is invalid.
+    """
+    if not voucher_username:
+        return requesting_user, False
+    if not party.is_party_mode():
+        return HttpResponse(
+            'Cannot vouch while not in party mode.',
+            status=409,
+        )
+    try:
+        voucher = User.objects.get(username=voucher_username)
+    except User.DoesNotExist:
+        return HttpResponse(
+            'Error vouching for guest: Invalid voucher username \'' +
+            voucher_username + '\'.',
+            status=422,
+        )
+    return voucher, True
+
+
+def _check_blacklisting(
+        guest_name,
+        guest_gender,
+        force,
+        added_by,
+        was_vouched_for
+):
+    """
+    Return 4XX response iff blacklist rejects given guest.
+
+    Arguments:
+        guest_name (str)
+        guest_gender (str)
+        force (str): 'true' if we want to override blacklist match;
+            otherwise, any other string on None
+        added_by (str)
+        was_vouched_for (bool)
+
+    Returns: (HttpResponse|NoneType)
+        HTTP response if blacklist match, else None.
+    """
+    if force == 'true':
+        return None
+    # Check to see if guest is on the blacklist before creating it
+    for entry in BlacklistedGuest.objects.all():
+        match = entry.check_match(guest_name)
+        if not match:
+            continue
+        guest_dict = {
+            'maybe_blacklisted': True,
+            'blacklist_name': match.name,
+            'blacklist_details': match.details,
+            'attempted_name': guest_name,
+            'attempted_gender': guest_gender,
+        }
+        if was_vouched_for:
+            guest_dict['attempted_voucher'] = added_by.username
+        # Respond with the details on the party guest that was just added
+        return HttpResponse(
+            json.dumps(guest_dict),
+            content_type='application/json'
+        )
+    return None
 
 
 @login_required

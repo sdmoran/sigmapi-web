@@ -40,13 +40,14 @@ PartyModule.messageUXTimeout = null;
  * Guest Class Definition
  */
 
-PartyModule.Guest = function(id, name, addedByName, addedByID, signedIn)
+PartyModule.Guest = function(id, name, addedByName, addedByID, signedIn, wasVouchedFor)
 {
 	this.name = name;
 	this.addedByName = addedByName;
 	this.addedByID = addedByID;
 	this.signedIn = signedIn;
 	this.id = id;
+	this.wasVouchedFor = wasVouchedFor;
 
 	this.signedInCallback = function() {};
 	this.signedOutCallback = function() {};
@@ -163,7 +164,8 @@ PartyModule.GuestList.prototype.pollServer = function()
 			var currentGuest = data.guests[i];
 
 			var guestObj = new PartyModule.Guest(currentGuest.id, currentGuest.name,
-				currentGuest.addedByName, currentGuest.addedByID, currentGuest.signedIn)
+				currentGuest.addedByName, currentGuest.addedByID, currentGuest.signedIn,
+				currentGuest.wasVouchedFor)
 
 			thisOuter.addGuest(guestObj);
 		}
@@ -238,7 +240,10 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 
 	// Set the name and details to the guest's
 	clonedTemplate.find(".name").html(guest.name);
-	clonedTemplate.find(".details").html("Added by " + guest.addedByName + ".");
+	clonedTemplate.find(".details").html(
+		(guest.wasVouchedFor ? "Vouched for by " : "Added by ") +
+		guest.addedByName + "."
+	);
 
 	// If not being added to the start, add after the one before.
 	if (location >= 0)
@@ -279,7 +284,6 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 		// Remove the remove button if user does not have permission to remove this guest
 		if (this.userID != guest.addedByID && !this.canDestroyAnyGuest)
 		{
-			console.log(':(')
 			removeButton.remove();
 		}
 		else // Otherwise, make it remove when clicked
@@ -474,8 +478,6 @@ PartyModule.PartyList.prototype.initialize = function()
 		type: "GET",
 		url: "init/",
 	}).done(function( data ) {
-
-		console.log(data);
 		thisOuter.userID = data.userID;
 		thisOuter.partyMode = data.partymode;
 		thisOuter.canDestroyAnyGuest = data.canDestroyAnyGuest;
@@ -545,42 +547,68 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 	// Add guest listeners
 	$("#add-male-btn").click(function() {
 		var name = $("#add-male-name").val().trim();
+		var voucherName =  outerThis.partyMode ? $("#voucher-male").val().trim() : null;
 		$("#add-male-name").val("");
 
 		if (name.length > 0)
 		{
-			outerThis.addGuest(name, "M", false);
+			outerThis.addGuest(
+				name,
+				"M",
+				voucherName ? voucherName : null,
+				false
+			);
 		}
 	});
 
-	$("#add-male-name").keyup(function(event) {
+	var clickAddMaleOnEnter = function(event) {
 		if (event.keyCode == 13)
 		{
 			$("#add-male-btn").click();
 		}
-	});
+	}
+	$("#add-male-name").keyup(clickAddMaleOnEnter);
+	if (this.partyMode) {
+		$("#voucher-male").keyup(clickAddMaleOnEnter);
+	}
 
 	$("#add-female-btn").click(function() {
 		var name = $("#add-female-name").val().trim();
+		var voucherName = outerThis.partyMode ? $("#voucher-female").val().trim() : null;
 		$("#add-female-name").val("");
 
 		if (name.length > 0)
 		{
-			outerThis.addGuest(name, "F", false);
+			outerThis.addGuest(
+				name,
+				"F",
+				voucherName ? voucherName : null,
+				false
+			);
 		}
 	});
 
-	$("#add-female-name").keyup(function(event) {
+	var clickAddFemaleOnEnter = function(event) {
 		if (event.keyCode == 13)
 		{
 			$("#add-female-btn").click();
 		}
-	});
+	}
+	$("#add-female-name").keyup(clickAddFemaleOnEnter);
+	if (this.partyMode) {
+		$("#voucher-female").keyup(clickAddMaleOnEnter);
+	}
 
 	$("#bl_override").click(function () {
 		if ($('input[name="add"]:checked').val() == "true")
 		{
-			outerThis.addGuest($("#attempted-add").text(), $("#attempted-add-gender").text(), true);
+			var voucher = $("#attempted-add-voucher").text();
+			outerThis.addGuest(
+				$("#attempted-add").text(),
+				$("#attempted-add-gender").text(),
+				voucher ? voucher : null,
+				true
+			);
 		}
 	});
 
@@ -604,25 +632,29 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 /**
  * Add a guest to the party list
  */
-PartyModule.PartyList.prototype.addGuest = function(guestName, gender, force)
+PartyModule.PartyList.prototype.addGuest = function(guestName, gender, voucher, force)
 {
 	var thisOuter = this;
-
+	var data = {
+		"name": guestName,
+		"gender": gender,
+		"force": force
+	};
+	if (voucher !== null) {
+		data["vouchedForBy"] = voucher;
+	}
 	$.ajax({
 		type: "POST",
 		url: "create/",
-		data: {
-			"name": guestName,
-			"gender": gender,
-			"force": force
-		}
+		data: data
 	}).done(function( data ) {
-		var addedGuest = new PartyModule.Guest(data.id, data.name, data.addedByName, data.addedByID, data.signedIn);
+		var addedGuest = new PartyModule.Guest(data.id, data.name, data.addedByName, data.addedByID, data.signedIn, data.wasVouchedFor);
 
 		if (data.maybe_blacklisted) {
 			$('#bl_name').text(data.blacklist_name);
 			$('#bl_details').text(data.blacklist_details);
 			$('#attempted-add').text(data.attempted_name);
+			$('#attempted-add-voucher').text(data.attempted_voucher || "");
 			$('#attempted-add-gender').text(data.attempted_gender);
 			$('#blacklist_warn').modal('show');
 			PartyModule.displayError("Potential blacklisted guest!")

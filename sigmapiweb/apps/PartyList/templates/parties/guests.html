@@ -4,7 +4,7 @@
 
 {% block module_includes %}
 	{% load staticfiles %}
-	<script type="text/javascript" src="{% static 'js/secure/party.guest.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/secure/party.guest.v2.js' %}"></script>
 
 	<link rel='stylesheet' type='text/css' href='{% static "css/secure/party.guests.css" %}' />
 {% endblock %}
@@ -26,6 +26,7 @@
 			<div class="modal-body">
 				<!-- This allows us to resubmit the user for a forced add -->
 				<p hidden id="attempted-add-gender"></p>
+				<p hidden id="attempted-add-voucher"></p>
 				<p>
 
 					The guest you've attempted to add (<span id="attempted-add"></span>)
@@ -130,10 +131,18 @@
 		<div class="col-xs-12 col-sm-6">
 			<h4>Male Guests</h4>
 			<div class="add-guest-form">
-				<input type="text" class="form-control" style="width: auto;" id="add-male-name" placeholder="{% if partymode %}Write-in{% else %}Add{% endif %} Male Guest"/>
+				<input type="text" class="form-control" style="width: auto;" id="add-male-name" placeholder="Add Male Guest"/>
 				<button type="submit" class="btn btn-default" id="add-male-btn">
 					<span class="glyphicon glyphicon-plus"></span>
 				</button>
+				{% if partymode %}
+				<select name="voucher" class="form-control" style="width: auto;" id="voucher-male"/>
+					<option value="">(Select Voucher)</option>
+					{% for voucher in vouchers %}
+					<option value="{{voucher.0}}">{{voucher.1}}</option>
+					{% endfor %}
+				</select>
+				{% endif %}
 			</div>
 
 			<div class="loader" id="M">
@@ -146,10 +155,18 @@
 		<div class="col-xs-12 col-sm-6">
 			<h4>Female Guests</h4>
 			<div class="add-guest-form">
-				<input type="text" class="form-control" style="width: auto;" id="add-female-name" placeholder="{% if partymode %}Write-in{% else %}Add{% endif %} Female Guest"/>
+				<input type="text" class="form-control" style="width: auto;" id="add-female-name" placeholder="Add Female Guest"/>
 				<button type="submit" class="btn btn-default" id="add-female-btn">
 					<span class="glyphicon glyphicon-plus"></span>
 				</button>
+				{% if partymode %}
+				<select name="voucher" class="form-control" style="width: auto;" id="voucher-female"/>
+					<option value="">(Select Voucher)</option>
+					{% for voucher in vouchers %}
+					<option value="{{voucher.0}}">{{voucher.1}}</option>
+					{% endfor %}
+				</select>
+				{% endif %}
 			</div>
 			<div class="loader" id="F">
 				<p>Loading Guest List...</p>

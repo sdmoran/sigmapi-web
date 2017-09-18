@@ -172,6 +172,7 @@ class PartyGuest(ModelMixin, models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
+    wasVouchedFor = models.BooleanField()
     createdAt = models.DateTimeField(auto_now_add=True, db_index=True)
     signedIn = models.BooleanField(default=False)
     everSignedIn = models.BooleanField(default=False)
@@ -203,6 +204,7 @@ class PartyGuest(ModelMixin, models.Model):
         data['addedByName'] = get_full_name_or_deleted(self.addedBy)
         data['addedByID'] = get_id_or_sentinel(self.addedBy)
         data['signedIn'] = self.signedIn
+        data['wasVouchedFor'] = self.wasVouchedFor
 
         return data
 
