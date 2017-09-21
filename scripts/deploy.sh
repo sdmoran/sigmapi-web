@@ -6,7 +6,9 @@ STATIC=static
 
 DEPLOY_UTILS=$HOME/deploy
 REPO=$DEPLOY_UTILS/sigmapi-web-repo
+REPO_SCRIPTS=$REPO/scripts
 PROD=$HOME/webapps
+PROD_SCRIPTS=$HOME/scripts
 
 PROD_PYTHON_WEBAPP=$PROD/sigma_pi_web_2
 PROD_STATIC_WEBAPP=$PROD/sigma_pi_web_static
@@ -26,6 +28,12 @@ echo "Copying REPO $REPO/$DJANGOAPP/$STATIC TO PROD $PROD_STATIC_WEBAPP";
 rm -rf $PROD_STATIC_WEBAPP/*;
 rm -rf $PROD_PYTHON_WEBAPP/$DJANGOAPP/$STATIC;
 cp -rf $REPO/$DJANGOAPP/$STATIC/* $PROD_STATIC_WEBAPP;
+echo "";
+
+echo "Copy scripts from $REPO_SCRIPTS to $PROD_SCRIPTS";
+rm -rf $PROD_SCRIPTS/*
+cp $REPO_SCRIPTS/* $PROD_SCRIPTS
+chmod +x $PROD_SCRIPTS/*
 echo "";
 
 echo "Copying admin panel static files.";

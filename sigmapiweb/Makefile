@@ -39,10 +39,12 @@ quality: pep8 pylint
 pep8:
 	pep8 common
 	pep8 apps/* --exclude='apps/*/migrations/*'
+	pep8 ../scripts
 
 pylint:
 	pylint common
 	pylint apps/*
+	pylint ../scripts
 
 newmigrations:
 	$(MANAGE) makemigrations
