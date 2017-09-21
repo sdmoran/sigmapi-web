@@ -1,6 +1,7 @@
 """
 API for MailingList invites.
 """
+from datetime import datetime, timedelta
 from email import message_from_string
 from email.utils import getaddresses
 from smtplib import SMTP, SMTPException
@@ -12,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .access import user_can_access_mailing_list
 from .access_constants import ACCESS_SEND, ACCESS_SUBSCRIBE
-from .models import MailingList
+from .models import MailingList, UserLastSentTime
 
 
 @csrf_exempt
@@ -61,6 +62,11 @@ def _forward_email(email):
     except User.DoesNotExist:
         raise Http404(
             'User with email \'{0}\' does not exist.'.format(from_addr)
+        )
+    if not _check_last_sent_time_constraint(user):
+        return HttpResponse(
+            'Each user can only send one email every 15 seconds.',
+            status=429,
         )
     new_addrs_by_header = {
         header: _get_forward_addresses(addrs_by_header[header], user)
@@ -143,6 +149,30 @@ def _strip_unwanted_headers(email):
             if substring in key.lower():
                 del email[key]
                 break
+
+
+def _check_last_sent_time_constraint(user):
+    """
+    Check if the user can send an email based on when they last sent one.
+
+    Arguments:
+        user (User)
+
+    Returns: bool
+    """
+    now = datetime.now()
+    try:
+        last_sent_record = UserLastSentTime.objects.get(user=user)
+    except UserLastSentTime.DoesNotExist:
+        UserLastSentTime(user=user, last_sent=now).save()
+        return True
+    min_timedelta = timedelta(
+        seconds=UserLastSentTime.MIN_SECONDS_BETWEEN_SENDS
+    )
+    can_send = now - last_sent_record.last_sent >= min_timedelta
+    last_sent_record.last_sent = now
+    last_sent_record.save()
+    return can_send
 
 
 def _send_email(email, from_addr, to_addrs):

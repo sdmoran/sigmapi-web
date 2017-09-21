@@ -20,7 +20,6 @@ ACCESS_DICT = {
 ACCESS_CHOICES = tuple(ACCESS_DICT.items())
 
 
-
 class MailingList(ModelMixin, models.Model):
     """
     A mailing list that can be subscribed to and have invites send to.
@@ -93,3 +92,14 @@ class MailingListSubscription(ModelMixin, models.Model):
 
     class Meta:
         unique_together = ('mailing_list', 'user')
+
+
+class UserLastSentTime(ModelMixin, models.Model):
+    """
+    Model tracking the last time a user sent an email in order
+    to prevent spamming and list loops.
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    last_sent = models.DateTimeField()
+
+    MIN_SECONDS_BETWEEN_SENDS = 15
