@@ -122,7 +122,7 @@ def _forward_email(email, from_addr, dest_addrs_by_header):
     }
     for header, value in new_headers.items():
         try:
-        email.replace_header(header, value)
+            email.replace_header(header, value)
         except KeyError:
             email[header] = value
     _strip_unwanted_headers(email)
@@ -130,7 +130,6 @@ def _forward_email(email, from_addr, dest_addrs_by_header):
     return (
         all_errors.union(send_errors),
         500 if send_errors else 204,
-        from_addr,
     )
 
 
@@ -164,9 +163,10 @@ def _get_forward_addresses(original_addrs, user):
         )
         if not can_send:
             errors.add(
-                "You do not have send access to mailing list '" +
+                "You do not have send access to the mailing list '" +
                 list_name + "'"
             )
+            continue
         mailing_lists.add(mailing_list)
     res_forward_addrs = frozenset.union(frozenset(), *(
         frozenset(
@@ -245,11 +245,12 @@ def _send_errors_email(errors, was_sent, original_subject, to_addr):
         "The following errors arose while trying " +
         "to send your message entitled '" + original_subject +
         "':\n\n- " +
-        "\n\n- ".join(errors) +
-        (
-            "\n\nPlease note that your message was successfully sent " +
-            "to mailing list(s) not shown here."
-        ) if was_sent else ""
+        "\n\n- ".join(errors) + (
+            (
+                "\n\nPlease note that your message was successfully sent " +
+                "to mailing list(s) not shown here."
+            ) if was_sent else ""
+        )
     )
     msg['Subject'] = "Errors while sending to mailing list(s)"
     msg['From'] = settings.MAILING_LISTS_FROM_EMAIL
