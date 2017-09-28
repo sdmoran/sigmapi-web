@@ -31,13 +31,13 @@ def guests(request, party_id):
     except Party.DoesNotExist:
         return redirect("partylist-index")
     party_mode = requested_party.is_party_mode()
-    vouchers = frozenset(
+    vouchers = [
         (user.username, user.get_full_name())
         for user in
         User.objects.filter(
             groups__name__in=['Brothers', 'Pledges']
-        )
-    )
+        ).order_by('first_name')
+    ]
     context = {
         'party': requested_party,
         'partymode': party_mode,
