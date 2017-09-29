@@ -695,11 +695,15 @@ PartyModule.PartyList.prototype.pollCount = function()
 	}).done(function( data ) {
 		thisOuter.lastTimePollSucceeded = thisOuter.lastTimePollTried;
 
-		$(".count#M").html(data.guycount);
-		$(".count#F").html(data.girlcount);
-		$(".count#total").html(data.guycount + data.girlcount);
-		$(".count#guysEverCheckedIn").html(data.guys_ever_signed_in);
-		$(".count#girlsEverCheckedIn").html(data.girls_ever_signed_in);
+		$("#in-the-party-guests-count").html(data.guycount + data.girlcount);
+		$("#in-the-party-male-count").html(data.guycount);
+		$("#in-the-party-female-count").html(data.girlcount);
+		$("#ever-checked-in-guests-count").html(
+			data.guys_ever_signed_in +
+			data.girls_ever_signed_in
+		);
+		$("#ever-checked-in-male-count").html(data.guys_ever_signed_in);
+		$("#ever-checked-in-female-count").html(data.girls_ever_signed_in);
 
 		setTimeout(
 			function(){
@@ -731,9 +735,9 @@ PartyModule.PartyList.prototype.updateCount = function(gender, delta)
 	}).done(function( data ) {
 
 		// Update counts
-		$(".count#M").html(data.guycount);
-		$(".count#F").html(data.girlcount);
-		$(".count#total").html(data.guycount + data.girlcount);
+		$("#in-the-party-guests-count").html(data.guycount + data.girlcount);
+		$("#in-the-party-male-count").html(data.guycount);
+		$("#in-the-party-female-count").html(data.girlcount);
 
 	}).fail(function( jqXHR, textStatus, errorThrown ) {
 		// If failed, we alert the user

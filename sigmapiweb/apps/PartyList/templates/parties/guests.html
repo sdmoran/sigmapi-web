@@ -4,9 +4,9 @@
 
 {% block module_includes %}
 	{% load staticfiles %}
-	<script type="text/javascript" src="{% static 'js/secure/party.guest.v2.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/secure/party.guest.v3.js' %}"></script>
 
-	<link rel='stylesheet' type='text/css' href='{% static "css/secure/party.guests.css" %}' />
+	<link rel='stylesheet' type='text/css' href='{% static "css/secure/party.guests.v2.css" %}' />
 {% endblock %}
 
 {% block content %}
@@ -68,13 +68,50 @@
 <div class="navbar-fixed-bottom">
 	<ul class="section">
 		<li id="message-ux" style="display:none;"></li>
-	{% if not partymode %}
-		<li class="title">View:</li>
+		{% if partymode %}
+		<li>
+			<span>In the Party
+				<span class="badge">T: <span id="in-the-party-guests-count">0</span></span>
+				<span class="badge">M: <span id="in-the-party-male-count">0</span></span>
+				<span class="badge">F: <span id="in-the-party-female-count">0</span></span>
+			</span>
+		</li>
+		<li>
+			<span>Ever Checked In
+				<span class="badge">T: <span id="ever-checked-in-guests-count">0</span></span>
+				<span class="badge">M: <span id="ever-checked-in-male-count">0</span></span>
+				<span class="badge">F: <span id="ever-checked-in-female-count">0</span></span>
+			</span>
+		</li>
+		<li>
+			<span>On the List
+		{% else %}
 		<li class="active">
 			<a href="#" id="all-guests">All Guests
+		{% endif %}
 				<span class="badge">T: <span id="all-guests-count">0</span></span>
 				<span class="badge">M: <span id="all-male-count">0</span></span>
 				<span class="badge">F: <span id="all-female-count">0</span></span>
+		{% if partymode %}
+			</span>
+		</li>
+		<li>
+			<button type="button" class="btn btn-default btn-sm sub-count btn-male" id="M">
+				<span class="glyphicon glyphicon-minus"></span>
+			</button>
+			<button type="button" class="btn btn-default btn-sm add-count btn-male" id="M">
+			 	<span class="glyphicon glyphicon-plus"></span>
+			 </button>
+		</li>
+		<li>
+			<button type="button" class="btn btn-default btn-sm sub-count btn-female" id="F">
+				<span class="glyphicon glyphicon-minus"></span>
+			</button>
+			<button type="button" class="btn btn-default btn-sm add-count btn-female" id="F">
+			 	<span class="glyphicon glyphicon-plus"></span>
+			 </button>
+		</li>
+		{% else %}
 			</a>
 		</li>
 		<li>
@@ -84,37 +121,7 @@
 				<span class="badge">F: <span id="my-female-count">0</span></span>
 			</a>
 		</li>
-	{% else %}
-		<li class="title">Counts:</li>
-		<li>
-
-			Guys: <span class="count" id="M">0</span>
-			<button type="button" class="btn btn-default btn-sm sub-count" id="M">
-				<span class="glyphicon glyphicon-minus"></span>
-			</button>
-			<button type="button" class="btn btn-default btn-sm add-count" id="M">
-			 	<span class="glyphicon glyphicon-plus"></span>
-			 </button>
-		</li>
-		<li>
-			Girls: <span class="count" id="F">0</span>
-			<button type="button" class="btn btn-default btn-sm sub-count" id="F">
-				<span class="glyphicon glyphicon-minus"></span>
-			</button>
-			<button type="button" class="btn btn-default btn-sm add-count" id="F">
-			 	<span class="glyphicon glyphicon-plus"></span>
-			 </button>
-		</li>
-		<li>
-			Total: <span class="count" id="total">0</span>
-		</li>
-		<li>
-			Guys ever checked in: <span class="count" id="guysEverCheckedIn">0</span>
-		</li>
-		<li>
-			Girls ever checked in: <span class="count" id="girlsEverCheckedIn">0</span>
-		</li>
-	{% endif %}
+		{% endif %}
 	</ul>
 </div>
 

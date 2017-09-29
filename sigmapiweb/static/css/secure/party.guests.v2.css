@@ -132,12 +132,32 @@
 	background-color: rgb(160, 220, 255);
 }
 
+.btn-male
+{
+	background-color: rgb(130, 200, 240);
+}
+
+.btn-male:hover
+{
+	background-color: rgb(160, 220, 255);
+}
+
 .guest-list.female > .guest
 {
 	background-color: rgb(255, 200, 255);
 }
 
 .guest-list.female > .guest:hover
+{
+	background-color: rgb(255, 230, 255);
+}
+
+.btn-female
+{
+	background-color: rgb(255, 200, 255);
+}
+
+.btn-female:hover
 {
 	background-color: rgb(255, 230, 255);
 }
