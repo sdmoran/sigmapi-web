@@ -69,21 +69,21 @@
 	<ul class="section">
 		<li id="message-ux" style="display:none;"></li>
 		{% if partymode %}
-		<li>
+		<li class="party-count-highlighted">
 			<span>In the Party
 				<span class="badge">T: <span id="in-the-party-guests-count">0</span></span>
 				<span class="badge">M: <span id="in-the-party-male-count">0</span></span>
 				<span class="badge">F: <span id="in-the-party-female-count">0</span></span>
 			</span>
 		</li>
-		<li>
+		<li class="party-count">
 			<span>Ever Checked In
 				<span class="badge">T: <span id="ever-checked-in-guests-count">0</span></span>
 				<span class="badge">M: <span id="ever-checked-in-male-count">0</span></span>
 				<span class="badge">F: <span id="ever-checked-in-female-count">0</span></span>
 			</span>
 		</li>
-		<li>
+		<li class="party-count-highlighted">
 			<span>On the List
 		{% else %}
 		<li class="active">
