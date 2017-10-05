@@ -1,11 +1,10 @@
 """
 Utility functions for notifying users about Standards events
 """
-from smtplib import SMTPException
-
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.mail import send_mail, EmailMessage
+
+from common.utils import send_email
 
 
 def summons_requested(summons_request_count):
@@ -19,13 +18,13 @@ def summons_requested(summons_request_count):
         'You may view details on the request and approve/deny it at: ' +
         'https://sigmapigammaiota.org/secure/standards/summons/requests/'
     )
-    try:
-        fourth = User.objects.get(groups__name='4th Counselor')
-        send_mail(
-            subject, message, settings.DEFAULT_FROM_EMAIL, [fourth.email],
-        )
-    except SMTPException:
-        pass  # TODO: Do something here
+    fourth = User.objects.get(groups__name='4th Counselor')
+    send_email(
+        subject=subject,
+        body=message,
+        to_emails=[fourth.email],
+        cc_emails=[],
+    )
 
 
 def summons_request_denied(summons_request):
@@ -40,18 +39,13 @@ def summons_request_denied(summons_request):
         ' has been denied. If you want more details, ' +
         'please speak with the Fourth Counselor.'
     )
-    try:
-        fourth = User.objects.get(groups__name='4th Counselor')
-        email = EmailMessage(
-            subject=subject,
-            body=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[summons_request.summoner.email],
-            cc=[fourth.email],
-        )
-        email.send()
-    except SMTPException:
-        pass  # TODO: Do something here
+    fourth = User.objects.get(groups__name='4th Counselor')
+    send_email(
+        subject=subject,
+        body=message,
+        to_emails=[summons_request.summoner.email],
+        cc_emails=[fourth.email],
+    )
 
 
 def summons_sent(summons):
@@ -83,16 +77,11 @@ def summons_sent(summons):
         'the summon. If you do not attend, you will automatically be given ' +
         'a punishment by standards.'
     )
-    try:
-        fourth = User.objects.get(groups__name='4th Counselor')
-        standards = User.objects.get(groups__name='Parliamentarian')
-        email = EmailMessage(
-            subject=subject,
-            body=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[summons.summonee.email],
-            cc=[fourth.email, standards.email, settings.EC_EMAIL],
-        )
-        email.send()
-    except SMTPException:
-        pass  # TODO: Do something here
+    fourth = User.objects.get(groups__name='4th Counselor')
+    standards = User.objects.get(groups__name='Parliamentarian')
+    send_email(
+        subject=subject,
+        body=message,
+        to_emails=[summons.summonee.email],
+        cc_emails=[fourth.email, standards.email, settings.EC_EMAIL],
+    )

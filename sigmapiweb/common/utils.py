@@ -1,7 +1,9 @@
 """
 General utility functions to be used across project.
 """
+from django.conf import settings
 from django.contrib import admin
+from django.core.mail import EmailMessage
 
 
 DELETED_STRING = '[deleted]'
@@ -75,3 +77,23 @@ def get_id_or_sentinel(model):
     Returns: int
     """
     return model.id if model else NONE_SENTINEL_ID
+
+
+def send_email(subject, body, to_emails, cc_emails):
+    """
+    Send an email from the DEFAULT_FROM_EMAIL.
+
+    Arguments:
+        subject (str)
+        body (str)
+        to_emails (list[str])
+        cc_emails (list[str])
+    """
+    email = EmailMessage(
+        subject=subject,
+        body=body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=to_emails,
+        cc=cc_emails,
+    )
+    email.send(fail_silently=False)

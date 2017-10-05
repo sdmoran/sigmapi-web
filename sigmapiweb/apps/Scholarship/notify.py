@@ -1,11 +1,10 @@
 """
 Utility functions for notifying users about Study Hours events
 """
-from smtplib import SMTPException
-
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.mail import EmailMessage
+
+from common.utils import send_email
 
 
 def scholarship_content_submitted():
@@ -20,22 +19,16 @@ def scholarship_content_submitted():
         "this content at" +
         "https://sigmapigammaiota.org/secure/scholarship/approve/"
     )
-
     scholarship = User.objects.filter(groups__name='Scholarship Chair')
     if not scholarship.exists():
         return
     scholarship = scholarship[0]
-
-    try:
-        email = EmailMessage(
-            subject=subject,
-            body=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[scholarship.email],
-        )
-        email.send()
-    except SMTPException:
-        pass  # TODO: Do something here
+    send_email(
+        subject=subject,
+        body=message,
+        to_emails=[scholarship.email],
+        cc_emails=[],
+    )
 
 
 def study_hours_tracked(tracked_user):
@@ -53,23 +46,16 @@ def study_hours_tracked(tracked_user):
         "You may report your study hours " +
         "at: https://sigmapigammaiota.org/secure/scholarship/study_hours/"
     )
-
     scholarship = User.objects.filter(groups__name='Scholarship Chair')
     if not scholarship.exists():
         return
     scholarship = scholarship[0]
-
-    try:
-        email = EmailMessage(
-            subject=subject,
-            body=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[tracked_user.user.email],
-            cc=[scholarship.email],
-        )
-        email.send()
-    except SMTPException:
-        pass  # TODO: Do something here
+    send_email(
+        subject=subject,
+        body=message,
+        to_emails=[tracked_user.user.email],
+        cc_emails=[scholarship.email],
+    )
 
 
 def study_hours_untracked(tracked_user):
@@ -79,23 +65,16 @@ def study_hours_untracked(tracked_user):
     subject = "Scholarship: Study Hours"
     message = "Based on your academic performance," +\
         " you are no longer required to report study hours."
-
     scholarship = User.objects.filter(groups__name='Scholarship Chair')
     if not scholarship.exists():
         return
     scholarship = scholarship[0]
-
-    try:
-        email = EmailMessage(
-            subject=subject,
-            body=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[tracked_user.user.email],
-            cc=[scholarship.email],
-        )
-        email.send()
-    except SMTPException:
-        pass  # TODO: Do something here
+    send_email(
+        subject=subject,
+        body=message,
+        to_emails=[tracked_user.user.email],
+        cc_emails=[scholarship.email],
+    )
 
 
 def social_probation(tracked_user):
@@ -105,20 +84,13 @@ def social_probation(tracked_user):
     subject = "Scholarship: Social Probation"
     message = "You have been placed on social probation" +\
         " for failing to complete study hours."
-
     scholarship = User.objects.filter(groups__name='Scholarship Chair')
     if not scholarship.exists():
         return
     scholarship = scholarship[0]
-
-    try:
-        email = EmailMessage(
-            subject=subject,
-            body=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[tracked_user.user.email],
-            cc=[scholarship.email, settings.EC_EMAIL],
-        )
-        email.send()
-    except SMTPException:
-        pass  # TODO: Do something here
+    send_email(
+        subject=subject,
+        body=message,
+        to_emails=[tracked_user.user.email],
+        cc_emails=[scholarship.email, settings.EC_EMAIL],
+    )
