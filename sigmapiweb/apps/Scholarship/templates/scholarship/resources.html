@@ -2,17 +2,17 @@
 
 {% block title %}Sigma Pi Secure - Academic Resources {% endblock %}
 
+{% load staticfiles %}
 {% block module_includes %}
-{% load static %}
-<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
-<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
-
-<!-- Async file upload library -->
-<script type="text/javascript" src='{% static "js/lib/jquery.ui.widget.js" %}'></script>
-<script type="text/javascript" src='{% static "js/lib/jquery.iframe-transport.js" %}'></script>
-<script type="text/javascript" src='{% static "js/lib/jquery.fileupload.js" %}'></script>
-
-<link rel="stylesheet" type="text/css" href='{% static "css/lib/jquery.fileupload.css" %}'/>
+	<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+	<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+	
+	<!-- Async file upload library -->
+	<script type="text/javascript" src='{% static "js/lib/jquery.ui.widget.js" %}'></script>
+	<script type="text/javascript" src='{% static "js/lib/jquery.iframe-transport.js" %}'></script>
+	<script type="text/javascript" src='{% static "js/lib/jquery.fileupload.js" %}'></script>
+	
+	<link rel="stylesheet" type="text/css" href='{% static "css/lib/jquery.fileupload.css" %}'/>
 {% endblock %}
 
 {% block content %}

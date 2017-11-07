@@ -1,9 +1,10 @@
 {% extends 'common/public_base.html' %}
 {% block title %}Sigma Pi Gamma Iota - Brothers{% endblock %}
 
-{% block local_includes %}
+{% load sass_tags %}
+{% block module_includes %}
 	{% load staticfiles %}
-	<link rel="stylesheet" type="text/css" href='{% static "css/brothers.css" %}'/>
+	<link rel="stylesheet" type="text/css" href='{% sass_src "css/public/brothers_v0.scss" %}'/>
 {% endblock %}
 
 {% block content %}

@@ -2,11 +2,11 @@
 
 {% block title %}Sigma Pi Secure - {{ party.name }}{% endblock %}
 
+{% load sass_tags %}
+{% load staticfiles %}
 {% block module_includes %}
-	{% load staticfiles %}
 	<script type="text/javascript" src="{% static 'js/secure/party.guest.v3.js' %}"></script>
-
-	<link rel='stylesheet' type='text/css' href='{% static "css/secure/party.guests.v2.css" %}' />
+	<link rel='stylesheet' type='text/css' href='{% sass_src "css/secure/party-guests_v0.scss" %}' />
 {% endblock %}
 
 {% block content %}

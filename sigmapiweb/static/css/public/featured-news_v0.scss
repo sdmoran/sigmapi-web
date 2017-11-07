@@ -1,0 +1,102 @@
+
+html,
+body {
+    height: 100%;
+}
+
+#main-content {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+
+/*
+ * Start Bootstrap - Full Slider (http://startbootstrap.com/)
+ * Copyright 2013-2016 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
+ */
+
+#home-carousel,
+.item,
+.active {
+    height: 100%;
+}
+
+/*
+#home-carousel .item {
+    .transition(2s ease-in-out left);
+}
+*/
+
+#home-carousel {
+    margin: 0%;
+}
+
+#home-carousel .carousel-indicators {
+    bottom: 50px;
+}
+
+#home-carousel .carousel-inner img {
+    min-height: 100%;
+    min-width: 100%;
+}
+
+#home-carousel .carousel-inner {
+    height: 100%;
+}
+
+#home-carousel .carousel-caption {
+    background-color: rgba(142, 143, 144, 0.7);
+    left: 0;
+    right: 0;
+    bottom: 50px;
+    padding: 0;
+    padding-bottom: 35px;
+    padding-top: 10px;
+}
+z
+#home-carousel .carousel-caption h1, h2, h3, p {
+    color: white;
+}
+
+#home-carousel .carousel-caption p {
+    margin: 0;
+}
+
+#home-carousel .carousel-caption h2 {
+    margin: 0;
+}
+
+#home-carousel p.carousel-date-caption {
+    font-size: 100%;
+    font-variant: small-caps;
+    margin: 0;
+}
+
+.carousel-image-div {
+    background-repeat: no-repeat;
+    background-position: left top;
+    -webkit-background-size: cover; /* For WebKit*/
+    -moz-background-size: cover;    /* Mozilla*/
+    -o-background-size: cover;      /* Opera*/
+    background-size: cover;         /* Generic*/
+    height: 100%;
+    width: 100%;
+}
+
+
+/* Background images are set within the HTML using inline CSS, not here */
+
+.fill {
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+footer {
+    margin: 50px 0;
+}

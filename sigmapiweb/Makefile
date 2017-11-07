@@ -23,7 +23,7 @@ syncdb:
 run: migrate quickrun
 
 static:
-	$(MANAGE) collectstatic
+	$(MANAGE) collectstatic --noinput
 
 migrate:
 	$(MANAGE) migrate

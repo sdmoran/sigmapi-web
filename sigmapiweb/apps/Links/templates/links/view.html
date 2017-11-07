@@ -2,9 +2,10 @@
 
 {% block title %}Sigma Pi Secure - Links {% endblock %}
 
-{%block  module_includes %}
+{% load sass_tags %}
+{% block module_includes %}
 	{% load staticfiles %}
-	<link rel='stylesheet' type='text/css' href='{% static "css/secure/links.css" %}' />
+	<link rel='stylesheet' type='text/css' href='{% sass_src "css/secure/links_v0.scss" %}' />
 {% endblock %}
 
 {% block content %}

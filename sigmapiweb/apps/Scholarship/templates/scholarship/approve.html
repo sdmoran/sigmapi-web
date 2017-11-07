@@ -2,12 +2,12 @@
 
 {% block title %}Sigma Pi Secure - Approve Scholarship Content{% endblock %}
 
-{% block module_includes %}
-{% load static %}
 {% load common_utils %}
-<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
-<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
 
+{% load staticfiles %}
+{% block module_includes %}
+	<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+	<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
 {% endblock %}
 
 {% block content %}

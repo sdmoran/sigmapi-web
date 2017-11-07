@@ -1,14 +1,14 @@
-{% extends 'common/public_base.html' %}
+{% extends 'public/_article_base.html' %}
 {% block title %}Sigma Pi Gamma Iota - History{% endblock %}
-{% block local_includes %}
-	{% load staticfiles %}
-{% endblock %}
+
+{% load staticfiles %}
+
 {% block content %}
 		<i>To learn about the rich history of our international organization, visit our Fraternity's <a href="http://www.sigmapi.org">official webpage.</a></i>
 		<h2>Our Founding</h2>
 		<div class="text-block">
 			<div class="image right medium">
-				<img src="{% static "img/house_summer_2016.jpg" %}">
+				<img src="{% static 'img/house_summer_2016.jpg' %}">
 				<div class="caption">Sigma Pi Fraternity House - 17 Dean St</div>
 			</div>
 

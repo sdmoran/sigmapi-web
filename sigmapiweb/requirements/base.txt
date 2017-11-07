@@ -4,3 +4,5 @@ beautifulsoup4==4.3.2
 requests==2.0.1
 editdistance==0.3.1
 django-downloadview==1.9
+django-compressor
+django-sass-processor

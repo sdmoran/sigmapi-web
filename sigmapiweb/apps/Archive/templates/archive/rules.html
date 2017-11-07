@@ -1,10 +1,11 @@
 {% extends 'archive/_base.html' %}
 {% block title %}Sigma Pi Secure - Archives - House Rules {% endblock %}
 
-{% block module_includes %}
 {% load staticfiles %}
-<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
-<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
+
+{% block module_includes %}
+	<script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
+	<script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
 {% endblock %}
 
 {% block content %}

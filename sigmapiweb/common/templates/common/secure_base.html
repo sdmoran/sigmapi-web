@@ -1,9 +1,9 @@
 {% extends 'common/_base.html' %}
 
 {% load staticfiles %}
+{% load sass_tags %}
 {% block local_includes %}
-	<link rel="stylesheet" type="text/css" href='{% static "css/secure/secure_theme.css" %}'/>
-
+	<link rel="stylesheet" type="text/css" href='{% sass_src "css/secure/base_v0.scss" %}'/>
 	<script type="text/javascript" src="{% static 'js/secure/common.js' %}"></script>
 	{% block module_includes %}
 	{% endblock %}

@@ -1,14 +1,12 @@
-{% extends 'common/public_base.html' %}
+{% extends 'public/_article_base.html' %}
 {% block title %}Sigma Pi Gamma Iota - Service{% endblock %}
-{% block local_includes %}
-	{% load staticfiles %}
-{% endblock %}
+{% load staticfiles %}
 {% block content %}
 	<i>To learn about the service and philanthropy efforts of our international organization, visit our Fraternity's <a href="http://sigmapi.org/about-sigma-pi/our-philanthropy/">official webpage.</a></i>
 	<h2>Overview</h2>
 	<div class="text-block">
 		<div class="image right medium">
-			<img src="{% static "img/service/service2.jpg" %}">
+			<img src="{% static 'img/service/service2.jpg' %}">
 			<div class="caption">Each year, we volunteer to assist with freshman move-in day at the end of August.</div>
 		</div>
 		<p>

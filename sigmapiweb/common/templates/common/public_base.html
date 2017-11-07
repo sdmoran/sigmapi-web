@@ -1,5 +1,12 @@
 {% extends 'common/_base.html' %}
 
+{% load sass_tags %}
+{% block local_includes %}
+	<link rel="stylesheet" type="text/css" href='{% sass_src "css/public/base_v0.scss" %}'/>
+	{% block module_includes %}
+	{% endblock %}
+{% endblock %}
+
 {% block navbar %}
 		{% if '/history' in request.path %}
 		<ul class="nav navbar-nav">
