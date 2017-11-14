@@ -55,20 +55,20 @@ def summons_sent(summons):
     subject = 'Standards Board: Summons'
     message = (
         'Date: ' + summons.dateSummonsSent.strftime('%Y-%m-%d') + '. ' +
-        'You are receiving this email because you are being summoned. '
+        'You are receiving this email because you are being summoned by ' +
+        summons.summonee.first_name + ' ' + summons.summonee.last_name + '. '
     )
     if summons.spokeWith:
         message += (
-            ' The recorded outcome of your conversation with the summonee (' +
-            summons.summonee.last_name + ', ' + summons.summonee.first_name +
-            ') is: ' + summons.outcomes +
-            '. The summonee has requested this case be ' +
+            ' The recorded outcome of your conversation with the summoner ' +
+            'is: ' + summons.outcomes +
+            '. The summoner has requested this case be ' +
             'sent to Standards Board for the following reason: ' +
             summons.standards_action + '. '
         )
     else:
         message += (
-            ' The reason for your summon is as follows: ' +
+            'The reason for your summon is as follows: ' +
             summons.special_circumstance + '. '
         )
     message += (
