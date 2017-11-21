@@ -1,39 +1,55 @@
 """
 Views for PubSite app.
 """
+from django.conf import settings
 from django.shortcuts import render
+
+
+def _get_context(page_name):
+    return {
+        'pages': settings.PUBLIC_PAGES,
+        'current_page_name': page_name,
+    }
 
 
 def index(request):
     """
     View for the static index page
     """
-    return render(request, 'public/home.html', None)
+    return render(request, 'public/home.html', _get_context('Home'))
 
 
-def history(request):
+def about(request):
     """
     View for the static chapter history page.
     """
-    return render(request, 'public/history.html', None)
+    return render(request, 'public/about.html', _get_context('About'))
 
 
-def service(request):
+def activities(request):
     """
     View for the static chapter service page.
     """
-    return render(request, 'public/service.html', None)
+    return render(
+        request,
+        'public/activities.html',
+        _get_context('Service & Activities'),
+    )
 
 
 def donate(request):
     """
     View for the static donate page.
     """
-    return render(request, 'public/donate.html', None)
+    return render(
+        request, 'public/donate.html', _get_context('Donate'),
+    )
 
 
 def permission_denied(request):
     """
     View for 403 (Permission Denied) error.
     """
-    return render(request, 'common/403.html', None)
+    return render(
+        request, 'common/403.html', _get_context('Permission Denied'),
+    )

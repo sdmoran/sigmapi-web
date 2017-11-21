@@ -26,3 +26,31 @@ def full_name(model, user_field_name):
     return get_full_name_or_deleted(
         getattr(model, user_field_name, None)
     )
+
+
+@register.filter
+def lookup(dictionary, key):
+    """
+    Lookup a key in a dictionary or list.
+
+    Arguments:
+        dictionary (dict|list)
+        key (str|int)
+
+    Returns: object
+    """
+    return dictionary[key]
+
+
+@register.filter
+def prepend(str1, str2):
+    """
+    Prepend the second string on the first.
+
+    Arguments:
+        str1 (str)
+        str2 (str)
+
+    Returns: str
+    """
+    return str2 + str1

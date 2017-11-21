@@ -3,6 +3,7 @@ URLs for PubSite app.
 """
 from django.conf.urls import url
 from django.contrib.auth import views as dsl
+from django.views.generic.base import RedirectView
 
 from . import views
 
@@ -25,13 +26,23 @@ urlpatterns = [
     ),
     url(
         regex=r'^history[/]$',
-        view=views.history,
+        view=RedirectView.as_view(pattern_name='pub-about'),
         name='pub-history',
     ),
     url(
+        regex=r'^about[/]$',
+        view=views.about,
+        name='pub-about',
+    ),
+    url(
         regex=r'^service[/]$',
-        view=views.service,
+        view=RedirectView.as_view(pattern_name='pub-activities'),
         name='pub-service',
+    ),
+    url(
+        regex=r'^activities[/]$',
+        view=views.activities,
+        name='pub-activities',
     ),
     url(
         regex=r'^403/',

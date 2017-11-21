@@ -1,0 +1,35 @@
+
+$static-root: '/static/';
+
+@font-face {
+  font-family: 'Bitter';
+  src: url($static-root + 'fonts/bitter/Bitter-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Bitter';
+  font-weight: bold;
+  src: url($static-root + 'fonts/bitter/Bitter-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Bitter';
+  font-style: italic;
+  src: url($static-root + 'fonts/bitter/Bitter-Italic.ttf');
+}
+
+$margin-col: #bbc;
+$bg-col: rgba(204, 204, 221, 0.92);
+$fg-col: #333;
+$accent-col: #662e6b;
+$line-col: rgb(124, 43, 131);
+
+$link-col: #009fdA;
+$link_hover_col: #0f80f8;
+
+$themed-bg-col: $accent-col;
+$themed-bg-active-col: #441f47;
+$themed-fg-col: #ccd;
+$themed-accent-col: #ffd700;
+
+$navbar-height: 90px;

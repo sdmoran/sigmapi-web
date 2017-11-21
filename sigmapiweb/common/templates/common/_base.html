@@ -37,73 +37,28 @@
 	</script>
 </head>
 <body>
-	<div id="wrapper">
-		<div id="banner-top">
-			<div id="banner-wrapper">
-				<a href="/"><img id="banner-img" src="/static/img/banner-crest.png"/></a>
-				<div class="text">
-					Sigma Pi
-				</div>
-				<div class="sub-text">
-					<span class="sub-text-main">Gamma Iota Chapter</span> <span class="sub-text-extra">at Worcester Polytechnic Institute</span> <span class="sub-text-extra-small">at WPI</span>
-				</div>
-			</div>
-		</div>
+    {% block body %}
+    {% endblock %}
+    <script type="text/javascript">
+        // Hack to fix Windows Phone 8 IE rendering bug
+        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+          var msViewportStyle = document.createElement('style')
+          msViewportStyle.appendChild(
+            document.createTextNode(
+              '@-ms-viewport{width:auto!important}'
+            )
+          )
+          document.querySelector('head').appendChild(msViewportStyle)
+        }
 
-		<nav class="navbar navbar-default" role="navigation">
-			<div class="container-fluid">
-			{% block navbar %}
-			{% endblock %}
-			</div>
-		</nav>
-
-		{% block subnav %}
-		{% endblock %}
-
-		<div class="container-fluid" id="content">
-			{% block content %}{% endblock %}
-		</div>
-	</div>
-	<div id="footer-wrapper">
-		<div id="footer-content">
-			<div id="values-wrapper">
-				<div id="title">Our Values</div>
-				<div id="values">Scholarship | Chivalry | Culture | Character | Service</div>
-			</div>
-
-			{% block footer-content %}
-
-			{% endblock %}
-		</div>
-	</div>
-	<!-- Block included for any content that must be rendered at the top level of the body -->
-	{% block toplevel_content %}
-	{% endblock %}
-
-	<!-- Embedded JS -->
-	<script type="text/javascript">
-		// Hack to fix Windows Phone 8 IE rendering bug
-		if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
-		  var msViewportStyle = document.createElement('style')
-		  msViewportStyle.appendChild(
-			document.createTextNode(
-			  '@-ms-viewport{width:auto!important}'
-			)
-		  )
-		  document.querySelector('head').appendChild(msViewportStyle)
-		}
-
-		// Hack to fix stock Android browser rendering of select inputs
-		$(function () {
-		  var nua = navigator.userAgent
-		  var isAndroid = (nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > -1 && nua.indexOf('AppleWebKit') > -1 && nua.indexOf('Chrome') === -1)
-		  if (isAndroid) {
-			$('select.form-control').removeClass('form-control').css('width', '100%')
-		  }
-		})
-	</script>
-
-	{% block embedded_js %}
-	{% endblock %}
+        // Hack to fix stock Android browser rendering of select inputs
+        $(function () {
+          var nua = navigator.userAgent
+          var isAndroid = (nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > -1 && nua.indexOf('AppleWebKit') > -1 && nua.indexOf('Chrome') === -1)
+          if (isAndroid) {
+            $('select.form-control').removeClass('form-control').css('width', '100%')
+          }
+        })
+    </script>
 </body>
 </html>

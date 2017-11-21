@@ -1,113 +1,180 @@
-{% extends 'common/public_base.html' %}
+{% extends "common/public_base.html" %}
+
+{% block module_includes %}
+    {% load sass_tags %}
+    <link rel='stylesheet' type='text/css' href='{% sass_src "css/public/home_v1.scss" %}' />
+{% endblock %}
 
 {% block title %}
 Sigma Pi Gamma Iota
 {% endblock %}
 
-{% block content %}
-<div class="row">
-	<div class="col-md-7">
-		<h2 style="display:inline;">Rush 2017</h2>
-	</div>
-</div>
-<div class="row" style="margin-top: 10px;">
-	<div class="col-md-6">
-		<a href="/static/img/home/rush_cal_2017_front.jpg">
-			<img class="img-responsive featured-news-image"
-			     src="/static/img/home/rush_cal_2017_front.jpg"/>
-		</a>
-	</div>
-	<div class="col-md-6">
-		<a href="/static/img/home/rush_cal_2017_front.jpg">
-			<img class="img-responsive featured-news-image"
-			     src="/static/img/home/rush_cal_2017_back.jpg"/>
-		</a>
-	</div>
-</div>
-<div class="row" style="margin-top: 10px">
-	<p>
-		<em>Click calendar to expand image</em>
-	</p>
-	<p>
-		Get excited for Rush 2017! All unaffiliated WPI students are welcome to join
-		us at our chapter house (34 Institute Road / 17 Dean Street) for lunch,
-		dinner, and events. Expect great food and fun while meeting the Brothers
-		and other rushees!
-	</p>
-	<p>
-		Also, check out our
-			<a href="https://www.facebook.com/groups/1443098042477079/">
-				Facebook Rush page
-			</a>
-		for news on meals, events, and everything else Rush-related.
-	</p>
-</div>
+{% load staticfiles %}
 
-<ul class="news">
-	<h2>
-		Past Events
-	</h2>
-	<li>
-		<h4>
-			Philanthropy: Amazing Day
-		</h4>
-		<img class="img-responsive" src="/static/img/home/amazing_day_event.jpg"/>
-		<div class="details">
-			Sigma Pi's Amazing Day event on the WPI quad raised awareness for suicide
-			prevention and accepted donations in
-			support of Amazing Day, Sigma Pi International's philanthropic organization.
-		</div>
-	</li>
-	<li class="separator">
-		<h4>
-			Graduation 2017
-		</h4>
-		<img class="img-responsive" src="/static/img/home/seniors_2017.jpg"/>
-		<p class="details">
-			Congratulations to Sigma Pi's twenty-eight seniors and one graduate student,
-			who graduated in May 2017!
-		</p>
-	</li>
-	<li>
-		<h4>
-			Orchid Ball
-		</h4>
-		<img class="img-responsive" src="/static/img/home/orchid_ball_2017.jpg"/>
-		<p class="details">
-			Held on a yacht in Boston Harbor, this year's Orchid Ball featured delicious
-			food, fun dancing, and beautiful sunset views of the Boston skyline.
-		</p>
-	</li>
-	<li class="separator">
-		<h4>
-			Relay for Life
-		</h4>
-		<img class="img-responsive" src="/static/img/home/relay_2017.jpg"/>
-		<p class="details">
-			We participated in the ACS's Relay for Life at WPI in order to raise funds
-			and support for cancer awareness, research, and treatment.
-		</p>
-	</li>
-	<li>
-		<h4>
-			Greek Week Talent Show 2nd Place!
-		</h4>
-		<iframe width="560" height="300" src="//www.youtube.com/embed/8DBLC0VtLNw" frameborder="0" allowfullscreen>
-		</iframe>
-		<p class="details">
-			Dance-off at the beach! (2017)
-		</p>
-	</li>
-	<li class="separator">
-		<h4>
-			Greek Week Talent Show 1st Place!
-		</h4>
-		<iframe width="560" height="350" src="//www.youtube.com/embed/NGgcKJ3XYDI" frameborder="0" allowfullscreen>
-		</iframe>
-		<p class="details">
-			 'N Sync versus Backstreet Boys throwdown! (2014)
-		</p>
-	</li>
-	<li>
-</ul>
+{% block content %}
+<div id="home-carousel" class="carousel slide" data-ride="carousel" data-interval="8000">
+    <!-- Carousel indicators -->
+    <ol class="carousel-indicators">
+        <li data-target="#home-carousel" data-slide-to="0" class="active"></li>
+        <li data-target="#home-carousel" data-slide-to="1"></li>
+        <li data-target="#home-carousel" data-slide-to="2"></li>
+        <li data-target="#home-carousel" data-slide-to="3"></li>
+    </ol>
+    <!-- Wrapper for carousel items -->
+    <div class="carousel-inner"
+         style="background-image: url('{% static "img/spinner.gif" %}');
+                background-repeat: no-repeat;
+                background-size: 100px 100px;
+                background-position: center">
+        <div class="item active" >
+            <div class="carousel-image-div"></div>
+            <div class="carousel-caption">
+                <h2>Welcome</h2>
+                <p>Learn about the
+                    <a href="/about">values, brotherhood, and history</a> 
+                   of Sigma Pi, Gamma Iota chapter at Worcester Polytechnic Institute
+                </p>
+            </div>
+        </div>
+        <div class="item">
+            <div class="carousel-image-div"></div>
+            <div class="carousel-caption">
+                <h2>Activities, Service, and Brotherhood</h2>
+                <p>Sigma Pi hosts and participates in a wide variety of
+                    <a href="/activities">events</a>,
+                   including community service, social, and recruitment events, among others.</p>
+            </div>
+        </div>
+        <div class="item">
+            <div class="carousel-image-div"></div>
+            <div class="carousel-caption">
+                <h2>Join Sigma Pi</h2>
+                <p>Learn about our exciting and engaging <a href="/activities#rush">recruitment process</a>, which takes place every Fall.</p>
+            </div>
+        </div>
+        <div class="item">
+            <div class="carousel-image-div"></div>
+            <div class="carousel-caption">
+                <h2>An International Brotherhood</h2>
+                <p>We are just one chapter of an <a href="//sigmapi.org">international organization</a> that has initiated over 100,000 members.</p>
+            </div>
+        </div>
+
+    </div>
+    <!-- Carousel controls -->
+    <a class="carousel-control left" href="#home-carousel" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+    </a>
+    <a class="carousel-control right" href="#home-carousel" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+    </a>
+</div>
+{% endblock %}
+
+{% block embedded_js %}
+<script type="text/javascript">
+(function() {
+
+    $('#home-carousel').carousel({
+        pause: false
+    });
+
+    $(document).ready(function() {
+        var imgDivs = $('#home-carousel .carousel-image-div');
+        if (imgDivs.length == 0) {
+            return;
+        }
+        if (imgDivs.length == 1) {
+            imgDivs[0].css('background-size', 'cover');
+            return;
+        }
+
+        var IMAGE_NAMES = ['amazing-day.jpg', 'orchid-ball.jpg', 'purgatory-chasm.jpg', 'province.jpg'];
+
+        for (var ii = 0; ii < imgDivs.length; ii++) { (function(i) {
+            var src = '/static/img/home/' + IMAGE_NAMES[i];
+            $('<img>').attr('src', src).load(function() {
+                var imgDiv = $(imgDivs[i]);
+                console.log(src);
+                imgDiv.css('background-image', 'url(\'' + src + '\')');
+                var wSrc = this.width;
+                var hSrc = this.height;
+                var slideDiv = imgDiv.parent();
+
+                var FPS = 25;
+                var SECONDS_PER_PAN = 8;
+                var MIN_OFFSET_PER_SECOND = 20, MAX_OFFSET_PER_SECOND = 60;
+                var newPanVertically, newMaxOffset, timeResized;
+
+                function onResize() {
+                    var activeImgDiv = $('#home-carousel .active .carousel-image-div')
+                    var wDst = activeImgDiv.width();
+                    var hDst = activeImgDiv.height();
+                    var ratioDst = wDst / hDst;
+                    var w, h;
+                    var ratioSrc = wSrc / hSrc;
+                    if (ratioDst > ratioSrc) {
+                        w = wDst;
+                        h = w / ratioSrc;
+                    } else {
+                        h = hDst;
+                        w = h * ratioSrc;
+                    }
+                    newPanVertically = ratioDst > ratioSrc
+                    newMaxOffset = newPanVertically ? (h - hDst) : (w - wDst);
+                    timeResized = +new Date();
+                }
+
+                onResize();
+                $(window).resize(onResize);
+
+                var offset, reverse, panVertically, maxOffset;
+
+                var lastTickTime = +new Date();
+                setInterval(function() {
+                    if (newPanVertically != panVertically) {
+                        offset = 0;
+                        reverse = 0;
+                    } else if (newMaxOffset < maxOffset) {
+                        offset = 0;
+                    }
+                    maxOffset = newMaxOffset;
+                    panVertically = newPanVertically;
+                    var offsetPerSecond = maxOffset / SECONDS_PER_PAN;
+                    var adjOffsetPerSecond = Math.min(offsetPerSecond, MAX_OFFSET_PER_SECOND);
+                    var adjustment = (offsetPerSecond - adjOffsetPerSecond) * SECONDS_PER_PAN / 2;
+
+                    var now = +new Date();
+                    var elapsed = now - lastTickTime;
+                    lastTickTime = now;
+                    if (now - timeResized < 200) return;
+
+                    if (adjOffsetPerSecond > 10 && 
+                       (slideDiv.hasClass('active') || 
+                       slideDiv.hasClass('left'))) {
+
+                        if (offset <= 0) {
+                            reverse = false;
+                        } else if (offset >= maxOffset) {
+                            reverse = true;
+                        }
+                        offset += (adjOffsetPerSecond * elapsed / 1000) *
+                                  (reverse ? -1 : 1);
+                        offsetStr = panVertically ? '0px -' + (offset + adjustment) + 'px'
+                                                  : '-' + (offset + adjustment) + 'px ' + '0px';
+                        imgDiv.css('background-position', offsetStr);
+
+                    } else {
+                        offset = 0;
+                        reverse = false;
+                        imgDiv.css('background-position', '0px 0px');
+                    }
+                }, 1000 / FPS);
+
+            });
+        })(ii);}
+    });
+
+})();
+</script>
 {% endblock %}

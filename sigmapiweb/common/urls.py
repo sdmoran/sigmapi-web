@@ -26,6 +26,10 @@ urlpatterns = [
         view=admin.site.urls,
     ),
     url(
+        regex=r'^brothers/',
+        view=include(userinfo_urls),
+    ),
+    url(
         regex=r'^users/',
         view=include(userinfo_urls),
     ),
