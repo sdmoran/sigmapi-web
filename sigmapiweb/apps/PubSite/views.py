@@ -8,7 +8,7 @@ def index(request):
     """
     View for the static index page
     """
-    return render(request, 'public/home.html', None)
+    return render(request, 'public/home2.html', None)
 
 
 def history(request):

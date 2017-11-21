@@ -1,0 +1,274 @@
+
+
+/**
+ * Hack to work around bug with Windows Phone 8 rendering
+ */
+@-webkit-viewport   { width: device-width; }
+@-moz-viewport      { width: device-width; }
+@-ms-viewport       { width: device-width; }
+@-o-viewport        { width: device-width; }
+@viewport           { width: device-width; }
+
+$bg-col: #ccd;
+$bg2-col: #bbc;
+$fg-col: #333;
+$accent-col: #662e6b;
+$line-col: rgb(124, 43, 131);
+
+$link-col: #009fdA;
+$link_hover_col: #0f80f8;
+
+$themed-bg-col: $accent-col;
+$themed-fg-col: #ccd;
+$themed-accent-col: #ffd700;
+
+/**
+ * Global
+ */
+
+html {
+  background-color: $bg-col;
+  height:100%;
+}
+
+body {
+  background: none;
+  height:100%;
+    font-size: 13px;
+}
+
+a {
+  color: $link-col;
+  text-decoration: none;
+    outline: 0;
+}
+
+a:hover {
+  color: $link_hover_col;
+}
+
+h2 {
+    color: $accent-col;
+    font-weight: 200;
+}
+
+
+/**
+ * Header/Navbar
+ */
+
+#navbar {
+    background-color: $themed-bg-col;
+    border-color: $themed-bg-col;
+    border-radius: 0;
+    margin: 0;
+    font-size: 100%;
+    min-height: 100px;
+    transition: top 0.2s ease-in-out;
+}
+
+.navbar-nav li a {
+    line-height: 60px;
+}
+
+@media only screen and (min-width: 768px) {
+    #navbar li a {
+        font-size: 18px;
+    }
+}
+
+.logo {
+    height: 100%;
+    width: auto;
+}
+
+.navbar-brand {
+    padding: 0;
+}
+
+.navbar-header {
+    padding: 20px;
+}
+
+.navbar-inverse
+.navbar-nav > li > a {
+    color: $themed-fg-col;
+}
+
+.navbar-inverse
+.navbar-nav > li > a:hover {
+    color: $themed-accent-col;
+}
+
+#navbar-spacer {
+  width: 100%;
+  min-height: 100px;
+}
+
+
+/**
+ * Content
+ */
+
+#main-content
+{
+  margin: 0 auto;
+}
+
+p  {
+  line-height: 1.635em;
+  margin: .7em 0 1em 0;
+  font-size: 1.1em;
+  color: $fg-col;
+}
+
+h4 {
+  display:block;
+  word-wrap:none;
+  font-size: 1.3em;
+  color: $accent-col;
+}
+
+h3  {
+  display:block;
+  word-wrap:none;
+  font-size: 1.5em;
+  color: $accent-col;
+}
+
+h2  {
+  display:block;
+  word-wrap:none;
+  font-size: 1.8em;  
+  color: $accent-col;
+}
+
+h1 {
+  display:block;
+  word-wrap:none;
+  font-size: 2.5em;
+  color: $accent-col;
+}
+
+.underlined {
+  width: 100%;
+  padding-bottom: 5px;
+  border-bottom: 1px solid $accent-col;
+}
+
+.themed-back {
+  text-align: center;
+  background: linear-gradient(to right, $bg-col, $themed-bg-col, $bg-col);
+  color: $themed-fg-col;
+  height: 50px;
+  line-height: 50px;
+  left: 0;
+  width: 100%;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.text-block {
+  margin-bottom:15px;
+}
+
+
+/**
+ * Image Formatting
+ */
+
+.side-by-side {
+  display: block;
+
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.side-by-side > .image {
+  display: inline-block;
+}
+
+.side-by-side > a > img {
+    max-width: 49%;
+}
+
+@media (max-width:700px){
+    .side-by-side > a > img
+    {
+      max-width: 100%;
+      width: 100%;
+
+      float:none !important;
+
+      padding-bottom: 10px;
+    }
+}
+
+.image {
+  padding-bottom: 10px;
+  padding-left: 10px;
+}
+
+.image.right {
+  display:inline-block;
+  float:right;
+  margin-left:5px;
+}
+
+.image.left {
+  display:inline-block;
+  float:left;
+  margin-right:5px;
+}
+
+.image.adaptive {
+  width: 100%;
+}
+
+.image.medium img {
+  max-width: 500px;
+}
+
+.image.small img {
+  max-width: 300px;
+}
+
+@media (max-width:600px){
+    .image.medium img
+    {
+      max-width: 100%;
+      width: 100%;
+
+      float:none !important;
+    }
+}
+
+@media (max-width:400px) {
+    .image.small img
+    {
+      max-width: 100%;
+      width: 100%;
+
+      float:none !important;
+    }
+}
+
+
+/**
+ * Button Styling
+ */
+
+.btn-themed
+{
+  background-color: $themed-bg-col;
+
+  color:white;
+}
+
+.btn-themed:hover
+{
+  background-color: $themed-bg-col;
+
+  color: white;
+}

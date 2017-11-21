@@ -37,73 +37,112 @@
 	</script>
 </head>
 <body>
-	<div id="wrapper">
-		<div id="banner-top">
-			<div id="banner-wrapper">
-				<a href="/"><img id="banner-img" src="/static/img/banner-crest.png"/></a>
-				<div class="text">
-					Sigma Pi
-				</div>
-				<div class="sub-text">
-					<span class="sub-text-main">Gamma Iota Chapter</span> <span class="sub-text-extra">at Worcester Polytechnic Institute</span> <span class="sub-text-extra-small">at WPI</span>
-				</div>
-			</div>
-		</div>
+	
+    <!-- Navigation -->
+    <nav id="navbar" class="navbar navbar-inverse sp-bg-color navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">
+                    <img class="logo" src="/static/img/logo.png"/>
+                </a>
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                {% block navbar_items %}
+                {% endblock %}
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
 
-		<nav class="navbar navbar-default" role="navigation">
-			<div class="container-fluid">
-			{% block navbar %}
-			{% endblock %}
-			</div>
-		</nav>
+    {% block subnav %}
+    {% endblock %}
 
-		{% block subnav %}
-		{% endblock %}
+    <div id="main-content">
+        {% block content %}{% endblock %}
+    </div>
 
-		<div class="container-fluid" id="content">
-			{% block content %}{% endblock %}
-		</div>
-	</div>
-	<div id="footer-wrapper">
-		<div id="footer-content">
-			<div id="values-wrapper">
-				<div id="title">Our Values</div>
-				<div id="values">Scholarship | Chivalry | Culture | Character | Service</div>
-			</div>
+    <!-- Block included for any content that must be rendered at the top level of the body -->
+    {% block toplevel_content %}
+    {% endblock %}
 
-			{% block footer-content %}
+    <!-- Embedded JS -->
+    <script type="text/javascript">
+    (function() {
 
-			{% endblock %}
-		</div>
-	</div>
-	<!-- Block included for any content that must be rendered at the top level of the body -->
-	{% block toplevel_content %}
-	{% endblock %}
+        // Hide header on scroll up
+        // Adapted from: https://medium.com/@mariusc23/hide-header-on-scroll-down-show-on-scroll-up-67bbaae9a78c#.bc4n36mjf
+        var navbar = $('#navbar');
+        var didScroll = false;
+        var lastScrollTop = 0;
+        var delta = 5;
+        var navbarHeight = navbar.outerHeight();
+        $(window).scroll(function(event){
+            didScroll = true;
+        });
+        setInterval(function() {
+            if (didScroll) {
+                hasScrolled();
+                didScroll = false;
+            }
+        }, 250);
+        function hasScrolled() {
+            console.log('awef');
+            var st = $(this).scrollTop();
+            if(Math.abs(lastScrollTop - st) <= delta) {
+                return;
+            } else if (st > lastScrollTop && st > navbarHeight){
+                navbar.css('top', -parseFloat(navbar.css('height')));
+            } else if (st + $(window).height() < $(document).height()) {
+                navbar.css('top', 0);
+            }
+            lastScrollTop = st;
+        }
 
-	<!-- Embedded JS -->
-	<script type="text/javascript">
-		// Hack to fix Windows Phone 8 IE rendering bug
-		if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
-		  var msViewportStyle = document.createElement('style')
-		  msViewportStyle.appendChild(
-			document.createTextNode(
-			  '@-ms-viewport{width:auto!important}'
-			)
-		  )
-		  document.querySelector('head').appendChild(msViewportStyle)
-		}
+        // Line up top of content with bottom of fixed navbar
+        function lineUpContent() {
+            var navbar = $('#navbar')
+            var content = $('#main-content')
+            var margin = 0; //window.innerWidth * 0.02; TODO
+            var contentPlacement = navbar.position().top + navbar.height() + margin;
+            content.css('margin-top', contentPlacement);
+            $('body').css('height', $('html').height() - navbar.height() - margin - 1);
+        }
+        $(document).ready(lineUpContent);
+        $(window).resize(lineUpContent);
 
-		// Hack to fix stock Android browser rendering of select inputs
-		$(function () {
-		  var nua = navigator.userAgent
-		  var isAndroid = (nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > -1 && nua.indexOf('AppleWebKit') > -1 && nua.indexOf('Chrome') === -1)
-		  if (isAndroid) {
-			$('select.form-control').removeClass('form-control').css('width', '100%')
-		  }
-		})
-	</script>
+        // Hack to fix Windows Phone 8 IE rendering bug
+        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+          var msViewportStyle = document.createElement('style')
+          msViewportStyle.appendChild(
+            document.createTextNode(
+              '@-ms-viewport{width:auto!important}'
+            )
+          )
+          document.querySelector('head').appendChild(msViewportStyle)
+        }
 
-	{% block embedded_js %}
-	{% endblock %}
+        // Hack to fix stock Android browser rendering of select inputs
+        $(function () {
+          var nua = navigator.userAgent
+          var isAndroid = (nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > -1 && nua.indexOf('AppleWebKit') > -1 && nua.indexOf('Chrome') === -1)
+          if (isAndroid) {
+            $('select.form-control').removeClass('form-control').css('width', '100%')
+          }
+        })
+    })();
+    </script>
+
+    {% block embedded_js %}
+    {% endblock %}
 </body>
 </html>

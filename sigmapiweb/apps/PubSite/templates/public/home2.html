@@ -1,0 +1,154 @@
+{% extends "common/public_base.html" %}
+
+{% block primary_stylesheet %}
+    {% load sass_tags %}
+    <link rel='stylesheet' type='text/css' href='{% sass_src "css/public/home_v1.scss" %}' />
+{% endblock %}
+
+{% block title %}
+Sigma Pi Gamma Iota
+{% endblock %}
+
+{% block content %}
+<div id="home-carousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+    <!-- Carousel indicators -->
+    <ol class="carousel-indicators">
+            <li data-target="#home-carousel" data-slide-to="0" class="active"></li>
+            <li data-target="#home-carousel" data-slide-to="1"></li>
+        {% endfor %}
+    </ol>
+    <!-- Wrapper for carousel items -->
+    <div class="carousel-inner">
+
+        <div class="item active">
+            <div class="carousel-image-div" style="background-image: url('{% sass_src \"img/featured/amazing_day_event.jpg\" %}')">
+            </div>
+            <div class="carousel-caption">
+                <h2>Service</h2>
+                <p>Click to learn about Sigma Pi's community service and philanthropic efforts.</p>
+            </div>
+        </div>
+        <div class="item active">
+            <div class="carousel-image-div" style="background-image: url('{% sass_src \"img/featured/orchid_ball_2017.jpg\" %}')">
+            </div>
+            <div class="carousel-caption">
+                <h2>Activities</h2>
+                <p>Click to learn about Sigma Pi's social and brotherhood events.</p>
+            </div>
+        </div>
+
+    </div>
+    <!-- Carousel controls -->
+    <a class="carousel-control left" href="#home-carousel" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+    </a>
+    <a class="carousel-control right" href="#home-carousel" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+    </a>
+</div>
+{% endblock %}
+
+{% block embedded_js %}
+<script type="text/javascript">
+(function() {
+
+    $('#home-carousel').carousel({
+        pause: false
+    });
+
+    $(document).ready(function() {
+        var imgDivs = $('#home-carousel .carousel-image-div');
+        if (imgDivs.length == 0) {
+            return;
+        }
+        if (imgDivs.length == 1) {
+            imgDivs[0].css('background-size', 'cover');
+            return;
+        }
+
+        for (var ii = 0; ii < imgDivs.length; ii++) { (function(i) {
+            var s = $(imgDivs[i]).css('background-image');
+            var src = s.substring(5, s.length - 2);
+            $('<img>').attr('src', src).load(function() {
+                var wSrc = this.width;
+                var hSrc = this.height;
+                var imgDiv = $(imgDivs[i]);
+                var slideDiv = imgDiv.parent();
+
+                var FPS = 25;
+                var SECONDS_PER_PAN = 6.5;
+                var MIN_OFFSET_PER_SECOND = 20, MAX_OFFSET_PER_SECOND = 60;
+                var newPanVertically, newMaxOffset, timeResized;
+
+                function onResize() {
+                    var activeImgDiv = $('#home-carousel .active .carousel-image-div')
+                    var wDst = activeImgDiv.width();
+                    var hDst = activeImgDiv.height();
+                    var ratioDst = wDst / hDst;
+                    var w, h;
+                    var ratioSrc = wSrc / hSrc;
+                    if (ratioDst > ratioSrc) {
+                        w = wDst;
+                        h = w / ratioSrc;
+                    } else {
+                        h = hDst;
+                        w = h * ratioSrc;
+                    }
+                    newPanVertically = ratioDst > ratioSrc
+                    newMaxOffset = newPanVertically ? (h - hDst) : (w - wDst);
+                    timeResized = +new Date();
+                }
+
+                onResize();
+                $(window).resize(onResize);
+
+                var offset, reverse, panVertically, maxOffset;
+
+                var lastTickTime = +new Date();
+                setInterval(function() {
+                    if (newPanVertically != panVertically) {
+                        offset = 0;
+                        reverse = 0;
+                    } else if (newMaxOffset < maxOffset) {
+                        offset = 0;
+                    }
+                    maxOffset = newMaxOffset;
+                    panVertically = newPanVertically;
+                    var offsetPerSecond = maxOffset / SECONDS_PER_PAN;
+                    var adjOffsetPerSecond = Math.min(offsetPerSecond, MAX_OFFSET_PER_SECOND);
+                    var adjustment = (offsetPerSecond - adjOffsetPerSecond) * SECONDS_PER_PAN / 2;
+
+                    var now = +new Date();
+                    var elapsed = now - lastTickTime;
+                    lastTickTime = now;
+                    if (now - timeResized < 200) return;
+
+                    if (adjOffsetPerSecond > 10 && 
+                       (slideDiv.hasClass('active') || 
+                       slideDiv.hasClass('left'))) {
+
+                        if (offset <= 0) {
+                            reverse = false;
+                        } else if (offset >= maxOffset) {
+                            reverse = true;
+                        }
+                        offset += (adjOffsetPerSecond * elapsed / 1000) *
+                                  (reverse ? -1 : 1);
+                        offsetStr = panVertically ? '0px -' + (offset + adjustment) + 'px'
+                                                  : '-' + (offset + adjustment) + 'px ' + '0px';
+                        imgDiv.css('background-position', offsetStr);
+
+                    } else {
+                        offset = 0;
+                        reverse = false;
+                        imgDiv.css('background-position', '0px 0px');
+                    }
+                }, 1000 / FPS);
+
+            });
+        })(ii);}
+    });
+
+})();
+</script>
+{% endblock %}
