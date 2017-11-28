@@ -4,9 +4,7 @@
     {% load staticfiles %}
     {% load sass_tags %}
 
-    {% block primary_stylesheet %}
-        <link rel="stylesheet" type="text/css" href="{% sass_src 'css/public/base_v1.scss' %}"/>
-    {% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% sass_src 'css/public/base_v1.scss' %}"/>
 
     {% block module_includes %}
     {% endblock %}
@@ -17,11 +15,6 @@
     <li class="child sibling">
         <a id="nav-home child" href='/'>
             Home
-        </a>
-    </li>
-    <li class="child sibling">
-        <a id="nav-home child" href='/news/all'>
-            News &amp; Events
         </a>
     </li>
     <li class="child sibling">

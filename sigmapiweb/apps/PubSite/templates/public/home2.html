@@ -1,6 +1,6 @@
 {% extends "common/public_base.html" %}
 
-{% block primary_stylesheet %}
+{% block module_includes %}
     {% load sass_tags %}
     <link rel='stylesheet' type='text/css' href='{% sass_src "css/public/home_v1.scss" %}' />
 {% endblock %}
@@ -13,23 +13,22 @@ Sigma Pi Gamma Iota
 <div id="home-carousel" class="carousel slide" data-ride="carousel" data-interval="6000">
     <!-- Carousel indicators -->
     <ol class="carousel-indicators">
-            <li data-target="#home-carousel" data-slide-to="0" class="active"></li>
-            <li data-target="#home-carousel" data-slide-to="1"></li>
-        {% endfor %}
+        <li data-target="#home-carousel" data-slide-to="0" class="active"></li>
+        <li data-target="#home-carousel" data-slide-to="1"></li>
     </ol>
     <!-- Wrapper for carousel items -->
     <div class="carousel-inner">
 
         <div class="item active">
-            <div class="carousel-image-div" style="background-image: url('{% sass_src \"img/featured/amazing_day_event.jpg\" %}')">
+            <div class="carousel-image-div" style="background-image: url('{% sass_src "img/featured/amazing_day_event.jpg" %}')">
             </div>
             <div class="carousel-caption">
                 <h2>Service</h2>
                 <p>Click to learn about Sigma Pi's community service and philanthropic efforts.</p>
             </div>
         </div>
-        <div class="item active">
-            <div class="carousel-image-div" style="background-image: url('{% sass_src \"img/featured/orchid_ball_2017.jpg\" %}')">
+        <div class="item">
+            <div class="carousel-image-div" style="background-image: url('{% sass_src "img/featured/orchid_ball_2017.jpg" %}')">
             </div>
             <div class="carousel-caption">
                 <h2>Activities</h2>
