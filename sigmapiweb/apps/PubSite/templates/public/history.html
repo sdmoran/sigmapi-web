@@ -4,7 +4,6 @@
 {% load staticfiles %}
 
 {% block content %}
-		<i>To learn about the rich history of our international organization, visit our Fraternity's <a href="http://www.sigmapi.org">official webpage.</a></i>
 		<h2>Our Founding</h2>
 		<div class="text-block">
 			<div class="image right medium">
@@ -39,10 +38,8 @@
 			<p>
 			Since our inception in 1965, we have maintained a continuously positive existence here at Worcester Polytechnic Institute (WPI). Our brothers are valued members of the undergraduate community and are passionate about their interests on campus. We are always looking for ways to give back to our community and participate in many different service-oriented events throughout the year.
 			</p>
-
-
-			For more information on the ways we try to give back to our community, visit our <a href="{% url 'pub-service' %}">Service page.</a>
-			<br/>
-			For more information about our active members, visit our <a href="{% url 'userinfo-users' %}">Brothers page.</a>
+		</div>
+		<div class="footer">
+			<i>To learn about the rich history of our international organization, visit our Fraternity's <a href="http://www.sigmapi.org">official webpage.</a></i>
 		</div>
 {% endblock %}
