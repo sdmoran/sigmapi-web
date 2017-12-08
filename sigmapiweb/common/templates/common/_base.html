@@ -56,7 +56,20 @@
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                {% block navbar_items %}
+                {% block navbar %}
+                <ul class="nav navbar-nav">
+                    {% for page_name, page_url in pages.items %}
+                        {% if page_name == current_page_name %}
+                            <li class="child sibling active">
+                        {% else %}
+                            <li class="child sibling">
+                        {% endif %}
+                            <a id="nav-home child" href='{{page_url}}'>
+                                {{page_name}}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
                 {% endblock %}
             </div>
             <!-- /.navbar-collapse -->
