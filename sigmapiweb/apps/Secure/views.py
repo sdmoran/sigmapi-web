@@ -9,6 +9,10 @@ from .models import CalendarKey
 
 
 @login_required
+def no_demo(request):
+    return render(request, 'common/no_demo.html', {})
+
+@login_required
 def index(request):
     """
     View for the index landing page of the site.
