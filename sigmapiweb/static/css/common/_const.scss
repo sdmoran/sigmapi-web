@@ -1,19 +1,21 @@
 
+$static-root: '/demo/static/'
+
 @font-face {
   font-family: 'Bitter';
-  src: url('/static/fonts/bitter/Bitter-Regular.ttf');
+  src: url($static-root + 'fonts/bitter/Bitter-Regular.ttf');
 }
 
 @font-face {
   font-family: 'Bitter';
   font-weight: bold;
-  src: url('/static/fonts/bitter/Bitter-Bold.ttf');
+  src: url($static-root + 'fonts/bitter/Bitter-Bold.ttf');
 }
 
 @font-face {
   font-family: 'Bitter';
   font-style: italic;
-  src: url('/static/fonts/bitter/Bitter-Italic.ttf');
+  src: url($static-root + 'fonts/bitter/Bitter-Italic.ttf');
 }
 
 $margin-col: #bbc;

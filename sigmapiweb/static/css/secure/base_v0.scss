@@ -65,7 +65,7 @@ a:hover
 	height:75px;
 	width:100%;
 	background-color: rgb(124, 43, 131);
-	background-image: url('/static/img/banner-owl.png');
+	background-image: url($static-root + 'img/banner-owl.png');
 	background-position: top right;
 	background-repeat:no-repeat;
 }
