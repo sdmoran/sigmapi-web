@@ -47,7 +47,8 @@ body,
 }
 
 #home-carousel .carousel-caption {
-    background-color: rgba(142, 143, 144, 0.7);
+    background-color: rgb(142, 143, 144);
+    opacity: 0.8;
     left: 0;
     right: 0;
     bottom: 50px;
@@ -100,4 +101,8 @@ z
 
 footer {
     margin: 50px 0;
+}
+
+a, a:hover {
+    color: blue;
 }

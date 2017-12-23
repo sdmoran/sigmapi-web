@@ -39,7 +39,7 @@
                         {% else %}
                             <li class="child sibling">
                         {% endif %}
-                            <a id="nav-home child" href='{{page_info.0}}'>
+                            <a id="nav-home child" href='{% url page_info.0 %}'>
                                 {{page_name}}
                             </a>
                         </li>
@@ -101,15 +101,15 @@
 
         // Replace low-res background image with high-res one
 	    window.onload = function() {
-	    	var cbLow = $('#content-bkg-lowres')[0].style;
-	    	var cbHigh = $('#content-bkg-highres')[0].style;
-	    	if (!cbLow.backgroundImage) return;
-	    	var urlHigh = cbLow.backgroundImage.replace('low-res', 'high-res');
+	    	var cbLow = $($('#content-bkg-lowres')[0]);
+	    	var cbHigh = $($('#content-bkg-highres')[0]);
+	    	var urlLow = cbLow.css('background-image');
+	    	if (!urlLow) return;
+	    	var urlHigh = urlLow.replace('low-res', 'high-res');
 	    	var img = new Image();
 	    	img.src = urlHigh.replace('url("', "").replace('")', '');
-	    	console.log(img.src);
-	    	cbHigh.backgroundImage = urlHigh;
-	    	setTimeout(function() { cbHigh.opacity = '1'; }, 1000);
+	    	cbHigh.css('background-image', urlHigh);
+	    	setTimeout(function() { cbHigh.css('opacity', '1'); }, 1000);
 	    };
     })();
     </script>

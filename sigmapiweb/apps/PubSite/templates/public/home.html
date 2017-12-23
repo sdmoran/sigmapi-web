@@ -12,32 +12,51 @@ Sigma Pi Gamma Iota
 {% load staticfiles %}
 
 {% block content %}
-<div id="home-carousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+<div id="home-carousel" class="carousel slide" data-ride="carousel" data-interval="8000">
     <!-- Carousel indicators -->
     <ol class="carousel-indicators">
         <li data-target="#home-carousel" data-slide-to="0" class="active"></li>
         <li data-target="#home-carousel" data-slide-to="1"></li>
+        <li data-target="#home-carousel" data-slide-to="2"></li>
+        <li data-target="#home-carousel" data-slide-to="3"></li>
     </ol>
     <!-- Wrapper for carousel items -->
-    <div class="carousel-inner">
-
-        <div class="item active" style="background-image: url('{% static "img/spinner.gif" %}');
-                                        background-repeat: no-repeat;
-                                        background-size: 100px 100px;
-                                        background-position: center">
-            <div class="carousel-image-div" style="background-image: url('{% static "img/featured/amazing_day_event.jpg" %}')">
-            </div>
+    <div class="carousel-inner"
+         style="background-image: url('{% static "img/spinner.gif" %}');
+                background-repeat: no-repeat;
+                background-size: 100px 100px;
+                background-position: center">
+        <div class="item active" >
+            <div class="carousel-image-div"></div>
             <div class="carousel-caption">
-                <h2>Service</h2>
-                <p>Click to learn about Sigma Pi's community service and philanthropic efforts.</p>
+                <h2>Welcome</h2>
+                <p>Learn about the
+                    <a href="/about">values, brotherhood, and history</a> 
+                   of Sigma Pi, Gamma Iota chapter at Worcester Polytechnic Institute
+                </p>
             </div>
         </div>
         <div class="item">
-            <div class="carousel-image-div" style="background-image: url('{% static "img/featured/orchid_ball_2017.jpg" %}')">
-            </div>
+            <div class="carousel-image-div"></div>
             <div class="carousel-caption">
-                <h2>Activities</h2>
-                <p>Click to learn about Sigma Pi's social and brotherhood events.</p>
+                <h2>Activities, Service, and Brotherhood</h2>
+                <p>Sigma Pi hosts and participates in a wide variety of
+                    <a href="/activities">events</a>,
+                   including community service, social, and recruitment events, among others.</p>
+            </div>
+        </div>
+        <div class="item">
+            <div class="carousel-image-div"></div>
+            <div class="carousel-caption">
+                <h2>Join Sigma Pi</h2>
+                <p>Learn about our exciting and engaging <a href="/activities#rush">recruitment process</a>, which takes place every Fall.</p>
+            </div>
+        </div>
+        <div class="item">
+            <div class="carousel-image-div"></div>
+            <div class="carousel-caption">
+                <h2>An International Brotherhood</h2>
+                <p>We are just one chapter of an <a href="//sigmapi.org">international organization</a> that has initiated over 100,000 members.</p>
             </div>
         </div>
 
@@ -70,17 +89,20 @@ Sigma Pi Gamma Iota
             return;
         }
 
+        var IMAGE_NAMES = ['amazing-day.jpg', 'orchid-ball.jpg', 'purgatory-chasm.jpg', 'province.jpg'];
+
         for (var ii = 0; ii < imgDivs.length; ii++) { (function(i) {
-            var s = $(imgDivs[i]).css('background-image');
-            var src = s.substring(5, s.length - 2);
+            var src = '/static/img/home/' + IMAGE_NAMES[i];
             $('<img>').attr('src', src).load(function() {
+                var imgDiv = $(imgDivs[i]);
+                console.log(src);
+                imgDiv.css('background-image', 'url(\'' + src + '\')');
                 var wSrc = this.width;
                 var hSrc = this.height;
-                var imgDiv = $(imgDivs[i]);
                 var slideDiv = imgDiv.parent();
 
                 var FPS = 25;
-                var SECONDS_PER_PAN = 6.5;
+                var SECONDS_PER_PAN = 8;
                 var MIN_OFFSET_PER_SECOND = 20, MAX_OFFSET_PER_SECOND = 60;
                 var newPanVertically, newMaxOffset, timeResized;
 
