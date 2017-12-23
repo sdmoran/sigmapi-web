@@ -7,7 +7,7 @@ from django.shortcuts import render
 _PAGES = {
     'Home': '/',
     'History': '/history',
-    'Service': '/service',
+    'Service & Activities': '/activities',
     'Brothers':  '/brothers',
     'Log In': '/secure',
 }
@@ -18,7 +18,7 @@ def index(request):
     View for the static index page
     """
     return render(
-        request, 'public/home2.html',
+        request, 'public/home.html',
         {'pages': _PAGES, 'current_page_name': 'Home'},
     )
 
@@ -33,13 +33,13 @@ def history(request):
     )
 
 
-def service(request):
+def activities(request):
     """
     View for the static chapter service page.
     """
     return render(
-        request, 'public/service.html',
-        {'pages': _PAGES, 'current_page_name': 'Service'},
+        request, 'public/activities.html',
+        {'pages': _PAGES, 'current_page_name': 'Service & Activities'},
     )
 
 

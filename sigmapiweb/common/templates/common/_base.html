@@ -60,7 +60,7 @@
                 <ul class="nav navbar-nav">
                     {% for page_name, page_url in pages.items %}
                         {% if page_name == current_page_name %}
-                            <li class="child sibling active">
+                            <li class="child sibling navbar-active">
                         {% else %}
                             <li class="child sibling">
                         {% endif %}
@@ -91,36 +91,6 @@
     <!-- Embedded JS -->
     <script type="text/javascript">
     (function() {
-
-        // Hide header on scroll up
-        // Adapted from: https://medium.com/@mariusc23/hide-header-on-scroll-down-show-on-scroll-up-67bbaae9a78c#.bc4n36mjf
-        var navbar = $('#navbar');
-        var didScroll = false;
-        var lastScrollTop = 0;
-        var delta = 5;
-        var navbarHeight = navbar.outerHeight();
-        $(window).scroll(function(event){
-            didScroll = true;
-        });
-        setInterval(function() {
-            if (didScroll) {
-                hasScrolled();
-                didScroll = false;
-            }
-        }, 250);
-        function hasScrolled() {
-            console.log('awef');
-            var st = $(this).scrollTop();
-            if(Math.abs(lastScrollTop - st) <= delta) {
-                return;
-            } else if (st > lastScrollTop && st > navbarHeight){
-                navbar.css('top', -parseFloat(navbar.css('height')));
-            } else if (st + $(window).height() < $(document).height()) {
-                navbar.css('top', 0);
-            }
-            lastScrollTop = st;
-        }
-
         // Line up top of content with bottom of fixed navbar
         function lineUpContent() {
             var navbar = $('#navbar')

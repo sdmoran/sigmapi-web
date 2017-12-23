@@ -1,7 +1,18 @@
 {% extends 'common/public_base.html' %}
+
+{% load sass_tags %}
+{% block module_includes %}
+	<link rel="stylesheet" href="{% sass_src 'css/public/login_v1.scss' %}">
+{% endblock %}
+
 {% block title %}Sigma Pi Gamma Iota - Login{% endblock %}
 
 {% block content %}
+
+<div id="login-wrapper-1">
+<div id="login-wrapper-2">
+<div id="login-content">
+
 {% if user.is_authenticated %}
 
 <h2>You Are Already Logged In.</h2>
@@ -36,10 +47,16 @@ Did you mean to <a href="{% url 'pub-logout' %}">logout?</a><br/><br/>
 				<input id="id_password" name="password" type="password" class="form-control">
 			</div>
 		</div>
-		<div class="form-group clearfix" style="margin-right:0px">
+		<div class="form-group clearfix pull-right" style="margin-right:0px">
 			<input type="hidden" name="next" value="{{next}}" style="display:none;" />
-	  		<button type="submit" class="btn btn-primary pull-right">Sign in</button>
+  			<a href="/" class="btn btn-default">Cancel</a>
+	  		<button type="submit" class="btn btn-primary">Sign in</button>
   		</div>
 	</form>
 {% endif %}
 {% endblock %}
+
+</div>
+</div>
+</div>
+

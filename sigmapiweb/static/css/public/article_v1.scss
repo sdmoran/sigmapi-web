@@ -1,10 +1,110 @@
 
+@import '../common/_const.scss';
+
+html, body {
+	width: 100%;
+}
+
 #main-content {
-	margin: 0% 20% 0% 20%;
-	padding: 2% 0% 2% 0%
+	background-color: $bg-col;
+	padding: 1px 2% 2% 2%;
+	margin-top: 0;
+	margin-bottom: 0;
+	width: 100%;
+	@media only screen and (min-width: 950px) {
+		width: 850px;
+		margin-left: auto;
+		margin-right: auto;
+	}
 }
 
 .footer {
 	text-align: center;
 	padding: 3% 0% 0% 0%;
+}
+
+.left-half {
+	@media only screen and (max-width: 767px) {
+		width: 100%
+	}
+	@media only screen and (min-width: 768px) {
+		width: 50%;
+		float: left;
+	}
+}
+
+.right-half {
+	@media only screen and (max-width: 767px) {
+		width: 100%
+	}
+	@media only screen and (min-width: 768px) {
+		width: 50%;
+		float: right;
+	}
+}
+
+.middle {
+	width: 100%;
+	text-align: center;
+	img {
+		@media only screen and (max-width: 767px) {
+			width: 100%
+		}
+		@media only screen and (min-width: 768px) {
+			width: 75%;
+		}
+	}
+}
+
+.image-wrapper {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	@media only screen and (min-width: 768px) {
+		margin-left: 10px;
+		margin-right: 10px;
+	}
+	display: inline-block;
+	text-align: center;
+	img {
+		padding: 0;
+		max-width: 100%
+	}
+	.caption {
+		padding-top: 5px;
+		text-decoration: none !important;
+		color: $fg-col;
+		outline: none;
+	}
+}
+
+.row .image-wrapper {
+	margin: 0px;
+}
+
+.image-pair-responsive {
+	width: 100%;
+	display: block;
+	@media only screen and (max-width: 767px) {
+	}
+	@media only screen and (min-width: 768px) {
+		height: 15%;
+		white-space: nowrap;
+		text-align: center;
+	}
+	.image-wrapper {
+		@media only screen and (max-width: 767px) {
+			text-align: center;
+			width: 100%;
+		}
+		@media only screen and (min-width: 768px) {
+			width: 42%;
+		}
+		img {
+			padding: 0;
+			width: 100%
+		}
+	}
+}
+.caption {
+	font-style: italic;
 }

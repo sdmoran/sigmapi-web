@@ -9,25 +9,14 @@
 @-o-viewport        { width: device-width; }
 @viewport           { width: device-width; }
 
-$bg-col: #ccd;
-$bg2-col: #bbc;
-$fg-col: #333;
-$accent-col: #662e6b;
-$line-col: rgb(124, 43, 131);
-
-$link-col: #009fdA;
-$link_hover_col: #0f80f8;
-
-$themed-bg-col: $accent-col;
-$themed-fg-col: #ccd;
-$themed-accent-col: #ffd700;
+@import '../common/_const';
 
 /**
  * Global
  */
 
 html {
-  background-color: $bg-col;
+  background-color: $margin-col;
   height:100%;
 }
 
@@ -63,8 +52,9 @@ h2 {
     border-radius: 0;
     margin: 0;
     font-size: 100%;
-    min-height: 100px;
+    min-height: 90px;
     transition: top 0.2s ease-in-out;
+    border: none;
 }
 
 .navbar-nav li a {
@@ -90,14 +80,20 @@ h2 {
     padding: 20px;
 }
 
-.navbar-inverse
-.navbar-nav > li > a {
+.navbar-inverse .navbar-nav {
+  li > a {
     color: $themed-fg-col;
-}
-
-.navbar-inverse
-.navbar-nav > li > a:hover {
+  }
+  .navbar-active > a {
+    background-color: $themed-bg-active-col;   
+  }
+  li > a:hover {
     color: $themed-accent-col;
+  }
+  .navbar-active > a:hover {
+    background-color: $themed-bg-active-col;  
+    color: $themed-accent-col; 
+  }
 }
 
 #navbar-spacer {
