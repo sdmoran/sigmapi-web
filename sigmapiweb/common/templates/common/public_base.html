@@ -1,5 +1,7 @@
 {% extends "common/_base.html" %}
 
+{% load common_utils %}
+
 {% block local_includes %}
     {% load staticfiles %}
     {% load sass_tags %}
@@ -8,4 +10,111 @@
 
     {% block module_includes %}
     {% endblock %}
+{% endblock %}
+
+{% block body %}
+
+    <!-- Navigation -->
+    <nav id="navbar" class="navbar navbar-inverse sp-bg-color navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">
+                    <img class="logo" src="/static/img/logo.png"/>
+                </a>
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    {% for page_name, page_info in pages.items %}
+                        {% if page_name == current_page_name %}
+                            <li class="child sibling navbar-active">
+                        {% else %}
+                            <li class="child sibling">
+                        {% endif %}
+                            <a id="nav-home child" href='{{page_info.0}}'>
+                                {{page_name}}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    {% block subnav %}
+    {% endblock %}
+
+    <div id="content-wrapper">
+	    {% if pages|lookup:current_page_name|lookup:1 %}
+	        <div id="content-bkg-lowres"
+	             class="content-bkg" 
+	             style="background-image: url('{% static pages|lookup:current_page_name|lookup:1|prepend:'img/bkg/low-res/' %}')">
+	    {% else %}
+	    	<div id="content-bkg-lowres" class="content-bkg">
+	    {% endif %}
+	    </div>
+	    <div id="content-bkg-highres" class="content-bkg"></div>
+        <div id="main-content">
+        	{% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Block included for any content that must be rendered at the top level of the body -->
+    {% block toplevel_content %}
+    {% endblock %}
+
+    <!-- Embedded JS -->
+    <script type="text/javascript">
+    (function() {
+        // Line up top of content with bottom of fixed navbar
+        function lineUpContent() {
+            var navbar = $('#navbar');
+            var content = $('#content-wrapper');
+            var margin = 0; //window.innerWidth * 0.02; TODO
+            var contentPlacement = navbar.position().top + navbar.height() + margin;
+            content.css('margin-top', contentPlacement);
+            $('body').css('height', $('html').height() - navbar.height() - margin - 1);
+        }
+        $(document).ready(lineUpContent);
+        $(window).resize(lineUpContent);
+
+        // Hack to fix Windows Phone 8 IE rendering bug
+        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+          var msViewportStyle = document.createElement('style')
+          msViewportStyle.appendChild(
+            document.createTextNode(
+              '@-ms-viewport{width:auto!important}'
+            )
+          )
+          document.querySelector('head').appendChild(msViewportStyle)
+        }
+
+        // Replace low-res background image with high-res one
+	    window.onload = function() {
+	    	var cbLow = $('#content-bkg-lowres')[0].style;
+	    	var cbHigh = $('#content-bkg-highres')[0].style;
+	    	if (!cbLow.backgroundImage) return;
+	    	var urlHigh = cbLow.backgroundImage.replace('low-res', 'high-res');
+	    	var img = new Image();
+	    	img.src = urlHigh.replace('url("', "").replace('")', '');
+	    	console.log(img.src);
+	    	cbHigh.backgroundImage = urlHigh;
+	    	setTimeout(function() { cbHigh.opacity = '1'; }, 1000);
+	    };
+    })();
+    </script>
+
+    {% block embedded_js %}
+    {% endblock %}
+
 {% endblock %}

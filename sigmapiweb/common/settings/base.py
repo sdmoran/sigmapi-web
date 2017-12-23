@@ -153,8 +153,8 @@ SASS_PRECISION = 8
 
 PUBLIC_PAGES = {
     'Home': ('/', None),
-    'About': ('/about', 'img/history/summer-house.jpg'),
-    'Service & Activities': ('/activities', 'img/activities/volleyball.jpg'),
-    'Brothers':  ('/brothers', 'img/misc/seniors-2017.jpg'),
+    'About': ('/about', 'summer-house.jpg'),
+    'Service & Activities': ('/activities', 'volleyball.jpg'),
+    'Brothers':  ('/brothers', 'seniors-2017.jpg'),
     'Log In': ('/secure', None),  # This image is hard-coded into login_v1.scss
 }

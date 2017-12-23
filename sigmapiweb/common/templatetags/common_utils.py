@@ -40,3 +40,17 @@ def lookup(dictionary, key):
     Returns: object
     """
     return dictionary[key]
+
+
+@register.filter
+def prepend(str1, str2):
+    """
+    Prepend the second string on the first.
+
+    Arguments:
+        str1 (str)
+        str2 (str)
+
+    Returns: str
+    """
+    return str2 + str1

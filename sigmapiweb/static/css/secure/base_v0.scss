@@ -1,4 +1,4 @@
-/**
+  /**
  * Hack to work around bug with Windows Phone 8 rendering
  **/
 @-webkit-viewport { width: device-width; }
@@ -526,4 +526,348 @@ ul.news > li > iframe
 
 .featured-news-image {
 	width: 100%;
+}
+
+/**
+ * Utility classes
+ */
+.no-spaced
+{
+	margin-top:0px !important;
+}
+
+
+hr.hr {
+	border-top: 1px solid black;
+}
+
+.separator
+{
+	margin-top: 10px;
+	margin-bottom: 20px;
+	border-bottom: 1px solid rgb(124, 43, 131);
+}
+
+/**
+ * Sub nav menu styling
+ */
+.sub-nav
+{
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-bottom: 10px;
+	margin-top: -10px;
+
+	border-bottom: 1px rgb(124, 43, 131) solid;
+}
+
+.sub-nav .nav.nav-pills li.active a
+{
+	background-color:rgb(124,43, 131);
+}
+
+.actions
+{
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-bottom: 10px;
+	margin-top: 10px;
+
+	margin-bottom: 20px;
+
+	border-bottom: 1px rgb(124, 43, 131) solid;
+}
+
+/**
+ * Footer Navigation styling
+ */
+.navbar-fixed-bottom
+{
+	background-color: #F8F8F8;
+	border: 2px solid #DDD !important;
+
+	width:80%; /* This needs to be synced up with the footer values in sigmapi_theme.css */
+	max-width:1000px;
+
+	margin-left:auto;
+	margin-right:auto;
+}
+
+@media (max-width:767px){
+	.navbar-fixed-bottom
+	{
+		width: 100%;
+	}
+}
+
+@media (max-width:255px){
+	.navbar-fixed-bottom
+	{
+		display:none;
+	}
+}
+
+
+.navbar-fixed-bottom > ul.section
+{
+	list-style: none;
+	padding: 5px;
+	margin: 0px;
+}
+
+.navbar-fixed-bottom > ul.section > li.title
+{
+	font-weight: bold;
+}
+
+.navbar-fixed-bottom > ul.section > li
+{
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-bottom: 5px;
+	padding-top: 5px;
+
+	display: inline-block;
+}
+
+.navbar-fixed-bottom > ul.section > li > button
+{
+	margin-left: 5px;
+}
+
+.navbar-fixed-bottom > ul.section > li.active
+{
+	background-color: #D6D6D6;
+}
+
+/**
+ * Tabs styling
+ */
+.nav-tabs
+{
+	margin-top: 20px;
+
+	border: none;
+}
+
+.tab-content
+{
+	padding-top: 5px;
+
+	border: 1px solid #DDD;
+	background-color: #F8F8F8;
+}
+
+.tab-content > .tab-pane > p
+{
+	margin-top: 10px;
+	margin-left: 10px;
+	margin-bottom: 0px;
+}
+
+/**
+ * Form styling
+ */
+form.small
+{
+	max-width: 300px;
+}
+
+form.medium
+{
+	max-width: 600px;
+}
+
+form.centered
+{
+	margin-left: auto;
+	margin-right:auto;
+}
+
+input[type="file"]
+{
+	padding-bottom: 40px;
+}
+
+.clearfix > .btn.pull-right
+{
+	margin-left: 5px;
+}
+
+/**
+ * Search box formatting
+ */
+.search-box
+{
+	display: block;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.search-box > input
+{
+	display: inline;
+	width: 85%;
+}
+
+.search-box > button
+{
+	display: inline-block;
+
+	float: right !important;
+
+	width: 12%;
+
+	min-width: 70px;
+}
+
+@media (max-width:585px){
+
+	.search-box > input
+	{
+		width: 100%;
+	}
+
+	.search-box > button
+	{
+		margin-top: 5px;
+
+		width: auto;
+	}
+}
+
+/**
+ * Data table styling
+ */
+.dataTable-filter
+{
+	display:inline-block;
+}
+
+.dataTable-length
+{
+	margin-right: 20px;
+	display:inline-block;
+}
+
+.dataTable-message
+{
+	width:100%;
+
+	background-color: #F8F8F8;
+
+	margin-bottom: 15px;
+	padding: 10px;
+}
+
+.dataTable-button-left
+{
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+
+	width: 100px;
+}
+
+.dataTable-button-right
+{
+	border-left: none;
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+
+	width: 100px;
+}
+
+.table-responsive
+{
+	margin-top:20px;
+	background-color: #F8F8F8;
+	padding: 15px;
+
+	border: none !important;
+}
+
+table
+{
+	border: 1px solid #DDD;
+}
+
+/* Table column sizing */
+th.one.wide
+{
+	width: 8% !important;
+}
+
+th.two.wide
+{
+	width: 16% !important;
+}
+
+th.three.wide
+{
+	width: 24% !important;
+}
+
+th.four.wide
+{
+	width: 32% !important;
+}
+
+th.five.wide
+{
+	width: 40% !important;
+}
+
+th.six.wide
+{
+	width: 48% !important;
+}
+
+th.seven.wide
+{
+	width: 56% !important;
+}
+
+th.eight.wide
+{
+	width: 64% !important;
+}
+
+th.nine.wide
+{
+	width: 72% !important;
+}
+
+th.ten.wide
+{
+	width: 80% !important;
+}
+
+th.eleven.wide
+{
+	width: 88% !important;
+}
+
+th.twelve.wide
+{
+	width: 96% !important;
+}
+
+/**
+ * Datepicker styling
+ */
+.datepicker
+{
+	z-index: 2000 !important;
+}
+
+#send-summons-form ul
+{
+	list-style: none;
+	padding-left: 5px;
+}
+
+.blacklist-table {
+	word-wrap: break-word;
 }

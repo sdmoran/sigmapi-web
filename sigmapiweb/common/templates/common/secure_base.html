@@ -3,117 +3,148 @@
 {% load staticfiles %}
 {% load sass_tags %}
 {% block local_includes %}
-	<link rel="stylesheet" type="text/css" href='{% sass_src "css/secure/base_v0.scss" %}'/>
+ 	<link rel="stylesheet" type="text/css" href='{% sass_src "css/secure/base_v0.scss" %}'/>
 	<script type="text/javascript" src="{% static 'js/secure/common.js' %}"></script>
 	{% block module_includes %}
 	{% endblock %}
 {% endblock %}
 
-{% block navbar %}
-		<ul class="nav navbar-nav">
+{% block body %}
+	<div id="wrapper">
+		<div id="banner-top">
+			<div id="banner-wrapper">
+				<a href="/"><img id="banner-img" src="/static/img/banner-crest.png"/></a>
+				<div class="text">
+					Sigma Pi
+				</div>
+				<div class="sub-text">
+					<span class="sub-text-main">Gamma Iota Chapter</span> <span class="sub-text-extra">at Worcester Polytechnic Institute</span> <span class="sub-text-extra-small">at WPI</span>
+				</div>
+			</div>
+		</div>
 
-			{% if secure_index %}
-			<li class="active">
-			{% else %}
-			<li>
-			{% endif %}
-				<a href="{{'/secure/'}}">
-					<span class="glyphicon glyphicon-lock"></span>
-				</a>
-			</li>
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="container-fluid">
+				<ul class="nav navbar-nav">
+					{% if secure_index %}
+					<li class="active">
+					{% else %}
+					<li>
+					{% endif %}
+						<a href="{{'/secure/'}}">
+							<span class="glyphicon glyphicon-lock"></span>
+						</a>
+					</li>
 
-	  {% if perms.Archive.access_guide %}
-	  {% if '/secure/archives' in request.path %}
-	  <li class="active">
-	  {% else %}
-	  <li>
-	  {% endif %}
-	  <a id="archives" href="{{ '/secure/archives' }}">
-			  Archives
-	  </a>
-	  </li>
-	  {% endif %}
+					{% if perms.Archive.access_guide %}
+					{% if '/secure/archives' in request.path %}
+					<li class="active">
+					{% else %}
+					<li>
+					{% endif %}
+					<a id="archives" href="{{ '/secure/archives' }}">
+						  Archives
+					</a>
+					</li>
+					{% endif %}
 
-			{% if '/secure/scholarship' in request.path %}
-			<li class="active">
-			{% else %}
-			<li>
-			{% endif %}
-			<a id="scholarship" href="{{ '/secure/scholarship' }}">
-				Scholarship
-			</a>
-			</li>
+					{% if '/secure/scholarship' in request.path %}
+					<li class="active">
+					{% else %}
+					<li>
+					{% endif %}
+					<a id="scholarship" href="{{ '/secure/scholarship' }}">
+						Scholarship
+					</a>
+					</li>
 
-			{% if '/secure/standards' in request.path %}
-			<li class="active">
-			{% else %}
-			<li>
-			{% endif %}
-			<a id="standards" href="{{'/secure/standards'}}">
-				Standards
-			</a>
-			</li>
+					{% if '/secure/standards' in request.path %}
+					<li class="active">
+					{% else %}
+					<li>
+					{% endif %}
+					<a id="standards" href="{{'/secure/standards'}}">
+						Standards
+					</a>
+					</li>
 
-			{% if perms.Links.access_link %}
-			{% if '/secure/links' in request.path %}
-			<li class="active">
-			{% else %}
-			<li>
-			{% endif %}
-			<a id="links" href="{{ '/secure/links' }}">
-				Links
-			</a>
-			</li>
-			{% endif %}
+					{% if perms.Links.access_link %}
+					{% if '/secure/links' in request.path %}
+					<li class="active">
+					{% else %}
+					<li>
+					{% endif %}
+					<a id="links" href="{{ '/secure/links' }}">
+						Links
+					</a>
+					</li>
+					{% endif %}
 
-			{% if '/secure/parties' in request.path %}
-			<li class="active">
-			{% else %}
-			<li>
-			{% endif %}
-			<a id="party_list" href="{{ '/secure/parties' }}">
-				Parties
-			</a>
-			</li>
+					{% if '/secure/parties' in request.path %}
+					<li class="active">
+					{% else %}
+					<li>
+					{% endif %}
+					<a id="party_list" href="{{ '/secure/parties' }}">
+						Parties
+					</a>
+					</li>
 
-			{% if perms.UserInfo.manage_users %}
-				{% if '/secure/users' in request.path %}
-				<li class="active">
-				{% else %}
-				<li>
-				{% endif %}
-				<a id="users" href="{{ '/secure/users' }}">
-					Users
-				</a>
-				</li>
-			{% endif %}
-		</ul>
-
-		<ul class="nav navbar-nav navbar-right">
-			<li class="dropdown">
-	  			<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.first_name }}
-	  				<span class="caret"></span>
-	  			</a>
-	  			<ul class="dropdown-menu" role="menu">
-							{% if user.is_staff %}
-				<li><a href="/admin/">Admin Panel</a>
-							{% else %}
-					<li><a href="{% url 'userinfo-edit_user' user.username %}">Edit Profile</a></li>
-					<li><a href="{% url 'userinfo-change_password' %}">Change Password</a></li>
-			  {% endif %}
-					<li class="divider"></li>
-					<li><a href="/logout/">Logout</a></li>
+					{% if perms.UserInfo.manage_users %}
+						{% if '/secure/users' in request.path %}
+						<li class="active">
+						{% else %}
+						<li>
+						{% endif %}
+						<a id="users" href="{{ '/secure/users' }}">
+							Users
+						</a>
+						</li>
+					{% endif %}
 				</ul>
-			</li>
-			<li>
-				<a href="{{'/'}}">
-					<span class="glyphicon glyphicon-home"></span>
-				</a>
-			</li>
-  		</ul>
-{% endblock %}
 
-{% block subnav %}
-	{% block module_nav %}
-	{% endblock %}
+				<ul class="nav navbar-nav navbar-right">
+					<li class="dropdown">
+			  			<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.first_name }}
+			  				<span class="caret"></span>
+			  			</a>
+			  			<ul class="dropdown-menu" role="menu">
+									{% if user.is_staff %}
+						<li><a href="/admin/">Admin Panel</a>
+									{% else %}
+							<li><a href="{% url 'userinfo-edit_user' user.username %}">Edit Profile</a></li>
+							<li><a href="{% url 'userinfo-change_password' %}">Change Password</a></li>
+					  {% endif %}
+							<li class="divider"></li>
+							<li><a href="/logout/">Logout</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="{{'/'}}">
+							<span class="glyphicon glyphicon-home"></span>
+						</a>
+					</li>
+		  		</ul>
+			</div>
+		</nav>
+
+		{% block module_nav %}
+		{% endblock %}
+
+		<div class="container-fluid" id="content">
+			{% block content %}{% endblock %}
+		</div>
+	</div>
+	<div id="footer-wrapper">
+		<div id="footer-content">
+			<div id="values-wrapper">
+				<div id="title">Our Values</div>
+				<div id="values">Scholarship | Chivalry | Culture | Character | Service</div>
+			</div>
+
+			{% block footer-content %}
+
+			{% endblock %}
+		</div>
+	</div>
 {% endblock %}
