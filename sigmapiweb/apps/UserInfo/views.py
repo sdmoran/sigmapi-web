@@ -1,6 +1,7 @@
 """
 Views for UserInfo app.
 """
+from django.conf import settings
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
@@ -114,6 +115,8 @@ def users(request):
         freshmen = freshmen.exclude(username=herald.username)
 
     context = {
+        'pages': settings.PUBLIC_PAGES,
+        'current_page_name': 'Brothers',
         'sage': sage,
         'second': second,
         'third': third,

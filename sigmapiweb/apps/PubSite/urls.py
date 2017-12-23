@@ -26,8 +26,13 @@ urlpatterns = [
     ),
     url(
         regex=r'^history[/]$',
-        view=views.history,
+        view=RedirectView.as_view(pattern_name='pub-about'),
         name='pub-history',
+    ),
+    url(
+        regex=r'^about[/]$',
+        view=views.about,
+        name='pub-about',
     ),
     url(
         regex=r'^service[/]$',

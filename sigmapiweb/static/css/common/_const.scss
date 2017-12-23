@@ -1,4 +1,28 @@
 
+@font-face {
+  font-family: 'Bitter';
+  src: url('static/fonts/bitter/Bitter-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Bitter';
+  font-weight: bold;
+  src: url('/static/fonts/bitter/Bitter-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Bitter';
+  font-style: italic;
+  src: url('static/fonts/bitter/Bitter-Italic.ttf');
+}
+
+@font-face {
+  font-family: 'Bitter';
+  font-weight: bold;
+  font-style: italic;
+  src: url('/static/fonts/bitter/Bitter-BoldItalic.ttf');
+}
+
 $margin-col: #bbc;
 $bg-col: #ccd;
 $fg-col: #333;

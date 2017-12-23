@@ -1,36 +1,29 @@
 """
 Views for PubSite app.
 """
+from django.conf import settings
 from django.shortcuts import render
 
 
-_PAGES = {
-    'Home': '/',
-    'History': '/history',
-    'Service & Activities': '/activities',
-    'Brothers':  '/brothers',
-    'Log In': '/secure',
-}
+def _get_context(page_name):
+    return {
+        'pages': settings.PUBLIC_PAGES,
+        'current_page_name': page_name,
+    }
 
 
 def index(request):
     """
     View for the static index page
     """
-    return render(
-        request, 'public/home.html',
-        {'pages': _PAGES, 'current_page_name': 'Home'},
-    )
+    return render(request, 'public/home.html', _get_context('Home'))
 
 
-def history(request):
+def about(request):
     """
     View for the static chapter history page.
     """
-    return render(
-        request, 'public/history.html',
-        {'pages': _PAGES, 'current_page_name': 'History'},
-    )
+    return render(request, 'public/about.html', _get_context('About'))
 
 
 def activities(request):
@@ -38,8 +31,9 @@ def activities(request):
     View for the static chapter service page.
     """
     return render(
-        request, 'public/activities.html',
-        {'pages': _PAGES, 'current_page_name': 'Service & Activities'},
+        request,
+        'public/activities.html',
+        _get_context('Service & Activities'),
     )
 
 
@@ -48,8 +42,7 @@ def donate(request):
     View for the static donate page.
     """
     return render(
-        request, 'public/donate.html',
-        {'pages': _PAGES, 'current_page_name': 'Donate'},
+        request, 'public/donate.html', _get_context('Donate'),
     )
 
 
@@ -58,6 +51,5 @@ def permission_denied(request):
     View for 403 (Permission Denied) error.
     """
     return render(
-        request, 'common/403.html',
-        {'pages': _PAGES, 'current_page_name': 'Permission Denied'},
+        request, 'common/403.html', _get_context('Permission Denied'),
     )

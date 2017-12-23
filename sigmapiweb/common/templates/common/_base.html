@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	{% load staticfiles %}
+    {% load common_utils %}
 	<script type='text/javascript' src='{% static "js/lib/jquery-1.11.1.min.js" %}'></script>
 	<script type="text/javascript" src='{% static "bootstrap/js/bootstrap.min.js" %}'></script>
 
@@ -58,13 +59,13 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 {% block navbar %}
                 <ul class="nav navbar-nav">
-                    {% for page_name, page_url in pages.items %}
+                    {% for page_name, page_info in pages.items %}
                         {% if page_name == current_page_name %}
                             <li class="child sibling navbar-active">
                         {% else %}
                             <li class="child sibling">
                         {% endif %}
-                            <a id="nav-home child" href='{{page_url}}'>
+                            <a id="nav-home child" href='{{page_info.0}}'>
                                 {{page_name}}
                             </a>
                         </li>
@@ -80,8 +81,15 @@
     {% block subnav %}
     {% endblock %}
 
-    <div id="main-content">
+
+    {% if pages|lookup:current_page_name|lookup:1 %}
+        <div id="content-wrapper" style="background-image: url('{% static pages|lookup:current_page_name|lookup:1 %}')">
+    {% else %}
+        <div id="content-wrapper">
+    {% endif %}
+        <div id="main-content">
         {% block content %}{% endblock %}
+        </div>
     </div>
 
     <!-- Block included for any content that must be rendered at the top level of the body -->
@@ -94,7 +102,7 @@
         // Line up top of content with bottom of fixed navbar
         function lineUpContent() {
             var navbar = $('#navbar')
-            var content = $('#main-content')
+            var content = $('#content-wrapper')
             var margin = 0; //window.innerWidth * 0.02; TODO
             var contentPlacement = navbar.position().top + navbar.height() + margin;
             content.css('margin-top', contentPlacement);

@@ -1,6 +1,15 @@
 
 @import '../common/_const.scss';
 
+html, body, #content-wrapper {
+	width: 100%;
+	height: 100%;
+}
+
+#content-wrapper {
+    background-image: url('/static/img/misc/flag.jpg');
+}
+
 #main-content {
 	padding: 1px 2% 2% 2%;
 	@media only screen and (min-width: 768px) {
@@ -24,6 +33,8 @@
 #login-content {
 	min-width: 100%;
 	background-color: $bg-col;
+	opacity: 0.92;
 	display: inline-block;
 	padding: 0 2% 0 2%;
+	border-radius: 10px;
 };

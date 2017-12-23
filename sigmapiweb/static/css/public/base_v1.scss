@@ -16,14 +16,22 @@
  */
 
 html {
-  background-color: $margin-col;
-  height:100%;
+  width: 100%;
 }
 
 body {
-  background: none;
-  height:100%;
-    font-size: 13px;
+  width: 100%;
+  font-size: 13px;
+  font-family: 'Bitter';
+}
+
+#content-wrapper {
+  width: 100%;
+  background-color: $margin-col;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
 }
 
 a {
