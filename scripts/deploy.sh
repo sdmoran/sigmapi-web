@@ -5,13 +5,13 @@ DJANGOAPP=sigmapiweb
 STATIC=static
 
 DEPLOY_UTILS=$HOME/deploy
-REPO=$DEPLOY_UTILS/sigmapi-web-repo
+REPO=$DEPLOY_UTILS/sigmapi-web-demo-repo
 REPO_SCRIPTS=$REPO/scripts
 PROD=$HOME/webapps
 PROD_SCRIPTS=$HOME/scripts
 
-PROD_PYTHON_WEBAPP=$PROD/sigma_pi_web_2
-PROD_STATIC_WEBAPP=$PROD/sigma_pi_web_static
+PROD_PYTHON_WEBAPP=$PROD/sigma_pi_web_demo
+PROD_STATIC_WEBAPP=$PROD/sigma_pi_web_demo_static
 
 ENV_SETTINGS_DIR=common/settings
 ENV_SETTINGS_FNAME=prod.py
