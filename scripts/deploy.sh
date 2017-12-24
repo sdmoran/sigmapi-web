@@ -1,5 +1,6 @@
 # This script will deploy the latest code to production.
 # This script does NOT apply migrations. Do those yourself carefully.
+set -x
 HOME=/home/sigmapiwpi
 DJANGOAPP=sigmapiweb
 STATIC=static
@@ -32,7 +33,7 @@ echo "";
 echo "Copying REPO $REPO/$DJANGOAPP/$STATIC TO PROD $PROD_STATIC_WEBAPP";
 rm -rf $PROD_STATIC_WEBAPP/*;
 cd $PROD_PYTHON_WEBAPP/$DJANGOAPP;
-make static;
+make static_prod;
 rm -rf $PROD_PYTHON_WEBAPP/$DJANGOAPP/$STATIC;
 echo "";
 
