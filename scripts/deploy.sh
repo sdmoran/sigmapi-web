@@ -14,7 +14,8 @@ PROD_PYTHON_WEBAPP=$PROD/sigma_pi_web_demo
 PROD_STATIC_WEBAPP=$PROD/sigma_pi_web_demo_static
 
 ENV_SETTINGS_DIR=common/settings
-ENV_SETTINGS_FNAME=prod.py
+ENV_SETTINGS_SRC_FNAME=prod_demo.py
+ENV_SETTINGS_DST_FNAME=prod.py
 
 PYTHON=python3.6
 DJANGO_LIB=Django-1.11.4-py3.6.egg/django
@@ -42,7 +43,7 @@ echo "";
 
 echo "Copying production environment settings file:"
 rm -rf $PROD_PYTHON_WEBAPP/$DJANGOAPP/$ENV_SETTINGS_DIR/$ENV_SETTINGS_FNAME;
-cp $DEPLOY_UTILS/$ENV_SETTINGS_FNAME $PROD_PYTHON_WEBAPP/$DJANGOAPP/$ENV_SETTINGS_DIR/$ENV_SETTINGS_FNAME;
+cp $DEPLOY_UTILS/$ENV_SETTINGS_SRC_FNAME $PROD_PYTHON_WEBAPP/$DJANGOAPP/$ENV_SETTINGS_DIR/$ENV_SETTINGS_DST_FNAME;
 echo "";
 
 echo "Installing Python dependencies:";
