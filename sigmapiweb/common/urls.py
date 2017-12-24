@@ -22,23 +22,23 @@ urlpatterns = [
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(
-        regex=r'^/admin/',
+        regex=r'^admin/',
         view=admin.site.urls,
     ),
     url(
-        regex=r'^/brothers/',
+        regex=r'^brothers/',
         view=include(userinfo_urls),
     ),
     url(
-        regex=r'^/users/',
+        regex=r'^users/',
         view=include(userinfo_urls),
     ),
     url(
-        regex=r'^/secure/',
+        regex=r'^secure/',
         view=include(secure_urls),
     ),
     url(
-        regex=r'^/',
+        regex=r'^',
         view=include(public_urls),
     ),
 ]

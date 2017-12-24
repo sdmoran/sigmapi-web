@@ -92,7 +92,7 @@ Sigma Pi Gamma Iota
         var IMAGE_NAMES = ['amazing-day.jpg', 'orchid-ball.jpg', 'purgatory-chasm.jpg', 'province.jpg'];
 
         for (var ii = 0; ii < imgDivs.length; ii++) { (function(i) {
-            var src = '/demo/static/img/home/' + IMAGE_NAMES[i];
+            var src = '/static/img/home/' + IMAGE_NAMES[i];
             $('<img>').attr('src', src).load(function() {
                 var imgDiv = $(imgDivs[i]);
                 console.log(src);
