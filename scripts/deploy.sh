@@ -25,10 +25,15 @@ echo "Copying REPO $REPO/$DJANGOAPP TO PROD $PROD_PYTHON_WEBAPP/$DJANGOAPP";
 cp -rf $REPO/$DJANGOAPP $PROD_PYTHON_WEBAPP;
 echo "";
 
+echo "Installing Python dependencies:";
+pip3.6 install --user -r $PROD_PYTHON_WEBAPP/$DJANGOAPP/requirements/prod.txt;
+echo "";
+
 echo "Copying REPO $REPO/$DJANGOAPP/$STATIC TO PROD $PROD_STATIC_WEBAPP";
 rm -rf $PROD_STATIC_WEBAPP/*;
+cd $PROD_PYTHON_WEBAPP/$DJANGOAPP;
+make static;
 rm -rf $PROD_PYTHON_WEBAPP/$DJANGOAPP/$STATIC;
-cp -rf $REPO/$DJANGOAPP/$STATIC/* $PROD_STATIC_WEBAPP;
 echo "";
 
 echo "Copy scripts from $REPO_SCRIPTS to $PROD_SCRIPTS";
@@ -44,10 +49,6 @@ echo "";
 echo "Copying production environment settings file:"
 rm -rf $PROD_PYTHON_WEBAPP/$DJANGOAPP/$ENV_SETTINGS_DIR/$ENV_SETTINGS_DST_FNAME;
 cp $DEPLOY_UTILS/$ENV_SETTINGS_SRC_FNAME $PROD_PYTHON_WEBAPP/$DJANGOAPP/$ENV_SETTINGS_DIR/$ENV_SETTINGS_DST_FNAME;
-echo "";
-
-echo "Installing Python dependencies:";
-pip3.6 install --user -r $PROD_PYTHON_WEBAPP/$DJANGOAPP/requirements/prod.txt;
 echo "";
 
 echo "Restarting server...";
