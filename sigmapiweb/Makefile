@@ -25,6 +25,10 @@ run: static migrate quickrun
 static:
 	$(MANAGE) collectstatic --noinput
 
+static_prod:
+	$(MANAGE) compilescss
+	$(MANAGE) collectstatic --noinput
+
 migrate:
 	$(MANAGE) migrate
 
