@@ -22,8 +22,13 @@ def users(request):
     TODO: Refactor
     """
     # pylint: disable=too-many-statements
+    context = {
+        'pages': settings.PUBLIC_PAGES,
+        'current_page_name': 'Brothers',
+    }
 
     # Find out what current year is the senior year grad date.
+    '''
     senior_year = utils.get_senior_year()
 
     # Get the execs.
@@ -128,7 +133,7 @@ def users(request):
         'sophomores': sophomores,
         'freshmen': freshmen
     }
-
+    '''
     return render(request, 'userinfo/public/brothers.html', context)
 
 
