@@ -11,7 +11,7 @@ REPO_SCRIPTS=$REPO/scripts
 PROD=$HOME/webapps
 PROD_SCRIPTS=$HOME/scripts
 
-PROD_PYTHON_WEBAPP=$PROD/sigma_pi_web
+PROD_PYTHON_WEBAPP=$PROD/sigma_pi_web_2
 PROD_STATIC_WEBAPP=$PROD/sigma_pi_web_static
 
 ENV_SETTINGS_DIR=common/settings

@@ -15,11 +15,6 @@ from . import views
 
 urlpatterns = [
     url(
-        regex=r'.*',
-        view=views.no_demo,
-        name='secure-no-demo',
-    ),
-    url(
         regex=r'^$',
         view=views.index,
         name='secure-index',
