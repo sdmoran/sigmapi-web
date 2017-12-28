@@ -3,13 +3,30 @@ Views for PubSite app.
 """
 from django.conf import settings
 from django.shortcuts import render
+from models import ArticleBlock
 
 
 def _get_context(page_name):
+    """ Returns the context necessary for any public page 
+    
+    Arguments:
+        page_name (str) The friendly name of the page being rendered
+    """
     return {
         'pages': settings.PUBLIC_PAGES,
-        'current_page_name': page_name,
+        'current_page_name': page_name
     }
+
+
+def _get_article_context(page_name):
+    """ Returns the context necessary for an article style page 
+    
+    Arguments:
+        page_name (str) The friendly name of the page being rendered
+    """
+    blocks_dict = {'article_blocks': ArticleBlock.blocks_for_page(page_name)}
+    blocks_dict.update(_get_context(page_name))
+    return blocks_dict
 
 
 def index(request):
@@ -23,7 +40,7 @@ def about(request):
     """
     View for the static chapter history page.
     """
-    return render(request, 'public/about.html', _get_context('About'))
+    return render(request, 'public/article.html', _get_article_context('About'))
 
 
 def activities(request):
@@ -32,8 +49,8 @@ def activities(request):
     """
     return render(
         request,
-        'public/activities.html',
-        _get_context('Service & Activities'),
+        'public/article.html',
+        _get_article_context('Service & Activities'),
     )
 
 
@@ -42,7 +59,7 @@ def donate(request):
     View for the static donate page.
     """
     return render(
-        request, 'public/donate.html', _get_context('Donate'),
+        request, 'public/article.html', _get_article_context('Donate'),
     )
 
 

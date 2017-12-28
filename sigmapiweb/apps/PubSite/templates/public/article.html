@@ -1,0 +1,23 @@
+{% extends 'public/_article_base.html' %}
+{% block title %}Sigma Pi Gamma Iota - History{% endblock %}
+
+{% load staticfiles %}
+
+{% block content %}
+
+    {% for article in article_blocks %}
+        <div class="article-section">
+            {% if article.title %}
+                <h1><span id={{ article.anchor_id }}></span>{{ article.title }}</h1>
+            {% endif %}
+            <div class="text-block">
+                {% if article.body %}
+                    {{ article.body }}
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+
+	<div class="stretcher">
+	</div>
+{% endblock %}

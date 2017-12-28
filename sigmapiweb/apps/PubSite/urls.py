@@ -6,6 +6,7 @@ from django.contrib.auth import views as dsl
 from django.views.generic.base import RedirectView
 
 from . import views
+from . import models
 
 
 urlpatterns = [
