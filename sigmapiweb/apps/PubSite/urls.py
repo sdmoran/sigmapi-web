@@ -21,6 +21,11 @@ urlpatterns = [
         name='pub-logout',
     ),
     url(
+        regex=r'^(?P<url_name>.{1,200})[/]$',
+        view=views.public_page,
+        name='pub-page',
+    ),
+    url(
         regex=r'^$',
         view=views.index,
         name='pub-index',

@@ -33,14 +33,14 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    {% for page_name, page_info in pages.items %}
-                        {% if page_name == current_page_name %}
+                    {% for page in pages %}
+                        {% if page == current_page %}
                             <li class="child sibling navbar-active">
                         {% else %}
                             <li class="child sibling">
                         {% endif %}
-                            <a id="nav-home child" href='{% url page_info.0 %}'>
-                                {{page_name}}
+                            <a id="nav-home child" href='{{ page.relative_url }}'>
+                                {{ page.friendly_name }}
                             </a>
                         </li>
                     {% endfor %}
@@ -55,10 +55,10 @@
     {% endblock %}
 
     <div id="content-wrapper">
-	    {% if pages|lookup:current_page_name|lookup:1 %}
+	    {% if current_page.background_img %}
 	        <div id="content-bkg-lowres"
 	             class="content-bkg" 
-	             style="background-image: url('{% static pages|lookup:current_page_name|lookup:1|prepend:'img/bkg/low-res/' %}')">
+	             style="background-image: url('{% static current_page.background_img.path %}')">
 	    {% else %}
 	    	<div id="content-bkg-lowres" class="content-bkg">
 	    {% endif %}
