@@ -3,6 +3,7 @@ Utility functions available to all SigmaPi templates.
 """
 
 from django import template
+import os
 
 from ..utils import get_full_name_or_deleted
 
@@ -54,3 +55,14 @@ def prepend(str1, str2):
     Returns: str
     """
     return str2 + str1
+
+
+@register.filter
+def filename(path):
+    """
+    Return only the filename from an arbitrary path
+    
+    Arguments:
+        path (str)
+    """
+    return os.path.split(path)[1]

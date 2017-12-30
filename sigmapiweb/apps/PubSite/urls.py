@@ -11,6 +11,11 @@ from . import models
 
 urlpatterns = [
     url(
+        regex=r'^$',
+        view=views.index,
+        name='pub-index'
+    ),
+    url(
         regex=r'^login',
         view=dsl.login,
         name='pub-login',
@@ -21,24 +26,9 @@ urlpatterns = [
         name='pub-logout',
     ),
     url(
-        regex=r'^(?P<url_name>.{1,200})[/]$',
-        view=views.public_page,
-        name='pub-page',
-    ),
-    url(
-        regex=r'^$',
-        view=views.index,
-        name='pub-index',
-    ),
-    url(
         regex=r'^history[/]$',
         view=RedirectView.as_view(pattern_name='pub-about'),
         name='pub-history',
-    ),
-    url(
-        regex=r'^about[/]$',
-        view=views.about,
-        name='pub-about',
     ),
     url(
         regex=r'^service[/]$',
@@ -46,18 +36,13 @@ urlpatterns = [
         name='pub-service',
     ),
     url(
-        regex=r'^activities[/]$',
-        view=views.activities,
-        name='pub-activities',
-    ),
-    url(
         regex=r'^403/',
         view=views.permission_denied,
         name='pub-permission_denied',
     ),
     url(
-        regex=r'^donate/',
-        view=views.donate,
-        name='pub-donate',
+        regex=r'^(?P<url_name>.{1,200})[/]$',
+        view=views.public_page,
+        name='pub-page',
     ),
 ]

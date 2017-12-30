@@ -12,6 +12,9 @@ class PublicImage(ModelMixin, models.Model):
     """ Model representing an image's path on the filesystem """
     path = models.CharField(max_length=200)
 
+    def __str__(self):
+        return str(self.path)
+
 
 class PublicPage(ModelMixin, models.Model):
     """

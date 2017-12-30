@@ -1,1 +1,160 @@
-made it to carousel
+{% extends "common/public_base.html" %}
+
+{% block module_includes %}
+    {% load sass_tags %}
+    <link rel='stylesheet' type='text/css' href='{% sass_src "css/public/home_v1.scss" %}' />
+{% endblock %}
+
+{% block title %}
+Sigma Pi Gamma Iota
+{% endblock %}
+
+{% load staticfiles %}
+{% load common_utils %}
+
+{% block content %}
+<div id="home-carousel" class="carousel slide" data-ride="carousel" data-interval="8000">
+    <!-- Carousel indicators -->
+    <ol class="carousel-indicators">
+        {% for _ in current_page.carouselpage.slides.all %}
+            <li data-target="#home-carousel" data-slide-to="{{ forloop.counter0 }}" class="active"></li>
+        {% endfor %}
+    </ol>
+    <!-- Wrapper for carousel items -->
+    <div class="carousel-inner"
+         style="background-image: url('{% static "img/spinner.gif" %}');
+                background-repeat: no-repeat;
+                background-size: 100px 100px;
+                background-position: center">
+        {% for slide in current_page.carouselpage.slides.all %}
+            <div class="item{% if forloop.first %} active{% endif %}" >
+                <div class="carousel-image-div"></div>
+                <div class="carousel-caption">
+                    <h2>{{ slide.title }}</h2>
+                    <p>{{ slide.description }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <!-- Carousel controls -->
+    <a class="carousel-control left" href="#home-carousel" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+    </a>
+    <a class="carousel-control right" href="#home-carousel" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+    </a>
+</div>
+{% endblock %}
+
+{% block embedded_js %}
+<script type="text/javascript">
+(function() {
+
+    $('#home-carousel').carousel({
+        pause: false
+    });
+
+    $(document).ready(function() {
+        var imgDivs = $('#home-carousel .carousel-image-div');
+        if (imgDivs.length == 0) {
+            return;
+        }
+        if (imgDivs.length == 1) {
+            imgDivs[0].css('background-size', 'cover');
+            return;
+        }
+
+        var IMAGE_NAMES = [
+            {% for slide in current_page.carouselpage.slides.all %}
+                '{{ slide.image.path|filename}}',
+            {% endfor %}
+        ];
+
+
+        for (var ii = 0; ii < imgDivs.length; ii++) { (function(i) {
+            var src = '/static/img/home/' + IMAGE_NAMES[i];
+            $('<img>').attr('src', src).load(function() {
+                var imgDiv = $(imgDivs[i]);
+                console.log(src);
+                imgDiv.css('background-image', 'url(\'' + src + '\')');
+                var wSrc = this.width;
+                var hSrc = this.height;
+                var slideDiv = imgDiv.parent();
+
+                var FPS = 25;
+                var SECONDS_PER_PAN = 8;
+                var MIN_OFFSET_PER_SECOND = 20, MAX_OFFSET_PER_SECOND = 60;
+                var newPanVertically, newMaxOffset, timeResized;
+
+                function onResize() {
+                    var activeImgDiv = $('#home-carousel .active .carousel-image-div')
+                    var wDst = activeImgDiv.width();
+                    var hDst = activeImgDiv.height();
+                    var ratioDst = wDst / hDst;
+                    var w, h;
+                    var ratioSrc = wSrc / hSrc;
+                    if (ratioDst > ratioSrc) {
+                        w = wDst;
+                        h = w / ratioSrc;
+                    } else {
+                        h = hDst;
+                        w = h * ratioSrc;
+                    }
+                    newPanVertically = ratioDst > ratioSrc
+                    newMaxOffset = newPanVertically ? (h - hDst) : (w - wDst);
+                    timeResized = +new Date();
+                }
+
+                onResize();
+                $(window).resize(onResize);
+
+                var offset, reverse, panVertically, maxOffset;
+
+                var lastTickTime = +new Date();
+                setInterval(function() {
+                    if (newPanVertically != panVertically) {
+                        offset = 0;
+                        reverse = 0;
+                    } else if (newMaxOffset < maxOffset) {
+                        offset = 0;
+                    }
+                    maxOffset = newMaxOffset;
+                    panVertically = newPanVertically;
+                    var offsetPerSecond = maxOffset / SECONDS_PER_PAN;
+                    var adjOffsetPerSecond = Math.min(offsetPerSecond, MAX_OFFSET_PER_SECOND);
+                    var adjustment = (offsetPerSecond - adjOffsetPerSecond) * SECONDS_PER_PAN / 2;
+
+                    var now = +new Date();
+                    var elapsed = now - lastTickTime;
+                    lastTickTime = now;
+                    if (now - timeResized < 200) return;
+
+                    if (adjOffsetPerSecond > 10 && 
+                       (slideDiv.hasClass('active') || 
+                       slideDiv.hasClass('left'))) {
+
+                        if (offset <= 0) {
+                            reverse = false;
+                        } else if (offset >= maxOffset) {
+                            reverse = true;
+                        }
+                        offset += (adjOffsetPerSecond * elapsed / 1000) *
+                                  (reverse ? -1 : 1);
+                        offsetStr = panVertically ? '0px -' + (offset + adjustment) + 'px'
+                                                  : '-' + (offset + adjustment) + 'px ' + '0px';
+                        imgDiv.css('background-position', offsetStr);
+
+                    } else {
+                        offset = 0;
+                        reverse = false;
+                        imgDiv.css('background-position', '0px 0px');
+                    }
+                }, 1000 / FPS);
+
+            });
+        })(ii);}
+    });
+
+})();
+</script>
+{% endblock %}

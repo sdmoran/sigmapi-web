@@ -18,30 +18,10 @@ def _get_context(page_name):
     }
 
 
-def _get_article_context(page_name):
-    """ Returns the context necessary for an article style page 
-    
-    Arguments:
-        page_name (str) The friendly name of the page being rendered
-    """
-    blocks_dict = {'article_blocks': models.ArticleBlock.blocks_for_page(page_name)}
-    blocks_dict.update(_get_context(page_name))
-    return blocks_dict
-
-
-def index(request):
-    """
-    View for the static index page
-    """
-    return render(request, 'public/home.html', _get_context('Home'))
-
-
 def public_page(request, url_name):
     """
     View to reach any public page stored in the database, used as a top-level page
     """
-    print('accessed public page --------')
-    print('url_name = %s' % url_name)
     page = models.PublicPage.get_by_url(url_name)
     template = None
     if hasattr(page, 'article'):
@@ -53,31 +33,11 @@ def public_page(request, url_name):
     raise Http404('The page "%s" could not be found.' % url_name)
 
 
-def about(request):
+def index(request):
     """
-    View for the static chapter history page.
+    View for the static index page
     """
-    return render(request, 'public/article.html', _get_article_context('About'))
-
-
-def activities(request):
-    """
-    View for the static chapter service page.
-    """
-    return render(
-        request,
-        'public/article.html',
-        _get_article_context('Service & Activities'),
-    )
-
-
-def donate(request):
-    """
-    View for the static donate page.
-    """
-    return render(
-        request, 'public/article.html', _get_article_context('Donate'),
-    )
+    return public_page(request, 'home')
 
 
 def permission_denied(request):
