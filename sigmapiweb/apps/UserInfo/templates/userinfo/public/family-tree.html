@@ -1,0 +1,20 @@
+{% extends 'common/public_base.html' %}
+{% block module_includes %}
+    <link rel="stylesheet" href="/static/css/lib/joint.min.css">
+    <script src="/static/js/lib/lodash.js"></script>
+    <script src="/static/js/lib/backbone.js"></script>
+    <script src="/static/js/lib/joint.min.js"></script>
+    <script src="/static/js/public/familytree.js"></script>
+{% endblock %}
+{% block title %}Sigma Pi Gamma Iota - Family Tree{% endblock %}
+
+{% block content %}
+
+    <div id="tree-container">
+    </div>
+    <script>
+        let jsonData = JSON.parse(unescape("{{ users | safe | escapejs}}"));
+        generateFamilyTree("tree-container", jsonData)
+    </script>
+
+{% endblock %}

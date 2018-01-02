@@ -8,6 +8,8 @@ from django.shortcuts import render, redirect
 from django.template.defaultfilters import stringfilter, register
 from django.utils.html import strip_tags
 
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 from . import utils
 from .forms import EditUserInfoForm
 from .models import UserInfo, PledgeClass
@@ -128,6 +130,62 @@ def users(request):
 
     return render(request, 'userinfo/public/brothers.html', context)
 
+
+def family_tree(request):
+    users = User.objects.all().prefetch_related('userinfo')
+    big_list = []
+    for user in users:
+        newBrother = {
+            'name': user.first_name + " " + user.last_name,
+            'id': user.id,
+            'littles': []
+        }
+        try:
+            newBrother['big_brother'] = user.userinfo.bigBrother.id
+
+            exists = False
+            for brothercheck in users:
+                if brothercheck.id == newBrother['big_brother']:
+                    exists = True
+            if not exists:
+                big_list.append({
+                    'name': user.userinfo.bigBrother.first_name + " " + user.userinfo.bigBrother.last_name,
+                    'id': user.userinfo.bigBrother.id,
+                    'littles': [],
+                    'big_brother': -1,
+                    'added': True
+                })
+
+        except UserInfo.DoesNotExist:
+            newBrother['big_brother'] = -1
+        big_list.append(newBrother)
+
+    # Expand the tree so it isn't flat
+    i = 0
+    while i < len(big_list):
+        print("i: " + str(i))
+        print(len(big_list))
+        big_id = big_list[i]['big_brother']
+        if find_big(big_list, big_id, big_list[i]):
+            big_list.pop(i)
+            i -= 1
+        i += 1
+
+    big_list = json.dumps(list(big_list), cls=DjangoJSONEncoder)
+    context = {
+        'users': big_list
+    }
+    return render(request, 'userinfo/public/family-tree.html', context)
+
+def find_big(tree, big_id, little):
+    for p in range(len(tree)):
+        if tree[p]['id'] == big_id:
+            tree[p]['littles'].append(little)
+            return True
+        elif len(tree[p]['littles']) > 0:
+            if find_big(tree[p]['littles'], big_id, little):
+                return True
+    return False
 
 @permission_required('UserInfo.manage_users', login_url='secure-index')
 def add_users(request):
@@ -271,5 +329,5 @@ def profile_image(rel_path):
     return (
         '/content/' + rel_path
         if rel_path
-        else 'static/img/user-placeholder.png'
+        else '/static/img/user-placeholder.png'
     )
