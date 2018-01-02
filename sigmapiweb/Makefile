@@ -20,9 +20,13 @@ dumpdata: syncdb
 syncdb:
 	$(MANAGE) migrate --run-syncdb
 
-run: migrate quickrun
+run: static migrate quickrun
 
 static:
+	$(MANAGE) collectstatic --noinput
+
+static_prod:
+	$(MANAGE) compilescss
 	$(MANAGE) collectstatic --noinput
 
 migrate:
