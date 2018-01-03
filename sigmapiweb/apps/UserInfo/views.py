@@ -135,6 +135,8 @@ def family_tree(request):
     users = User.objects.all().prefetch_related('userinfo')
     big_list = []
     for user in users:
+        if "Admin" in user.first_name:
+            continue
         newBrother = {
             'name': user.first_name + " " + user.last_name,
             'id': user.id,
