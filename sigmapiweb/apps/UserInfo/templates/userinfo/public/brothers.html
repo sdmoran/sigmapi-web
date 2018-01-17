@@ -1,6 +1,6 @@
 {% extends 'public/_article_base.html' %}
 {% block title %}Sigma Pi Gamma Iota - Brothers{% endblock %}
-
+{% comment %}
 {% block content %}
 <div class="article-section">
 	<em>This page is currently under construction.</em>
@@ -8,8 +8,8 @@
 <div class="stretcher">
 </div>
 {% endblock %}
+{% endcomment %}
 
-{% comment %}
 {% load sass_tags %}
 {% block module_includes %}
 	{% load staticfiles %}
@@ -18,6 +18,8 @@
 
 {% block content %}
 		<h2 class="themed-back">The Executive Council</h2>
+		<h2> hello world</h2>
+
 				<!-- Start EC -->
 				{% if sage %}
 				<!--Sage Here-->
@@ -428,4 +430,3 @@
 				{% endif %}
 				<!-- End freshmen -->
 {% endblock %}
-{% endcomment %}
