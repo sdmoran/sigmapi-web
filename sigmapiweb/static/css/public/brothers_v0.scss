@@ -1,6 +1,11 @@
 .user-panel
 {
-	display:inline;
+	overflow: hidden; 
+	border-radius: 10px; 
+	padding: 2% 2% 2% 2%; 
+	margin: 5% auto 5% auto;
+	background-color:#ccd; 
+	opacity:0.92;
 	width: 100%;
 }
 
@@ -20,9 +25,9 @@
 .user-panel > .panel-body > img
 {
 	vertical-align: top !important;
-
+	border-radius: 50%;
 	padding-left: 10px;
-
+	opacity: 1.5;
 	max-width: 215px;
 }
 
@@ -31,7 +36,6 @@
 		{
 			max-width:100%;
 			width:100%;
-
 			float:none !important;
 		}
 }

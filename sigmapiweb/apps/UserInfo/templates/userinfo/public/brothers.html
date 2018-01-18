@@ -18,9 +18,9 @@
 
 {% block content %}
 		<h2 class="themed-back">The Executive Council</h2>
-		<h2> hello world</h2>
-
-				<!-- Start EC -->
+		<!-- Start EC -->
+		<div class="column-container" style="overflow: hidden;">
+			<div class="user-column-left" style="float:left; width:40%; margin:auto 2% auto 8%">
 				{% if sage %}
 				<!--Sage Here-->
 				<div class="user-panel">
@@ -60,46 +60,6 @@
 					</div>
 				</div>
 				<!--End sage-->
-				{% endif %}
-				{% if second %}
-				<!--Second starts-->
-				<div class="user-panel">
-					<h3>2nd Counselor - {{ second.first_name }} {{ second.last_name }}</h3>
-					<div class="panel-body">
-						<img src="{{ second.userinfo.picture|profile_image }}">
-						<div class="content">
-							<div class="nameval">
-								<div class="name">Class:</div>
-								<div class="value">{{ second.userinfo.pledgeClass.name }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Year:</div>
-								<div class="value">{{ second.userinfo.graduationYear }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Major:</div>
-								<div class="value">{{ second.userinfo.major }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Hometown:</div>
-								<div class="value">{{ second.userinfo.hometown }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Activities:</div>
-								<div class="value">{{ second.userinfo.activities }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Interests:</div>
-								<div class="value">{{ second.userinfo.interests }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Favorite Memory:</div>
-								<div class="value">{{ second.userinfo.favoriteMemory }}</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- End second -->
 				{% endif %}
 				{% if third %}
 				<!-- Start 3rd -->
@@ -141,46 +101,6 @@
 				</div>
 				<!-- End 3rd -->
 				{% endif %}
-				{% if fourth %}
-				<!-- Start 4th -->
-				<div class="user-panel">
-					<h3>4th Counselor - {{ fourth.first_name }} {{ fourth.last_name }}</h3>
-					<div class="panel-body">
-						<img src="{{ fourth.userinfo.picture|profile_image }}">
-						<div class="content">
-							<div class="nameval">
-								<div class="name">Class:</div>
-								<div class="value">{{ fourth.userinfo.pledgeClass.name }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Year:</div>
-								<div class="value">{{ fourth.userinfo.graduationYear }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Major:</div>
-								<div class="value">{{ fourth.userinfo.major }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Hometown:</div>
-								<div class="value">{{ fourth.userinfo.hometown }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Activities:</div>
-								<div class="value">{{ fourth.userinfo.activities }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Interests:</div>
-								<div class="value">{{ fourth.userinfo.interests }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Favorite Memory:</div>
-								<div class="value">{{ fourth.userinfo.favoriteMemory }}</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- End 4th -->
-				{% endif %}
 				{% if first %}
 				<!-- Start 1st -->
 				<div class="user-panel">
@@ -220,6 +140,88 @@
 					</div>
 				</div>
 				<!-- End 1st -->
+				{% endif %}
+			</div>
+			<div class="user-column-right" style="float:left; width:40%; margin:auto 8% auto 2%">
+				{% if second %}
+				<!--Second starts-->
+				<div class="user-panel">
+					<h3>2nd Counselor - {{ second.first_name }} {{ second.last_name }}</h3>
+					<div class="panel-body">
+						<img src="{{ second.userinfo.picture|profile_image }}">
+						<div class="content">
+							<div class="nameval">
+								<div class="name">Class:</div>
+								<div class="value">{{ second.userinfo.pledgeClass.name }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Year:</div>
+								<div class="value">{{ second.userinfo.graduationYear }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Major:</div>
+								<div class="value">{{ second.userinfo.major }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Hometown:</div>
+								<div class="value">{{ second.userinfo.hometown }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Activities:</div>
+								<div class="value">{{ second.userinfo.activities }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Interests:</div>
+								<div class="value">{{ second.userinfo.interests }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Favorite Memory:</div>
+								<div class="value">{{ second.userinfo.favoriteMemory }}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- End second -->
+				{% endif %}
+				{% if fourth %}
+				<!-- Start 4th -->
+				<div class="user-panel">
+					<h3>4th Counselor - {{ fourth.first_name }} {{ fourth.last_name }}</h3>
+					<div class="panel-body">
+						<img src="{{ fourth.userinfo.picture|profile_image }}">
+						<div class="content">
+							<div class="nameval">
+								<div class="name">Class:</div>
+								<div class="value">{{ fourth.userinfo.pledgeClass.name }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Year:</div>
+								<div class="value">{{ fourth.userinfo.graduationYear }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Major:</div>
+								<div class="value">{{ fourth.userinfo.major }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Hometown:</div>
+								<div class="value">{{ fourth.userinfo.hometown }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Activities:</div>
+								<div class="value">{{ fourth.userinfo.activities }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Interests:</div>
+								<div class="value">{{ fourth.userinfo.interests }}</div>
+							</div>
+							<div class="nameval">
+								<div class="name">Favorite Memory:</div>
+								<div class="value">{{ fourth.userinfo.favoriteMemory }}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- End 4th -->
 				{% endif %}
 				{% if herald %}
 				<!-- Start Herald -->
@@ -261,172 +263,361 @@
 				</div>
 				<!-- End herald-->
 				{% endif %}
+			</div>
 				<!-- End EC -->
+		</div>
 
-				<!-- Start Seniors -->
-				<h2 class="themed-back">Seniors</h2>
+		<h2 class="themed-back">Seniors</h2>
+		<div class="column-container" style="overflow: hidden;">
+			<div class="user-column-left" style="float:left; width:40%; margin:auto 2% auto 8%">
 				{% for user in seniors %}
-				<div class="user-panel">
-					<h3>{{ user.first_name }} {{ user.last_name }}</h3>
-					<div class="panel-body">
-						<img src="{{ user.userinfo.picture|profile_image }}">
-						<div class="content">
-							<div class="nameval">
-								<div class="name">Class:</div>
-								<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Year:</div>
-								<div class="value">{{ user.userinfo.graduationYear }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Major:</div>
-								<div class="value">{{ user.userinfo.major }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Hometown:</div>
-								<div class="value">{{ user.userinfo.hometown }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Activities:</div>
-								<div class="value">{{ user.userinfo.activities }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Interests:</div>
-								<div class="value">{{ user.userinfo.interests }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Favorite Memory:</div>
-								<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+					{% if not forloop.counter|divisibleby:2 %}
+						<div class="user-panel">
+							<h3>{{ user.first_name }} {{ user.last_name }}</h3>
+							<div class="panel-body">
+								<img src="{{ user.userinfo.picture|profile_image }}">
+								<div class="content">
+									<div class="nameval">
+										<div class="name">Class:</div>
+										<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Year:</div>
+										<div class="value">{{ user.userinfo.graduationYear }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Major:</div>
+										<div class="value">{{ user.userinfo.major }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Hometown:</div>
+										<div class="value">{{ user.userinfo.hometown }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Activities:</div>
+										<div class="value">{{ user.userinfo.activities }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Interests:</div>
+										<div class="value">{{ user.userinfo.interests }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Favorite Memory:</div>
+										<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-				</div>
+					{% endif %}
 				{% endfor %}
-				<!-- End Seniors -->
-				<!-- Start juniors-->
-				<h2 class="themed-back">Juniors</h2>
+			</div>
+			<div class="user-column-right" style="float:left; width:40%; margin:auto 8% auto 2%">
+				{% for user in seniors %}
+					{% if forloop.counter|divisibleby:2 %}
+						<div class="user-panel">
+							<h3>{{ user.first_name }} {{ user.last_name }}</h3>
+							<div class="panel-body">
+								<img src="{{ user.userinfo.picture|profile_image }}">
+								<div class="content">
+									<div class="nameval">
+										<div class="name">Class:</div>
+										<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Year:</div>
+										<div class="value">{{ user.userinfo.graduationYear }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Major:</div>
+										<div class="value">{{ user.userinfo.major }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Hometown:</div>
+										<div class="value">{{ user.userinfo.hometown }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Activities:</div>
+										<div class="value">{{ user.userinfo.activities }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Interests:</div>
+										<div class="value">{{ user.userinfo.interests }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Favorite Memory:</div>
+										<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+
+		<h2 class="themed-back">Juniors</h2>
+		<div class="column-container" style="overflow: hidden;">
+			<div class="user-column-left" style="float:left; width:40%; margin:auto 2% auto 8%">
 				{% for user in juniors %}
-				<div class="user-panel">
-					<h3>{{ user.first_name }} {{ user.last_name }}</h3>
-					<div class="panel-body">
-						<img src="{{ user.userinfo.picture|profile_image }}">
-						<div class="content">
-							<div class="nameval">
-								<div class="name">Class:</div>
-								<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Year:</div>
-								<div class="value">{{ user.userinfo.graduationYear }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Major:</div>
-								<div class="value">{{ user.userinfo.major }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Hometown:</div>
-								<div class="value">{{ user.userinfo.hometown }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Activities:</div>
-								<div class="value">{{ user.userinfo.activities }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Interests:</div>
-								<div class="value">{{ user.userinfo.interests }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Favorite Memory:</div>
-								<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+					{% if not forloop.counter|divisibleby:2 %}
+						<div class="user-panel">
+							<h3>{{ user.first_name }} {{ user.last_name }}</h3>
+							<div class="panel-body">
+								<img src="{{ user.userinfo.picture|profile_image }}">
+								<div class="content">
+									<div class="nameval">
+										<div class="name">Class:</div>
+										<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Year:</div>
+										<div class="value">{{ user.userinfo.graduationYear }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Major:</div>
+										<div class="value">{{ user.userinfo.major }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Hometown:</div>
+										<div class="value">{{ user.userinfo.hometown }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Activities:</div>
+										<div class="value">{{ user.userinfo.activities }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Interests:</div>
+										<div class="value">{{ user.userinfo.interests }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Favorite Memory:</div>
+										<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-				</div>
+					{% endif %}
 				{% endfor %}
-				<!-- end juniors -->
-				<!-- start sophomores -->
-				<h2 class="themed-back">Sophomores</h2>
+			</div>
+			<div class="user-column-right" style="float:left; width:40%; margin:auto 8% auto 2%">
+				{% for user in juniors %}
+					{% if forloop.counter|divisibleby:2 %}
+						<div class="user-panel">
+							<h3>{{ user.first_name }} {{ user.last_name }}</h3>
+							<div class="panel-body">
+								<img src="{{ user.userinfo.picture|profile_image }}">
+								<div class="content">
+									<div class="nameval">
+										<div class="name">Class:</div>
+										<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Year:</div>
+										<div class="value">{{ user.userinfo.graduationYear }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Major:</div>
+										<div class="value">{{ user.userinfo.major }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Hometown:</div>
+										<div class="value">{{ user.userinfo.hometown }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Activities:</div>
+										<div class="value">{{ user.userinfo.activities }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Interests:</div>
+										<div class="value">{{ user.userinfo.interests }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Favorite Memory:</div>
+										<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+
+		<h2 class="themed-back">Sophomores</h2>
+		<div class="column-container" style="overflow: hidden;">
+			<div class="user-column-left" style="float:left; width:40%; margin:auto 2% auto 8%">
 				{% for user in sophomores %}
-				<div class="user-panel">
-					<h3>{{ user.first_name }} {{ user.last_name }}</h3>
-					<div class="panel-body">
-						<img src="{{ user.userinfo.picture|profile_image }}">
-						<div class="content">
-							<div class="nameval">
-								<div class="name">Class:</div>
-								<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Year:</div>
-								<div class="value">{{ user.userinfo.graduationYear }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Major:</div>
-								<div class="value">{{ user.userinfo.major }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Hometown:</div>
-								<div class="value">{{ user.userinfo.hometown }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Activities:</div>
-								<div class="value">{{ user.userinfo.activities }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Interests:</div>
-								<div class="value">{{ user.userinfo.interests }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Favorite Memory:</div>
-								<div class="value">{{ user.userinfo.favoriteMemory }}</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				{% endfor %}
-				<!-- End Sophomores -->
-				<!-- Start freshmen -->
-				{% if freshmen %}
-				<h2 class="themed-back">Freshmen</h2>
-				{% for user in freshmen %}
-				<div class="user-panel">
-					<h3>{{ user.first_name }} {{ user.last_name }}</h3>
-					<div class="panel-body">
-						<img src="{{ user.userinfo.picture|profile_image }}">
-						<div class="content">
-							<div class="nameval">
-								<div class="name">Class:</div>
-								<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Year:</div>
-								<div class="value">{{ user.userinfo.graduationYear }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Major:</div>
-								<div class="value">{{ user.userinfo.major }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Hometown:</div>
-								<div class="value">{{ user.userinfo.hometown }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Activities:</div>
-								<div class="value">{{ user.userinfo.activities }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Interests:</div>
-								<div class="value">{{ user.userinfo.interests }}</div>
-							</div>
-							<div class="nameval">
-								<div class="name">Favorite Memory:</div>
-								<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+					{% if not forloop.counter|divisibleby:2 %}
+						<div class="user-panel">
+							<h3>{{ user.first_name }} {{ user.last_name }}</h3>
+							<div class="panel-body">
+								<img src="{{ user.userinfo.picture|profile_image }}">
+								<div class="content">
+									<div class="nameval">
+										<div class="name">Class:</div>
+										<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Year:</div>
+										<div class="value">{{ user.userinfo.graduationYear }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Major:</div>
+										<div class="value">{{ user.userinfo.major }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Hometown:</div>
+										<div class="value">{{ user.userinfo.hometown }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Activities:</div>
+										<div class="value">{{ user.userinfo.activities }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Interests:</div>
+										<div class="value">{{ user.userinfo.interests }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Favorite Memory:</div>
+										<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-				</div>
+					{% endif %}
 				{% endfor %}
-				{% endif %}
-				<!-- End freshmen -->
+			</div>
+			<div class="user-column-right" style="float:left; width:40%; margin:auto 8% auto 2%">
+				{% for user in sophomores %}
+					{% if forloop.counter|divisibleby:2 %}
+						<div class="user-panel">
+							<h3>{{ user.first_name }} {{ user.last_name }}</h3>
+							<div class="panel-body">
+								<img src="{{ user.userinfo.picture|profile_image }}">
+								<div class="content">
+									<div class="nameval">
+										<div class="name">Class:</div>
+										<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Year:</div>
+										<div class="value">{{ user.userinfo.graduationYear }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Major:</div>
+										<div class="value">{{ user.userinfo.major }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Hometown:</div>
+										<div class="value">{{ user.userinfo.hometown }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Activities:</div>
+										<div class="value">{{ user.userinfo.activities }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Interests:</div>
+										<div class="value">{{ user.userinfo.interests }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Favorite Memory:</div>
+										<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+
+		{% if freshmen %}
+		<h2 class="themed-back">Freshman</h2>
+		<div class="column-container" style="overflow: hidden;">
+			<div class="user-column-left" style="float:left; width:40%; margin:auto 2% auto 8%">
+				{% for user in freshman %}
+					{% if not forloop.counter|divisibleby:2 %}
+						<div class="user-panel">
+							<h3>{{ user.first_name }} {{ user.last_name }}</h3>
+							<div class="panel-body">
+								<img src="{{ user.userinfo.picture|profile_image }}">
+								<div class="content">
+									<div class="nameval">
+										<div class="name">Class:</div>
+										<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Year:</div>
+										<div class="value">{{ user.userinfo.graduationYear }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Major:</div>
+										<div class="value">{{ user.userinfo.major }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Hometown:</div>
+										<div class="value">{{ user.userinfo.hometown }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Activities:</div>
+										<div class="value">{{ user.userinfo.activities }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Interests:</div>
+										<div class="value">{{ user.userinfo.interests }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Favorite Memory:</div>
+										<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+			<div class="user-column-right" style="float:left; width:40%; margin:auto 8% auto 2%">
+				{% for user in freshman %}
+					{% if forloop.counter|divisibleby:2 %}
+						<div class="user-panel">
+							<h3>{{ user.first_name }} {{ user.last_name }}</h3>
+							<div class="panel-body">
+								<img src="{{ user.userinfo.picture|profile_image }}">
+								<div class="content">
+									<div class="nameval">
+										<div class="name">Class:</div>
+										<div class="value">{{ user.userinfo.pledgeClass.name }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Year:</div>
+										<div class="value">{{ user.userinfo.graduationYear }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Major:</div>
+										<div class="value">{{ user.userinfo.major }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Hometown:</div>
+										<div class="value">{{ user.userinfo.hometown }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Activities:</div>
+										<div class="value">{{ user.userinfo.activities }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Interests:</div>
+										<div class="value">{{ user.userinfo.interests }}</div>
+									</div>
+									<div class="nameval">
+										<div class="name">Favorite Memory:</div>
+										<div class="value">{{ user.userinfo.favoriteMemory }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+		{% endif %}
 {% endblock %}
