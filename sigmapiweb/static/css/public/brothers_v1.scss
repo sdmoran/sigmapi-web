@@ -1,31 +1,20 @@
-.column-container
+.position-title
 {
-	overflow: hidden;
+	text-align:center;
 }
-
-.column-container > .user-column-left
+.name-title
 {
-	 float:left; 
-	 width:40%; 
-	 margin: auto 2% auto 8%;
-}
-
-.column-container > .user-column-right
-{
-	 float:left; 
-	 width:40%; 
-	 margin: auto 8% auto 2%;
+	text-align:center;
 }
 
 .user-panel
 {
 	overflow: hidden; 
 	border-radius: 10px; 
-	padding: 2% 2% 2% 2%; 
-	margin: 5% auto 5% auto;
+	padding: 2% 0% 2% 0%; 
 	background-color:#ccd; 
 	opacity:0.92;
-	width: 100%;
+	width: 66%;
 }
 
 .user-panel > h3
@@ -38,6 +27,7 @@
 	color: rgb(82, 77, 77);
 	padding: 0px;
 	padding-left: 15px;
+	padding-right: 15px;
 	max-width: 100%;
 }
 
@@ -45,9 +35,10 @@
 {
 	vertical-align: top !important;
 	border-radius: 50%;
-	padding-left: 10px;
 	opacity: 1.5;
 	max-width: 215px;
+	display:block;
+	margin: 0 auto;
 }
 
 @media (max-width:265px){
