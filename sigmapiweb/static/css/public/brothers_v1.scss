@@ -1,3 +1,22 @@
+.column-container
+{
+	overflow: hidden;
+}
+
+.column-container > .user-column-left
+{
+	 float:left; 
+	 width:40%; 
+	 margin: auto 2% auto 8%;
+}
+
+.column-container > .user-column-right
+{
+	 float:left; 
+	 width:40%; 
+	 margin: auto 8% auto 2%;
+}
+
 .user-panel
 {
 	overflow: hidden; 
