@@ -274,5 +274,5 @@ def profile_image(rel_path):
     return (
         '/content/' + rel_path
         if rel_path
-        else 'static/img/user-placeholder.png'
+        else '/static/img/user-placeholder.png'
     )

@@ -1,7 +1,20 @@
+.position-title
+{
+	text-align:center;
+}
+.name-title
+{
+	text-align:center;
+}
+
 .user-panel
 {
-	display:inline;
-	width: 100%;
+	overflow: hidden; 
+	border-radius: 10px; 
+	padding: 2% 0% 2% 0%; 
+	background-color:#ccd; 
+	opacity:0.92;
+	width: 66%;
 }
 
 .user-panel > h3
@@ -14,16 +27,19 @@
 	color: rgb(82, 77, 77);
 	padding: 0px;
 	padding-left: 15px;
+	padding-right: 15px;
 	max-width: 100%;
+	height:600px;
 }
 
 .user-panel > .panel-body > img
 {
 	vertical-align: top !important;
-
-	padding-left: 10px;
-
+	border-radius: 50%;
+	opacity: 1.5;
 	max-width: 215px;
+	display:block;
+	margin: 0 auto;
 }
 
 @media (max-width:265px){
@@ -31,7 +47,6 @@
 		{
 			max-width:100%;
 			width:100%;
-
 			float:none !important;
 		}
 }
@@ -41,8 +56,9 @@
 	display:inline-block;
 	margin-top: 10px;
 	margin-left: 10px;
+	margin-right: 10px;
 
-	max-width: 60%;
+	width: 99%;
 }
 
 @media (max-width:860px){
@@ -90,4 +106,5 @@
 {
 	word-wrap: break-word;
 	margin-left: 20px;
+	width:90%;
 }
