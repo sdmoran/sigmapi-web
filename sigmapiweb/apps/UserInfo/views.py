@@ -13,6 +13,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from . import utils
 from .forms import EditUserInfoForm
 from .models import UserInfo, PledgeClass
+import time
 
 
 def users(request):
@@ -133,14 +134,18 @@ def users(request):
 
 def family_tree(request):
     users = User.objects.all().prefetch_related('userinfo')
-    big_list = []
+
+    big_list = {
+        'name': "Sigma Pi Gamma Iota",
+        'children': []
+    }
     for user in users:
-        if "Admin" in user.first_name:
+        if "Admin" in user.first_name or user.first_name == "":
             continue
         newBrother = {
             'name': user.first_name + " " + user.last_name,
             'id': user.id,
-            'littles': []
+            'children': []
         }
         try:
             newBrother['big_brother'] = user.userinfo.bigBrother.id
@@ -150,42 +155,43 @@ def family_tree(request):
                 if brothercheck.id == newBrother['big_brother']:
                     exists = True
             if not exists:
-                big_list.append({
+                big_list['children'].append({
                     'name': user.userinfo.bigBrother.first_name + " " + user.userinfo.bigBrother.last_name,
                     'id': user.userinfo.bigBrother.id,
-                    'littles': [],
+                    'children': [],
                     'big_brother': -1,
                     'added': True
                 })
 
         except UserInfo.DoesNotExist:
             newBrother['big_brother'] = -1
-        big_list.append(newBrother)
+        big_list['children'].append(newBrother)
 
     # Expand the tree so it isn't flat
     i = 0
-    while i < len(big_list):
+    while i < len(big_list['children']):
         print("i: " + str(i))
-        print(len(big_list))
-        big_id = big_list[i]['big_brother']
-        if find_big(big_list, big_id, big_list[i]):
-            big_list.pop(i)
+        print(len(big_list['children']))
+        big_id = big_list['children'][i]['big_brother']
+        if find_big(big_list['children'], big_id, big_list['children'][i]):
+            big_list['children'].pop(i)
             i -= 1
         i += 1
 
-    big_list = json.dumps(list(big_list), cls=DjangoJSONEncoder)
+    big_list = json.dumps(big_list, cls=DjangoJSONEncoder)
+
     context = {
-        'users': big_list
+        'users': big_list,
     }
     return render(request, 'userinfo/public/family-tree.html', context)
 
 def find_big(tree, big_id, little):
     for p in range(len(tree)):
         if tree[p]['id'] == big_id:
-            tree[p]['littles'].append(little)
+            tree[p]['children'].append(little)
             return True
-        elif len(tree[p]['littles']) > 0:
-            if find_big(tree[p]['littles'], big_id, little):
+        elif len(tree[p]['children']) > 0:
+            if find_big(tree[p]['children'], big_id, little):
                 return True
     return False
 
