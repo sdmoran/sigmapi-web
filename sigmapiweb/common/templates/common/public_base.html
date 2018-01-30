@@ -39,8 +39,16 @@
                         {% else %}
                             <li class="child sibling">
                         {% endif %}
-                            <a id="nav-home child" href='{% url page_info.0 %}'>
+
+                            {% if page_info.0 == "pub-login" and user.is_authenticated %}
+                                <a id="nav-home child" href='{% url 'secure-index' %}'>
+                                Secure
+                                </a>
+                            {% else %}
+                                <a id="nav-home child" href='{% url page_info.0 %}'>
                                 {{page_name}}
+                                </a>
+                            {% endif %}
                             </a>
                         </li>
                     {% endfor %}
