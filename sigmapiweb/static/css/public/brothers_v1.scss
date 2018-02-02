@@ -1,10 +1,24 @@
+.row {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-content: stretch;
+	align-items: stretch;
+}
+
 .position-title
 {
 	text-align:center;
+	font-size: 1.8em;
 }
 .name-title
 {
 	text-align:center;
+}
+
+.name {
+	font-size: 1.15em;
 }
 
 .user-panel
@@ -14,7 +28,10 @@
 	padding: 2% 0% 2% 0%; 
 	background-color:#ccd; 
 	opacity:0.92;
-	width: 66%;
+	margin: 3%;
+	max-width: 400px;
+	min-width: 350px;
+	flex-grow: 1;
 }
 
 .user-panel > h3
@@ -29,7 +46,6 @@
 	padding-left: 15px;
 	padding-right: 15px;
 	max-width: 100%;
-	height:600px;
 }
 
 .user-panel > .panel-body > img
