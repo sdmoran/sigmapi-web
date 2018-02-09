@@ -50,7 +50,7 @@ urlpatterns = [
         name='pub-permission_denied',
     ),
     url(
-        regex=r'^donate/',
+        regex=r'^donate[/]$',
         view=views.donate,
         name='pub-donate',
     ),
