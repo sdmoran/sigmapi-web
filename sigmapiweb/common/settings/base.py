@@ -3,7 +3,7 @@ Base settings for Sigma Pi, Gamma Iota chapter website.
 """
 
 import os
-
+from collections import OrderedDict
 
 BASE_DIR = os.getcwd()
 
@@ -150,10 +150,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 SASS_PROCESSOR_AUTO_INCLUDE = False
 SASS_PRECISION = 8
 
-PUBLIC_PAGES = {
-    'Home': ('pub-index', None),
-    'About': ('pub-about', 'summer-house.jpg'),
-    'Service & Activities': ('pub-activities', 'volleyball.jpg'),
-    'Brothers':  ('userinfo-users', 'seniors-2017.jpg'),
-    'Log In': ('pub-login', None),  # This image is hard-coded into login_v1.scss
-}
+PUBLIC_PAGES = OrderedDict([
+    ('Home', ('pub-index', None)),
+    ('About', ('pub-about', 'summer-house.jpg')),
+    ('Service & Activities', ('pub-activities', 'volleyball.jpg')),
+    ('Brothers',  ('userinfo-users', 'seniors-2017.jpg')),
+    ('Donate', ('pub-donate', None)),
+    ('Log In', ('pub-login', None)),  # This image is hard-coded into login_v1.scss
+])
