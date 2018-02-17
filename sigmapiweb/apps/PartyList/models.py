@@ -114,10 +114,46 @@ class BlacklistedGuest(ModelMixin, models.Model):
             if edit_distance <= self.MAX_MATCH_EDIT_DISTANCE
             else None
         )
-
     class Meta:
         permissions = (
             ("manage_blacklist", "Can manage the blacklist"),
+        )
+
+class GreylistedGuest(ModelMixin, models.Model):
+    """
+    Model to represent a person who has been greylisted.
+
+    Does NOT use the Guest model; just simply stores a name and details.
+    """
+    name = models.CharField(max_length=100, db_index=True)
+    details = models.TextField()
+
+    MAX_MATCH_EDIT_DISTANCE = 5
+
+    def __str__(self):
+        return self.name
+
+    def check_match(self, to_check):
+        """
+        Returns self if it matches the name to_check, else None.
+
+        Arguments:
+            to_check (str)
+
+        Returns: (GreylistedGuest|NoneType)s
+        """
+        check_name = ''.join(c.lower() for c in to_check if not c.isspace())
+        gl_name = ''.join(c.lower() for c in self.name if not c.isspace())
+        edit_distance = editdistance.eval(check_name, gl_name)
+        return (
+            self
+            if edit_distance <= self.MAX_MATCH_EDIT_DISTANCE
+            else None
+        )
+
+    class Meta:
+        permissions = (
+            ("manage_greylist", "Can manage the greylist"),
         )
 
 
@@ -217,6 +253,19 @@ class PartyGuest(ModelMixin, models.Model):
         match_results = (
             blacklisted.check_match(self.guest.name)
             for blacklisted in BlacklistedGuest.objects.all()
+        )
+        positives = (match for match in match_results if match)
+        return positives.next() if positives else None
+    
+    def check_greylisted(self):
+        """
+        Return this guest's match on the greylist if one exists, else None.
+
+        Returns: (GreylistedGuest|NoneType)
+        """
+        match_results = (
+            greylisted.check_match(self.guest.name)
+            for greylisted in GreylistedGuest.objects.all()
         )
         positives = (match for match in match_results if match)
         return positives.next() if positives else None

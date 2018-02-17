@@ -39,6 +39,21 @@ urlpatterns = [
         name='partylist-remove_blacklisting',
     ),
     url(
+        regex=r'^greylist/$',
+        view=views.view_greylist,
+        name='partylist-view_greylist',
+    ),
+    url(
+        regex=r'^greylist/manage/$',
+        view=views.manage_greylist,
+        name='partylist-manage_greylist',
+    ),
+    url(
+        regex=r'^greylist/manage/remove/(?P<bl_id>[\d]+)/$',
+        view=views.remove_greylisting,
+        name='partylist-remove_greylisting',
+    ),
+    url(
         regex=r'^manage/$',
         view=views.manage_parties,
         name='partylist-manage_parties',
