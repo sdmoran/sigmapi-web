@@ -56,6 +56,7 @@ def view_blacklist(request):
     }
     return render(request, 'parties/blacklist/view.html', context)
 
+
 @login_required
 def view_greylist(request):
     """
@@ -65,7 +66,6 @@ def view_greylist(request):
         'greylist': GreylistedGuest.objects.all()
     }
     return render(request, 'parties/greylist/view.html', context)
-
 
 
 @permission_required(

@@ -55,7 +55,6 @@ class GreylistForm(ModelForm):
         fields = ['name', 'details']
 
 
-
 class EditPartyInfoForm(ModelForm):
     """
     Form for editing a party

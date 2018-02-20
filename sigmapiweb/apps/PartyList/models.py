@@ -114,10 +114,12 @@ class BlacklistedGuest(ModelMixin, models.Model):
             if edit_distance <= self.MAX_MATCH_EDIT_DISTANCE
             else None
         )
+
     class Meta:
         permissions = (
             ("manage_blacklist", "Can manage the blacklist"),
         )
+
 
 class GreylistedGuest(ModelMixin, models.Model):
     """
@@ -256,7 +258,7 @@ class PartyGuest(ModelMixin, models.Model):
         )
         positives = (match for match in match_results if match)
         return positives.next() if positives else None
-    
+
     def check_greylisted(self):
         """
         Return this guest's match on the greylist if one exists, else None.

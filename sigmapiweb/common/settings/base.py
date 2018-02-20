@@ -154,7 +154,7 @@ PUBLIC_PAGES = OrderedDict([
     ('Home', ('pub-index', None)),
     ('About', ('pub-about', 'summer-house.jpg')),
     ('Service & Activities', ('pub-activities', 'volleyball.jpg')),
-    ('Brothers',  ('userinfo-users', 'seniors-2017.jpg')),
+    ('Brothers', ('userinfo-users', 'seniors-2017.jpg')),
     ('Donate', ('pub-donate', None)),
-    ('Log In', ('pub-login', None)),  # This image is hard-coded into login_v1.scss
+    ('Log In', ('pub-login', None)),  # This is hard-coded into login_v1.scss
 ])

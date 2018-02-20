@@ -79,8 +79,6 @@ def create(request, party_id):
         added_by,
         was_vouched_for,
     )
-    if blacklist_response:
-        return blacklist_response
 
     greylist_response = _check_greylisting(
         guest_name,
@@ -89,8 +87,13 @@ def create(request, party_id):
         added_by,
         was_vouched_for,
     )
-    if greylist_response:
-        return greylist_response
+
+    if blacklist_response or greylist_response:
+        if blacklist_response:
+            response = blacklist_response
+        else:
+            response = greylist_response
+        return response
 
     try:
         guest = Guest.objects.get(
@@ -261,7 +264,6 @@ def _check_greylisting(
             content_type='application/json'
         )
     return None
-
 
 
 @login_required
