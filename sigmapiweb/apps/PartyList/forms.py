@@ -4,7 +4,7 @@ Forms for PartyList app.
 from django import forms
 from django.forms import ModelForm
 
-from .models import BlacklistedGuest, Guest, Party
+from .models import BlacklistedGuest, GreylistedGuest, Guest, Party
 
 
 class GuestForm(ModelForm):
@@ -40,6 +40,18 @@ class BlacklistForm(ModelForm):
 
     class Meta:
         model = BlacklistedGuest
+        fields = ['name', 'details']
+
+
+class GreylistForm(ModelForm):
+    """
+    Form for adding a guest to the greylist.
+    """
+    name = forms.CharField(max_length=100, label='Full Name')
+    details = forms.CharField(max_length=1000, label='Details', required=False)
+
+    class Meta:
+        model = GreylistedGuest
         fields = ['name', 'details']
 
 

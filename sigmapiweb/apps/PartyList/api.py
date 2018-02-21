@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Party, Guest, PartyGuest, BlacklistedGuest
+from .models import Party, Guest, PartyGuest, BlacklistedGuest, GreylistedGuest
 from .forms import GuestForm
 
 
@@ -79,8 +79,21 @@ def create(request, party_id):
         added_by,
         was_vouched_for,
     )
-    if blacklist_response:
-        return blacklist_response
+
+    greylist_response = _check_greylisting(
+        guest_name,
+        guest_gender,
+        request.POST.get('force'),
+        added_by,
+        was_vouched_for,
+    )
+
+    if blacklist_response or greylist_response:
+        if blacklist_response:
+            response = blacklist_response
+        else:
+            response = greylist_response
+        return response
 
     try:
         guest = Guest.objects.get(
@@ -195,6 +208,51 @@ def _check_blacklisting(
             'maybe_blacklisted': True,
             'blacklist_name': match.name,
             'blacklist_details': match.details,
+            'attempted_name': guest_name,
+            'attempted_gender': guest_gender,
+        }
+        if was_vouched_for:
+            guest_dict['attempted_voucher'] = added_by.username
+        # Respond with the details on the party guest that was just added
+        return HttpResponse(
+            json.dumps(guest_dict),
+            content_type='application/json'
+        )
+    return None
+
+
+def _check_greylisting(
+        guest_name,
+        guest_gender,
+        force,
+        added_by,
+        was_vouched_for
+):
+    """
+    Return 4XX response iff greylist rejects given guest.
+
+    Arguments:
+        guest_name (str)
+        guest_gender (str)
+        force (str): 'true' if we want to override greylist match;
+            otherwise, any other string on None
+        added_by (str)
+        was_vouched_for (bool)
+
+    Returns: (HttpResponse|NoneType)
+        HTTP response if greylist match, else None.
+    """
+    if force == 'true':
+        return None
+    # Check to see if guest is on the greylist before creating it
+    for entry in GreylistedGuest.objects.all():
+        match = entry.check_match(guest_name)
+        if not match:
+            continue
+        guest_dict = {
+            'maybe_greylisted': True,
+            'greylist_name': match.name,
+            'greylist_details': match.details,
             'attempted_name': guest_name,
             'attempted_gender': guest_gender,
         }

@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import permission_required, login_required
 from django.shortcuts import render, redirect
 
-from .models import Party, BlacklistedGuest
-from .forms import PartyForm, EditPartyInfoForm, BlacklistForm
+from .models import Party, BlacklistedGuest, GreylistedGuest
+from .forms import PartyForm, EditPartyInfoForm, BlacklistForm, GreylistForm
 
 
 @login_required
@@ -57,6 +57,17 @@ def view_blacklist(request):
     return render(request, 'parties/blacklist/view.html', context)
 
 
+@login_required
+def view_greylist(request):
+    """
+    View for viewing greylist.
+    """
+    context = {
+        'greylist': GreylistedGuest.objects.all()
+    }
+    return render(request, 'parties/greylist/view.html', context)
+
+
 @permission_required(
     'PartyList.manage_blacklist',
     login_url='pub-permission_denied',
@@ -87,6 +98,35 @@ def manage_blacklist(request):
 
 
 @permission_required(
+    'PartyList.manage_greylist',
+    login_url='pub-permission_denied',
+)
+def manage_greylist(request):
+    """
+    View for managing greylist.
+    """
+    context = {
+        'greylist': GreylistedGuest.objects.all(),
+        'message': None
+    }
+    if request.method == 'POST':
+        form = GreylistForm(request.POST)
+        if form.is_valid():
+            # Set details to empty string if blank
+            new_greylisted_guest = form.save(commit=False)
+            if not form.cleaned_data['details']:
+                new_greylisted_guest.details = ''
+            new_greylisted_guest.save()
+            context['message'] = 'Successfully added entry to greylist'
+        else:
+            context['message'] = 'Error adding entry to greylist'
+    else:
+        form = GreylistForm()
+    context['form'] = form
+    return render(request, 'parties/greylist/manage.html', context)
+
+
+@permission_required(
     'PartyList.manage_blacklist',
     login_url='pub-permission_denied',
 )
@@ -98,6 +138,20 @@ def remove_blacklisting(request, bl_id):
         bl_guest = BlacklistedGuest.objects.get(pk=bl_id)
         bl_guest.delete()
     return redirect('partylist-manage_blacklist')
+
+
+@permission_required(
+    'PartyList.manage_greylist',
+    login_url='pub-permission_denied',
+)
+def remove_greylisting(request, bl_id):
+    """
+    View for removing a greylisted guest.
+    """
+    if request.method == 'POST':
+        gl_guest = GreylistedGuest.objects.get(pk=bl_id)
+        gl_guest.delete()
+    return redirect('partylist-manage_greylist')
 
 
 @permission_required(
