@@ -49,7 +49,7 @@ urlpatterns = [
         name='partylist-manage_greylist',
     ),
     url(
-        regex=r'^greylist/manage/remove/(?P<bl_id>[\d]+)/$',
+        regex=r'^greylist/manage/remove/(?P<gl_id>[\d]+)/$',
         view=views.remove_greylisting,
         name='partylist-remove_greylisting',
     ),

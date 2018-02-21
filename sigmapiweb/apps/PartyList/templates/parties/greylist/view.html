@@ -1,5 +1,7 @@
 {% extends 'parties/_base.html' %}
 
+{% load common_utils %}
+
 {% block title %}Sigma Pi Secure - Greylist{% endblock %}
 
 {% block content %}
@@ -11,6 +13,7 @@
 		<thead>
 			<tr>
 				<th class="two wide">Name</th>
+				<th class="two wide">Added By</th>
 				<th class="six wide">Details</th>
 			</tr>
 		</thead>
@@ -18,6 +21,7 @@
 		{% for person in greylist %}
 			<tr>
 				<td>{{ person.name }}</td>
+				<td>{{ person|full_name:'greylister' }}
 				<td>{{ person.details }}</td>
 			</tr>
 		{% endfor %}

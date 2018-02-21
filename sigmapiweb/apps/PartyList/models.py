@@ -37,6 +37,22 @@ def get_party_jobs_path(_, filename):
     return "parties/partyjobs/" + _time_stamp_filename(filename)
 
 
+def user_can_delete_greylisting(user, greylisting):
+    """
+    Is a user allowed to remove a guest from the greylist?
+
+    Arguments:
+        user: User
+        greylisting: GreylistedGuest
+
+    Returns: bool
+    """
+    return (
+        greylisting.greylister == user or
+        user.has_perm('PartyList.can_delete_any_greylisted_guest')
+    )
+
+
 class Party(ModelMixin, models.Model):
     """
     Model to represent a party.
@@ -128,6 +144,11 @@ class GreylistedGuest(ModelMixin, models.Model):
     Does NOT use the Guest model; just simply stores a name and details.
     """
     name = models.CharField(max_length=100, db_index=True)
+    greylister = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        default=None,
+    )
     details = models.TextField()
 
     MAX_MATCH_EDIT_DISTANCE = 5
@@ -155,7 +176,10 @@ class GreylistedGuest(ModelMixin, models.Model):
 
     class Meta:
         permissions = (
-            ("manage_greylist", "Can manage the greylist"),
+            (
+                'can_delete_any_greylisted_guest',
+                'Can delete any greylsted guest',
+            ),
         )
 
 

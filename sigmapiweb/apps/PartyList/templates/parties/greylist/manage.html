@@ -1,5 +1,7 @@
 {% extends 'parties/_base.html' %}
 
+{% load common_utils %}
+
 {% block title %}Sigma Pi Secure - Greylist{% endblock %}
 
 {% block content %}
@@ -11,21 +13,26 @@
 		<thead>
 			<tr>
 				<th class="two wide">Name</th>
+				<th class="two wide">Added By</th>
 				<th class="two wide">Details</th>
 				<th class="one wide">Delete</th>
 
 			</tr>
 		</thead>
 		<tbody>
-		{% for person in greylist %}
+		{% for person, can_delete in greylist %}
 			<tr>
 				<td>{{ person.name }}</td>
+				<td>{{ person|full_name:'greylister' }}</td>
 				<td>{{ person.details }}</td>
 				<td>
-					<form method="POST" action="{% url 'partylist-remove_greylisting' person.id %}">
-						{% csrf_token %}
-						<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
-					</form>
+					{% if can_delete %}
+						<form method="POST" action="{% url 'partylist-remove_greylisting' person.id %}">
+							{% csrf_token %}
+							<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
+						</form>
+					{% else %}
+					{% endif %}
 				</td>
 			</tr>
 		{% endfor %}

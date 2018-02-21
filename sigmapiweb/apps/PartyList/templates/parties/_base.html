@@ -68,7 +68,7 @@
 			<a href="{% url 'partylist-view_greylist' %}">View Greylist</a>
 		</li>
 
-		{% if perms.PartyList.manage_greylist %}
+		{% if perms.PartyList.add_greylistedguest %}
 		{% if '/greylist/manage' in request.path %}
 		<li class="active">
 		{% else %}
