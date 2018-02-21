@@ -29,9 +29,11 @@ def full_name(model, user_field_name):
 
 
 @register.filter
-def lookup(dictionary, key):
+def lookup(collection, key):
     """
     Lookup a key in a dictionary or list.
+
+    Returns None if dictionary is None or key is not found.
 
     Arguments:
         dictionary (dict|list)
@@ -39,7 +41,13 @@ def lookup(dictionary, key):
 
     Returns: object
     """
-    return dictionary[key]
+    if collection:
+        try:
+            return collection[key]
+        except (KeyError, IndexError):
+            return None
+    else:
+        return None
 
 
 @register.filter
