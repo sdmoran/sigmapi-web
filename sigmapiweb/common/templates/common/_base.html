@@ -39,6 +39,10 @@
 <body>
     {% block body %}
     {% endblock %}
+
+    {% block embedded_js %}
+    {% endblock %}
+
     <script type="text/javascript">
         // Hack to fix Windows Phone 8 IE rendering bug
         if (navigator.userAgent.match(/IEMobile\/10\.0/)) {

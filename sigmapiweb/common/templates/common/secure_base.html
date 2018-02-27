@@ -10,6 +10,11 @@
 {% endblock %}
 
 {% block body %}
+	
+    <!-- Block included for any content that must be rendered at the top level of the body -->
+    {% block toplevel_content %}
+    {% endblock %}  
+
 	<div id="wrapper">
 		<div id="banner-top">
 			<div id="banner-wrapper">
@@ -132,7 +137,10 @@
 		{% endblock %}
 
 		<div class="container-fluid" id="content">
-			{% block content %}{% endblock %}
+			{% block content %}
+
+
+			{% endblock %}
 		</div>
 	</div>
 	<div id="footer-wrapper">
