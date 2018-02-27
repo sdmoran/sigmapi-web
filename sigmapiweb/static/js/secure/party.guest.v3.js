@@ -280,7 +280,6 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 
 		var removeButton = clonedTemplate.find(".status.remove-guest");
 
-		console.log(this.canDestroyAnyGuest);
 		// Remove the remove button if user does not have permission to remove this guest
 		if (this.userID != guest.addedByID && !this.canDestroyAnyGuest)
 		{
@@ -599,20 +598,30 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 		$("#voucher-female").keyup(clickAddMaleOnEnter);
 	}
 
-	$("#bl_override").click(function () {
-		if ($('input[name="add"]:checked').val() == "true")
-		{
-			var voucher = $("#attempted-add-voucher").text();
-			outerThis.addGuest(
-				$("#attempted-add").text(),
-				$("#attempted-add-gender").text(),
-				voucher ? voucher : null,
-				true
-			);
-		}
-	});
+	var prefixes = ["bl", "gl"];
+	for (var i = 0; i < 2; i++) {
+		(function(p) {
+			$(p + "override").click(function () {
+				if ($('input[name="add"]:checked').val() == "true")
+				{
+					var voucher = $(p + "attempted-add-voucher").text();
+					outerThis.addGuest(
+						$(p + "attempted-add").text(),
+						$(p + "attempted-add-gender").text(),
+						voucher ? voucher : null,
+						true
+					);
+				}
+			});
+		})("#" + prefixes[i] + "-");
+		
+	}
 
-	$("#blacklist_warn").on("hide.bs.modal", function (){
+	$("#blacklist-warn").on("hide.bs.modal", function (){
+		//no matter what we want to reset the default confirmation value when the modal hides
+		document.getElementById("nForce").checked = true;
+	});
+	$("#greylist-warn").on("hide.bs.modal", function (){
 		//no matter what we want to reset the default confirmation value when the modal hides
 		document.getElementById("nForce").checked = true;
 	});
@@ -651,13 +660,21 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender, voucher, 
 		var addedGuest = new PartyModule.Guest(data.id, data.name, data.addedByName, data.addedByID, data.signedIn, data.wasVouchedFor);
 
 		if (data.maybe_blacklisted) {
-			$('#bl_name').text(data.blacklist_name);
-			$('#bl_details').text(data.blacklist_details);
-			$('#attempted-add').text(data.attempted_name);
-			$('#attempted-add-voucher').text(data.attempted_voucher || "");
-			$('#attempted-add-gender').text(data.attempted_gender);
-			$('#blacklist_warn').modal('show');
+			$('#bl-attempted-add').text(data.attempted_name);
+			$('#bl-attempted-add-voucher').text(data.attempted_voucher || "");
+			$('#bl-attempted-add-gender').text(data.attempted_gender);
+			$('#bl-name').text(data.blacklist_name);
+			$('#bl-details').text(data.blacklist_details);
+			$('#blacklist-warn').modal('show');
 			PartyModule.displayError("Potential blacklisted guest!")
+		} else if (data.maybe_greylisted) {
+			$('#gl-attempted-add').text(data.attempted_name);
+			$('#gl-attempted-add-voucher').text(data.attempted_voucher || "");
+			$('#gl-attempted-add-gender').text(data.attempted_gender);
+			$('#gl-name').text(data.greylisted_name);
+			$('#gl-details').text(data.greylisted_details);
+			$('#greylist-warn').modal('show');
+			PartyModule.displayError("Potential greylisted guest!")
 		}
 
 		/*

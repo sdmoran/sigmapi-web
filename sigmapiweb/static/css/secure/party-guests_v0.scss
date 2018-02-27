@@ -198,6 +198,22 @@
 	}
 }
 
+#blacklist-warn .modal-content, #greylist-warn .modal-content
+{
+	color: white;
+	p { color: white; }
+}
+
+#blacklist-warn .modal-content {
+	h4 { color: red; }
+	background-color: black;
+}
+
+#greylist-warn .modal-content {
+	h4 { color: yellow; }
+	background-color: #222;
+}
+
 .blacklist-option
 {
 	display: block;
