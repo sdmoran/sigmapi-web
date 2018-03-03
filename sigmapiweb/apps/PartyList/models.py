@@ -115,21 +115,28 @@ class BlacklistedGuest(ModelMixin, models.Model):
 
     def check_match(self, to_check):
         """
-        Returns self if it matches the name to_check, else None.
+        Return int indicating strength of match, where 0 indicates no match.
 
         Arguments:
             to_check (str)
 
-        Returns: (BlacklistedGuest|NoneType)s
+        Returns: int
         """
         check_name = ''.join(c.lower() for c in to_check if not c.isspace())
         bl_name = ''.join(c.lower() for c in self.name if not c.isspace())
         edit_distance = editdistance.eval(check_name, bl_name)
-        return (
-            self
-            if edit_distance <= self.MAX_MATCH_EDIT_DISTANCE
-            else None
-        )
+        return max([0, self.MAX_MATCH_EDIT_DISTANCE - edit_distance])
+
+    def to_json(self):
+        """
+        Return a dictionary form of self.
+
+        Returns: dict
+        """
+        return {
+            'name': self.name,
+            'details': self.details,
+        }
 
     class Meta:
         permissions = (
@@ -168,11 +175,19 @@ class GreylistedGuest(ModelMixin, models.Model):
         check_name = ''.join(c.lower() for c in to_check if not c.isspace())
         gl_name = ''.join(c.lower() for c in self.name if not c.isspace())
         edit_distance = editdistance.eval(check_name, gl_name)
-        return (
-            self
-            if edit_distance <= self.MAX_MATCH_EDIT_DISTANCE
-            else None
-        )
+        return max([0, self.MAX_MATCH_EDIT_DISTANCE - edit_distance])
+
+    def to_json(self):
+        """
+        Return a dictionary form of self.
+
+        Returns: dict
+        """
+        return {
+            'name': self.name,
+            'greylister': self.greylister.get_full_name(),
+            'details': self.details,
+        }
 
     class Meta:
         permissions = (
@@ -239,6 +254,8 @@ class PartyGuest(ModelMixin, models.Model):
     signedIn = models.BooleanField(default=False)
     everSignedIn = models.BooleanField(default=False)
     timeFirstSignedIn = models.DateTimeField(auto_now_add=True)
+    maybeBlacklisted = models.BooleanField(default=False)
+    maybeGreylisted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.guest.name
@@ -267,6 +284,8 @@ class PartyGuest(ModelMixin, models.Model):
         data['addedByID'] = get_id_or_sentinel(self.addedBy)
         data['signedIn'] = self.signedIn
         data['wasVouchedFor'] = self.wasVouchedFor
+        data['maybeBlacklisted'] = self.maybeBlacklisted
+        data['maybeGreylisted'] = self.maybeGreylisted
 
         return data
 

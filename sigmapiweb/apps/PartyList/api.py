@@ -4,6 +4,7 @@ API for PartyList app.
 import csv
 from datetime import datetime
 import json
+import urllib.parse
 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
@@ -50,12 +51,60 @@ def get_full_guest(party_name, date, guest_id):
 
 
 @login_required
+def query_blacklist(_request, query_str):
+    """
+    Check if a guest matching the query string is on the blacklist.
+
+    See _query_bad_guest_list for details.
+    """
+    return _query_bad_guest_list(BlacklistedGuest, query_str)
+
+
+@login_required
+def query_greylist(_request, query_str):
+    """
+    Check if a guest matching the query string is on the greylist.
+
+    See _query_bad_guest_list for details.
+    """
+    return _query_bad_guest_list(GreylistedGuest, query_str)
+
+
+def _query_bad_guest_list(list_cls, query_str):
+    """
+    Check if a guest matching the query string is on the {black|grey}list.
+
+    Arguments:
+        list_cls (type): Either BlacklistedGuest or GreylistedGuest
+        query_str (str): URL-encoded query string
+
+    Return 200 OK with dict containing match information if matched.
+    Return 204 NO CONTENT otherwise.
+    """
+    match_str = urllib.parse.unquote(query_str)
+    best_match_strength = 0
+    best_match = None
+    for entry in list_cls.objects.all():
+        match_strength = entry.check_match(match_str)
+        if match_strength > best_match_strength:
+            best_match = entry
+    return HttpResponse(
+        json.dumps(best_match.to_json()),
+        content_type='application/json',
+    ) if best_match else HttpResponse(
+        status=204
+    )
+
+
+@login_required
 @csrf_exempt
 @permission_required('PartyList.add_partyguest')
 def create(request, party_id):
     """
     Create a guest and party guest object for the given party.
     """
+    # pylint: disable=too-many-return-statements
+
     if request.method != 'POST':
         return HttpResponse('Endpoint supports POST method only.', status=405)
 
@@ -75,7 +124,6 @@ def create(request, party_id):
     blacklist_response = _check_blacklisting(
         guest_name,
         guest_gender,
-        request.POST.get('force'),
         added_by,
         was_vouched_for,
     )
@@ -83,17 +131,15 @@ def create(request, party_id):
     greylist_response = _check_greylisting(
         guest_name,
         guest_gender,
-        request.POST.get('force'),
         added_by,
         was_vouched_for,
     )
 
-    if blacklist_response or greylist_response:
-        if blacklist_response:
-            response = blacklist_response
-        else:
-            response = greylist_response
-        return response
+    force = (request.POST.get('force') == 'true')
+    if blacklist_response and not force:
+        return blacklist_response
+    if greylist_response and not force:
+        return greylist_response
 
     try:
         guest = Guest.objects.get(
@@ -130,6 +176,8 @@ def create(request, party_id):
         guest=guest,
         addedBy=added_by,
         wasVouchedFor=was_vouched_for,
+        maybeBlacklisted=(blacklist_response is not None),
+        maybeGreylisted=(greylist_response is not None),
     )
     party_guest.save()
 
@@ -179,7 +227,6 @@ def _get_added_by(party, requesting_user, voucher_username):
 def _check_blacklisting(
         guest_name,
         guest_gender,
-        force,
         added_by,
         was_vouched_for
 ):
@@ -189,25 +236,21 @@ def _check_blacklisting(
     Arguments:
         guest_name (str)
         guest_gender (str)
-        force (str): 'true' if we want to override blacklist match;
-            otherwise, any other string on None
         added_by (str)
         was_vouched_for (bool)
 
     Returns: (HttpResponse|NoneType)
         HTTP response if blacklist match, else None.
     """
-    if force == 'true':
-        return None
     # Check to see if guest is on the blacklist before creating it
     for entry in BlacklistedGuest.objects.all():
-        match = entry.check_match(guest_name)
-        if not match:
+        match_strength = entry.check_match(guest_name)
+        if not match_strength:
             continue
         guest_dict = {
             'maybe_blacklisted': True,
-            'blacklist_name': match.name,
-            'blacklist_details': match.details,
+            'blacklist_name': entry.name,
+            'blacklist_details': entry.details,
             'attempted_name': guest_name,
             'attempted_gender': guest_gender,
         }
@@ -224,7 +267,6 @@ def _check_blacklisting(
 def _check_greylisting(
         guest_name,
         guest_gender,
-        force,
         added_by,
         was_vouched_for
 ):
@@ -234,25 +276,21 @@ def _check_greylisting(
     Arguments:
         guest_name (str)
         guest_gender (str)
-        force (str): 'true' if we want to override greylist match;
-            otherwise, any other string on None
         added_by (str)
         was_vouched_for (bool)
 
     Returns: (HttpResponse|NoneType)
         HTTP response if greylist match, else None.
     """
-    if force == 'true':
-        return None
     # Check to see if guest is on the greylist before creating it
     for entry in GreylistedGuest.objects.all():
-        match = entry.check_match(guest_name)
-        if not match:
+        match_strength = entry.check_match(guest_name)
+        if not match_strength:
             continue
         guest_dict = {
             'maybe_greylisted': True,
-            'greylist_name': match.name,
-            'greylist_details': match.details,
+            'greylist_name': entry.name,
+            'greylist_details': entry.details,
             'attempted_name': guest_name,
             'attempted_gender': guest_gender,
         }

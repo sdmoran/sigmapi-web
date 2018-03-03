@@ -38,3 +38,36 @@
 		</div>
 	</div>
 </div>
+
+<div class="modal" id="{{listname}}ee-info">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title">Potential {{listname}} match information</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					<em>The guest <strong id="{{listname}}-matched-name"></strong>,
+						added by <strong id="{{listname}}-matched-added-by"></strong>,
+						matched the following {{listname}} entry.
+						Note that it is possible
+						that this is a false positive.
+					</em>
+				</p>
+				<p>
+					<strong>Name: </strong><span id="{{listname}}ee-name"></span>
+				</p>
+				<p id="{{listname}}ee-added-by-wrapper">
+					<strong>Added By: </strong><span id="{{listname}}ee-added-by"></span>
+				</p>
+				<p>
+					<strong>Details: </strong><span id="{{listname}}ee-details"></span>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
