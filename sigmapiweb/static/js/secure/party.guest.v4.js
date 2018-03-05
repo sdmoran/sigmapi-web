@@ -496,6 +496,28 @@ PartyModule.GuestList.prototype.showMyGuests = function()
 	}
 };
 
+/**
+ * Shows only the guests who are potentially blacklisted or greylisted
+ */
+PartyModule.GuestList.prototype.showListedGuests = function()
+{
+	this.viewAllGuests = false;
+
+	for (var i = 0; i < this.list.length; i++)
+	{
+		var currentGuest = this.list[i];
+		if (currentGuest.potentialBlacklisting || currentGuest.potentialBlacklisting)
+		{
+			$(".guest#"+currentGuest.id).removeClass("filtered-2");
+		}
+		else
+		{
+			$(".guest#"+currentGuest.id).addClass("filtered-2");
+		}
+	}
+};
+
+
 /*
  * Party List Class Definition
  */
@@ -549,6 +571,30 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 	this.maleList.pollServer();
 	this.femaleList.pollServer();
 
+	function clearActive() {
+		$("#listed-guests").parent().removeClass("active");
+		$("#my-guests").parent().removeClass("active");
+		$("#all-guests").parent().removeClass("active");			
+	}
+
+	var origListedGuestsTitle = $("#listed-guests").attr("title");
+	$("#listed-guests").click(function()
+	{
+		var parent = $(this).parent();
+		if (parent.hasClass("active")) {
+			clearActive();
+			outerThis.maleList.showAllGuests();
+			outerThis.femaleList.showAllGuests();
+			$(this).attr("title", origListedGuestsTitle);
+		} else {
+			$(this).attr("title", "Click to view all guests");
+			outerThis.maleList.showListedGuests();
+			outerThis.femaleList.showListedGuests();
+			clearActive();
+			parent.addClass("active");
+		}
+	});
+
 	// Setup count listeners if in party mode
 	if (this.partyMode)
 	{
@@ -570,8 +616,8 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 			outerThis.maleList.showAllGuests();
 			outerThis.femaleList.showAllGuests();
 
+			clearActive();
 			$(this).parent().addClass("active");
-			$("#my-guests").parent().removeClass("active");
 		});
 
 		$("#my-guests").click(function()
@@ -579,8 +625,8 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 			outerThis.maleList.showMyGuests();
 			outerThis.femaleList.showMyGuests();
 
+			clearActive();
 			$(this).parent().addClass("active");
-			$("#all-guests").parent().removeClass("active");
 		});
 	}
 
