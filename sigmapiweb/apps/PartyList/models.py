@@ -106,7 +106,10 @@ class BlacklistedGuest(ModelMixin, models.Model):
     Does NOT use the Guest model; just simply stores a name and details.
     """
     name = models.CharField(max_length=100, db_index=True)
-    details = models.TextField()
+    details = models.TextField(
+        default="(No identifying details provided)"
+    )
+    reason = models.TextField(default="(No reason provided)")
 
     MAX_MATCH_EDIT_DISTANCE = 5
 
@@ -136,6 +139,7 @@ class BlacklistedGuest(ModelMixin, models.Model):
         return {
             'name': self.name,
             'details': self.details,
+            'reason': self.reason,
         }
 
     class Meta:
@@ -156,7 +160,10 @@ class GreylistedGuest(ModelMixin, models.Model):
         on_delete=models.CASCADE,
         default=None,
     )
-    details = models.TextField()
+    details = models.TextField(
+        default="(No identifying details provided)"
+    )
+    reason = models.TextField(default="(No reason provided)")
 
     MAX_MATCH_EDIT_DISTANCE = 5
 
@@ -187,6 +194,7 @@ class GreylistedGuest(ModelMixin, models.Model):
             'name': self.name,
             'addedBy': self.addedBy.get_full_name(),
             'details': self.details,
+            'reason': self.reason,
         }
 
     class Meta:

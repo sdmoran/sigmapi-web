@@ -11,9 +11,9 @@
 		<thead>
 			<tr>
 				<th class="two wide">Name</th>
-				<th class="two wide">Details</th>
+				<th class="five wide">Identifying Details</th>
+				<th class="four wide">Reason</th>
 				<th class="one wide">Delete</th>
-
 			</tr>
 		</thead>
 		<tbody>
@@ -21,6 +21,7 @@
 			<tr>
 				<td>{{ person.name }}</td>
 				<td>{{ person.details }}</td>
+				<td>{{ person.reason }}</td>
 				<td>
 					<form method="POST" action="{% url 'partylist-remove_blacklisting' person.id %}">
 						{% csrf_token %}
@@ -60,6 +61,11 @@
 		{{ form.details.label_tag }}
 		{{ form.details }}
 		<em>Distinguishing details, in case someone has the same name. Physical features, class year, greek affiliation, etc.</em>
+	</div>
+	<div class="form-group">
+		{{ form.reason.label_tag }}
+		{{ form.reason }}
+		<em>Reason for blacklisting.</em>
 	</div>
 	<button type="submit" class="btn btn-primary pull-right">Add to blacklist</button>
 </form>

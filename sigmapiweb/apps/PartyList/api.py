@@ -251,6 +251,7 @@ def _check_blacklisting(
             'maybe_blacklisted': True,
             'blacklist_name': entry.name,
             'blacklist_details': entry.details,
+            'blacklist_reason': entry.reason,
             'attempted_name': guest_name,
             'attempted_gender': guest_gender,
         }
@@ -291,6 +292,7 @@ def _check_greylisting(
             'maybe_greylisted': True,
             'greylist_name': entry.name,
             'greylist_details': entry.details,
+            'greylist_reason': entry.reason,
             'attempted_name': guest_name,
             'attempted_gender': guest_gender,
         }

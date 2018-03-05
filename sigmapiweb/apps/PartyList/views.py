@@ -87,8 +87,6 @@ def manage_blacklist(request):
         if form.is_valid():
             # Set details to empty string if blank
             new_blacklisted_guest = form.save(commit=False)
-            if not form.cleaned_data['details']:
-                new_blacklisted_guest.details = ''
             new_blacklisted_guest.save()
             message = 'Successfully added entry to blacklist'
         else:
@@ -117,8 +115,6 @@ def manage_greylist(request):
         if form.is_valid():
             # Set details to empty string if blank
             new_greylisted_guest = form.save(commit=False)
-            if not form.cleaned_data['details']:
-                new_greylisted_guest.details = ''
             new_greylisted_guest.addedBy = request.user
             new_greylisted_guest.save()
             message = 'Successfully added entry to greylist'

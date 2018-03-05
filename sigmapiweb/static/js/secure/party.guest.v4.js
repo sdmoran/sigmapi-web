@@ -288,6 +288,7 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 							set("listee-added-by", matchData.addedBy);
 						}
 						set("listee-details", matchData.details);
+						set("listee-reason", matchData.reason);
 						$("#" + listColor + "listee-info").modal("show");
 					}
 				);
@@ -725,6 +726,7 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender, voucher, 
 			$('#bl-attempted-add-gender').text(data.attempted_gender);
 			$('#bl-name').text(data.blacklist_name);
 			$('#bl-details').text(data.blacklist_details);
+			$('#bl-reason').text(data.blacklist_reason);
 			$('#blacklist-warn').modal('show');
 			PartyModule.displayError("Potential blacklisted guest!")
 		} else if (data.maybe_greylisted) {
@@ -732,7 +734,8 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender, voucher, 
 			$('#gl-attempted-add-voucher').text(data.attempted_voucher || "");
 			$('#gl-attempted-add-gender').text(data.attempted_gender);
 			$('#gl-name').text(data.greylisted_name);
-			$('#gl-details').text(data.greylisted_details);
+			$('#gl-details').text(data.greylist_details);
+			$('#gl-reason').text(data.greylist_reason);
 			$('#greylist-warn').modal('show');
 			PartyModule.displayError("Potential greylisted guest!")
 		}
