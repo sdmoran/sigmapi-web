@@ -2,10 +2,10 @@
 Models for PartyList app.
 """
 from datetime import datetime
-import editdistance
 
 from django.db import models
 from django.contrib.auth.models import User
+from fuzzywuzzy import fuzz
 
 from common.mixins import ModelMixin
 from common.utils import get_id_or_sentinel, get_full_name_or_deleted
@@ -111,7 +111,7 @@ class BlacklistedGuest(ModelMixin, models.Model):
     )
     reason = models.TextField(default="(No reason provided)")
 
-    MAX_MATCH_EDIT_DISTANCE = 5
+    MIN_MATCH_RATIO = 70
 
     def __str__(self):
         return self.name
@@ -127,8 +127,8 @@ class BlacklistedGuest(ModelMixin, models.Model):
         """
         check_name = ''.join(c.lower() for c in to_check if not c.isspace())
         bl_name = ''.join(c.lower() for c in self.name if not c.isspace())
-        edit_distance = editdistance.eval(check_name, bl_name)
-        return max([0, self.MAX_MATCH_EDIT_DISTANCE - edit_distance])
+        match_ratio = fuzz.ratio(check_name, bl_name)
+        return match_ratio if match_ratio >= self.MIN_MATCH_RATIO else 0
 
     def to_json(self):
         """
@@ -165,7 +165,7 @@ class GreylistedGuest(ModelMixin, models.Model):
     )
     reason = models.TextField(default="(No reason provided)")
 
-    MAX_MATCH_EDIT_DISTANCE = 5
+    MIN_MATCH_RATIO = 70
 
     def __str__(self):
         return self.name
@@ -181,8 +181,8 @@ class GreylistedGuest(ModelMixin, models.Model):
         """
         check_name = ''.join(c.lower() for c in to_check if not c.isspace())
         gl_name = ''.join(c.lower() for c in self.name if not c.isspace())
-        edit_distance = editdistance.eval(check_name, gl_name)
-        return max([0, self.MAX_MATCH_EDIT_DISTANCE - edit_distance])
+        match_ratio = fuzz.ratio(check_name, gl_name)
+        return match_ratio if match_ratio >= self.MIN_MATCH_RATIO else 0
 
     def to_json(self):
         """
