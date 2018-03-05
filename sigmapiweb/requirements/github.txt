@@ -1,4 +1,4 @@
 -r base.txt
 pylint
 pylint-django
-pep8
+pycodestyle
