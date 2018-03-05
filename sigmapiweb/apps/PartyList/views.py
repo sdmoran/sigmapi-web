@@ -3,15 +3,18 @@ Views for PartyList app.
 """
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import permission_required, login_required
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 
+from .forms import PartyForm, EditPartyInfoForm, BlacklistForm, GreylistForm
 from .models import (
     BlacklistedGuest,
     GreylistedGuest,
     Party,
+    PartyGuest,
     user_can_delete_greylisting,
 )
-from .forms import PartyForm, EditPartyInfoForm, BlacklistForm, GreylistForm
+from .utils import check_bad_guest_list
 
 
 @login_required
@@ -252,3 +255,28 @@ def delete_party(request, party_id):
         else:
             party.delete()
     return redirect("partylist-manage_parties")
+
+
+@permission_required(
+    'PartyList.manage_parties',
+    login_url='pub-permission_denied',
+)
+def refresh_party_listings(request, party_id):
+    """
+    Re-check all party guests against the blacklist/greylist.
+    """
+    if request.method != 'POST':
+        return HttpResponse("Endpoint supports POST method only", status=405)
+    try:
+        party = Party.objects.get(pk=party_id)
+    except Party.DoesNotExist:
+        raise Http404("Party with id {0} not found".format(party_id))
+    for party_guest in PartyGuest.objects.filter(party=party):
+        party_guest.potentialBlacklisting = check_bad_guest_list(
+            BlacklistedGuest, party_guest.guest.name,
+        )
+        party_guest.potentialGreylisting = check_bad_guest_list(
+            GreylistedGuest, party_guest.guest.name,
+        )
+        party_guest.save()
+    return redirect("partylist-guests", party_id=party_id)

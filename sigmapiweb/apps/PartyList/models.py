@@ -157,7 +157,9 @@ class GreylistedGuest(ModelMixin, models.Model):
     name = models.CharField(max_length=100, db_index=True)
     addedBy = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
         default=None,
     )
     details = models.TextField(
@@ -192,7 +194,7 @@ class GreylistedGuest(ModelMixin, models.Model):
         """
         return {
             'name': self.name,
-            'addedBy': self.addedBy.get_full_name(),
+            'addedBy': get_full_name_or_deleted(self.addedBy),
             'details': self.details,
             'reason': self.reason,
         }
@@ -253,8 +255,9 @@ class PartyGuest(ModelMixin, models.Model):
     addedBy = models.ForeignKey(
         User,
         related_name="added_by",
-        default=1,
         null=True,
+        blank=False,
+        default=None,
         on_delete=models.SET_NULL,
     )
     wasVouchedFor = models.BooleanField()
@@ -262,8 +265,20 @@ class PartyGuest(ModelMixin, models.Model):
     signedIn = models.BooleanField(default=False)
     everSignedIn = models.BooleanField(default=False)
     timeFirstSignedIn = models.DateTimeField(auto_now_add=True)
-    maybeBlacklisted = models.BooleanField(default=False)
-    maybeGreylisted = models.BooleanField(default=False)
+    potentialBlacklisting = models.ForeignKey(
+        BlacklistedGuest,
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+    )
+    potentialGreylisting = models.ForeignKey(
+        GreylistedGuest,
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+    )
 
     def __str__(self):
         return self.guest.name
@@ -292,33 +307,15 @@ class PartyGuest(ModelMixin, models.Model):
         data['addedByID'] = get_id_or_sentinel(self.addedBy)
         data['signedIn'] = self.signedIn
         data['wasVouchedFor'] = self.wasVouchedFor
-        data['maybeBlacklisted'] = self.maybeBlacklisted
-        data['maybeGreylisted'] = self.maybeGreylisted
+        data['potentialBlacklisting'] = (
+            self.potentialBlacklisting.to_json()
+            if self.potentialBlacklisting
+            else None
+        )
+        data['potentialGreylisting'] = (
+            self.potentialGreylisting.to_json()
+            if self.potentialGreylisting
+            else None
+        )
 
         return data
-
-    def check_blacklisted(self):
-        """
-        Return this guest's match on the blacklist if one exists, else None.
-
-        Returns: (BlacklistedGuest|NoneType)
-        """
-        match_results = (
-            blacklisted.check_match(self.guest.name)
-            for blacklisted in BlacklistedGuest.objects.all()
-        )
-        positives = (match for match in match_results if match)
-        return positives.next() if positives else None
-
-    def check_greylisted(self):
-        """
-        Return this guest's match on the greylist if one exists, else None.
-
-        Returns: (GreylistedGuest|NoneType)
-        """
-        match_results = (
-            greylisted.check_match(self.guest.name)
-            for greylisted in GreylistedGuest.objects.all()
-        )
-        positives = (match for match in match_results if match)
-        return positives.next() if positives else None

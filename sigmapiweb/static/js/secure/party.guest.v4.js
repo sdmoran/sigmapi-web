@@ -42,7 +42,7 @@ PartyModule.messageUXTimeout = null;
 
 PartyModule.Guest = function(
 		id, name, addedByName, addedByID, signedIn, wasVouchedFor,
-		maybeBlacklisted, maybeGreylisted
+		potentialBlacklisting, potentialGreylisting
 )
 {
 	this.name = name;
@@ -51,8 +51,8 @@ PartyModule.Guest = function(
 	this.signedIn = signedIn;
 	this.id = id;
 	this.wasVouchedFor = wasVouchedFor;
-	this.maybeBlacklisted = maybeBlacklisted;
-	this.maybeGreylisted = maybeGreylisted;
+	this.potentialBlacklisting = potentialBlacklisting;
+	this.potentialGreylisting = potentialGreylisting;
 
 	this.signedInCallback = function() {};
 	this.signedOutCallback = function() {};
@@ -175,8 +175,8 @@ PartyModule.GuestList.prototype.pollServer = function()
 				currentGuest.addedByID,
 				currentGuest.signedIn,
 				currentGuest.wasVouchedFor,
-				currentGuest.maybeBlacklisted,
-				currentGuest.maybeGreylisted
+				currentGuest.potentialBlacklisting,
+				currentGuest.potentialGreylisting
 			)
 
 			thisOuter.addGuest(guestObj);
@@ -257,41 +257,31 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 		guest.addedByName + "."
 	);
 	var listWarning = clonedTemplate.find(".list-warning").addClass(
-		guest.maybeBlacklisted ? "list-warning-blacklist" :
-		guest.maybeGreylisted  ? "list-warning-greylist"  :
-                                 "list-warning-none"
-)
+		guest.potentialBlacklisting ? "list-warning-blacklist" :
+		guest.potentialGreylisting  ? "list-warning-greylist"  :
+                                      "list-warning-none"
+	)
 
-	if (guest.maybeBlacklisted || guest.maybeGreylisted) {
-		var listColor = guest.maybeBlacklisted ? "black" : "grey";
-		var url = (
-			"/secure/parties/" + listColor + "list/match/" +
-			encodeURIComponent(guest.name)
-		);
+	if (guest.potentialBlacklisting || guest.potentialGreylisting) {
+		var listColor = guest.potentialBlacklisting ? "black" : "grey";
+		var listing = guest.potentialBlacklisting	|| guest.potentialGreylisting;
 		listWarning.attr(
 			"title",
 			"Potentially " + listColor + "listed; click for details."
 		).click(
 			function() {
-				$.ajax({
-					"type": "GET",
-					"url": url
-				}).done(
-					function(matchData) {
-						function set(suffix, value) {
-							$("#" + listColor + suffix).text(value);
-						}
-						set("list-matched-name", guest.name);
-						set("list-matched-added-by", guest.addedByName);
-						set("listee-name", matchData.name);
-						if (!guest.maybeBlacklisted) {
-							set("listee-added-by", matchData.addedBy);
-						}
-						set("listee-details", matchData.details);
-						set("listee-reason", matchData.reason);
-						$("#" + listColor + "listee-info").modal("show");
-					}
-				);
+				function set(suffix, value) {
+					$("#" + listColor + "list-info-" + suffix).text(value);
+				}
+				set("matched-name", guest.name);
+				set("matched-added-by", guest.addedByName);
+				set("name", listing.name);
+				if (!guest.potentialBlacklisting) {
+					set("added-by", listing.addedBy);
+				}
+				set("details", listing.details);
+				set("reason", listing.reason);
+				$("#" + listColor + "list-info").modal("show");
 			}
 		)
 	}
@@ -649,23 +639,22 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 		$("#voucher-female").keyup(clickAddMaleOnEnter);
 	}
 
-	var prefixes = ["bl", "gl"];
+	var listColors = ["black", "grey"];
 	for (var i = 0; i < 2; i++) {
-		(function(p) {
-			$(p + "override").click(function () {
+		(function(prefix) {
+			$(prefix + "override").click(function () {
 				if ($('input[name="add"]:checked').val() == "true")
 				{
-					var voucher = $(p + "attempted-add-voucher").text();
+					var voucher = $(prefix + "attempted-add-voucher").text();
 					outerThis.addGuest(
-						$(p + "attempted-add").text(),
-						$(p + "attempted-add-gender").text(),
+						$(prefix + "attempted-add").text(),
+						$(prefix + "attempted-add-gender").text(),
 						voucher ? voucher : null,
 						true
 					);
 				}
 			});
-		})("#" + prefixes[i] + "-");
-		
+		})("#" + listColors[i] + "list-warn-");
 	}
 
 	$("#blacklist-warn").on("hide.bs.modal", function (){
@@ -708,6 +697,27 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender, voucher, 
 		url: "create/",
 		data: data
 	}).done(function( data ) {
+
+		var listing = data.potentialBlacklisting || data.potentialGreylisting;
+		if (listing && !force) {
+			var listname = data.potentialBlacklisting ? "blacklist" : "greylist";
+			function set(key, value) {
+				$("#" + listname + "-warn-" + key).text(value);
+			}
+			set("attempted-add", data.name);
+			set("attempted-add-voucher", data.wasVouchedFor ? data.addedBy : "");
+			set("attempted-add-gender", gender);
+			set("name", listing.name);
+			set("details", listing.details);
+			set("reason", listing.reason);
+			if (listname === "greylist") {
+				set("added-by", listing.addedBy);
+			}
+			$("#" + listname + "-warn").modal("show");
+			PartyModule.displayError("Potential " + listname + "ed guest!");
+			return;
+		}
+
 		var addedGuest = new PartyModule.Guest(
 			data.id,
 			data.name,
@@ -715,37 +725,16 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender, voucher, 
 			data.addedByID,
 			data.signedIn,
 			data.wasVouchedFor,
-			data.maybeBlacklisted, 
-			data.maybeGreylisted  
+			data.potentialBlacklisting,
+			data.potentialGreylisting
 		);         
-		           
-
-		if (data.maybe_blacklisted) {
-			$('#bl-attempted-add').text(data.attempted_name);
-			$('#bl-attempted-add-voucher').text(data.attempted_voucher || "");
-			$('#bl-attempted-add-gender').text(data.attempted_gender);
-			$('#bl-name').text(data.blacklist_name);
-			$('#bl-details').text(data.blacklist_details);
-			$('#bl-reason').text(data.blacklist_reason);
-			$('#blacklist-warn').modal('show');
-			PartyModule.displayError("Potential blacklisted guest!")
-		} else if (data.maybe_greylisted) {
-			$('#gl-attempted-add').text(data.attempted_name);
-			$('#gl-attempted-add-voucher').text(data.attempted_voucher || "");
-			$('#gl-attempted-add-gender').text(data.attempted_gender);
-			$('#gl-name').text(data.greylisted_name);
-			$('#gl-details').text(data.greylist_details);
-			$('#gl-reason').text(data.greylist_reason);
-			$('#greylist-warn').modal('show');
-			PartyModule.displayError("Potential greylisted guest!")
-		}
 
 		/*
 			PartyList.api.create does not return with data.maybe_blacklisted
 			if the person is not on the blacklist, or the create was called with force = true
 		 */
 
-		else if (gender === "M")
+		if (gender === "M")
 		{
 			thisOuter.maleList.addGuest(addedGuest);
 			PartyModule.displayMessage("Guest added.");

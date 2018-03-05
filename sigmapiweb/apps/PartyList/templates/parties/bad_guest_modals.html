@@ -11,24 +11,29 @@
 			</div>
 			<div class="modal-body">
 				<!-- This allows us to resubmit the user for a forced add -->
-				<p hidden id="{{listprefix}}-attempted-add-gender"></p>
-				<p hidden id="{{listprefix}}-attempted-add-voucher"></p>
+				<p hidden id="{{listname}}-warn-attempted-add-gender"></p>
+				<p hidden id="{{listname}}-warn-attempted-add-voucher"></p>
 				<p>
 
-					The guest you've attempted to add (<span id="{{listprefix}}-attempted-add"></span>)
+					The guest you've attempted to add (<span id="{{listname}}-warn-attempted-add"></span>)
 					is similar to the following {{listname}} entry.
 				</p>
 
 				<p>
-					<strong>Name:</strong> <span id="{{listprefix}}-name"></span>
+					<strong>Name:</strong> <span id="{{listname}}-warn-name"></span>
+				</p>
+
+
+				<p class="{{listname}}-added-by-wrapper">
+					<strong>Added By: </strong><span id="{{listname}}-warn-added-by"></span>
 				</p>
 
 				<p>
-					<strong>Identifying Details:</strong> <span id="{{listprefix}}-details"></span>
+					<strong>Identifying Details:</strong> <span id="{{listname}}-warn-details"></span>
 				</p>
 
 				<p>
-					<strong>Reason:</strong> <span id="{{listprefix}}-reason"></span>
+					<strong>Reason:</strong> <span id="{{listname}}-warn-reason"></span>
 				</p>
 
 				<p>This could be a false positive, if the names are similar.</p>
@@ -37,13 +42,13 @@
 					<label class="{{listname}}-option"><input type="radio" name="add" value=true id="yForce">Continue adding guest; they are a different person</label>
 					<label class="{{listname}}-option"><input type="radio" name="add" value=false id="nForce" checked="">Do not add this person</label>
 				</div>
-				<button type="button" class="btn btn-default" id="{{listprefix}}-override" data-dismiss="modal">Confirm Selection</button>
+				<button type="button" class="btn btn-default" id="{{listname}}-warn-override" data-dismiss="modal">Confirm Selection</button>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div class="modal" id="{{listname}}ee-info">
+<div class="modal" id="{{listname}}-info">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -55,24 +60,24 @@
 			</div>
 			<div class="modal-body">
 				<p>
-					<em>The guest <strong id="{{listname}}-matched-name"></strong>,
-						added by <strong id="{{listname}}-matched-added-by"></strong>,
+					<em>The guest <strong id="{{listname}}-info-matched-name"></strong>,
+						added by <strong id="{{listname}}-info-matched-added-by"></strong>,
 						matched the following {{listname}} entry.
 						Note that it is possible
 						that this is a false positive.
 					</em>
 				</p>
 				<p>
-					<strong>Name: </strong><span id="{{listname}}ee-name"></span>
+					<strong>Name: </strong><span id="{{listname}}-info-name"></span>
 				</p>
-				<p id="{{listname}}ee-added-by-wrapper">
-					<strong>Added By: </strong><span id="{{listname}}ee-added-by"></span>
-				</p>
-				<p>
-					<strong>Identifying Details: </strong><span id="{{listname}}ee-details"></span>
+				<p class="{{listname}}-added-by-wrapper">
+					<strong>Added By: </strong><span id="{{listname}}-info-added-by"></span>
 				</p>
 				<p>
-					<strong>Reason: </strong><span id="{{listname}}ee-reason"></span>
+					<strong>Identifying Details: </strong><span id="{{listname}}-info-details"></span>
+				</p>
+				<p>
+					<strong>Reason: </strong><span id="{{listname}}-info-reason"></span>
 				</p>
 			</div>
 		</div>

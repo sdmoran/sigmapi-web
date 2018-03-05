@@ -4,15 +4,15 @@ API for PartyList app.
 import csv
 from datetime import datetime
 import json
-import urllib.parse
 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Party, Guest, PartyGuest, BlacklistedGuest, GreylistedGuest
 from .forms import GuestForm
+from .models import Party, Guest, PartyGuest, BlacklistedGuest, GreylistedGuest
+from .utils import check_bad_guest_list
 
 
 # TODO: Make this API follow REST standards
@@ -51,95 +51,38 @@ def get_full_guest(party_name, date, guest_id):
 
 
 @login_required
-def query_blacklist(_request, query_str):
-    """
-    Check if a guest matching the query string is on the blacklist.
-
-    See _query_bad_guest_list for details.
-    """
-    return _query_bad_guest_list(BlacklistedGuest, query_str)
-
-
-@login_required
-def query_greylist(_request, query_str):
-    """
-    Check if a guest matching the query string is on the greylist.
-
-    See _query_bad_guest_list for details.
-    """
-    return _query_bad_guest_list(GreylistedGuest, query_str)
-
-
-def _query_bad_guest_list(list_cls, query_str):
-    """
-    Check if a guest matching the query string is on the {black|grey}list.
-
-    Arguments:
-        list_cls (type): Either BlacklistedGuest or GreylistedGuest
-        query_str (str): URL-encoded query string
-
-    Return 200 OK with dict containing match information if matched.
-    Return 204 NO CONTENT otherwise.
-    """
-    match_str = urllib.parse.unquote(query_str)
-    best_match_strength = 0
-    best_match = None
-    for entry in list_cls.objects.all():
-        match_strength = entry.check_match(match_str)
-        if match_strength > best_match_strength:
-            best_match = entry
-    return HttpResponse(
-        json.dumps(best_match.to_json()),
-        content_type='application/json',
-    ) if best_match else HttpResponse(
-        status=204
-    )
-
-
-@login_required
 @csrf_exempt
 @permission_required('PartyList.add_partyguest')
 def create(request, party_id):
     """
     Create a guest and party guest object for the given party.
-    """
-    # pylint: disable=too-many-return-statements
 
+    Return 405 if not POST.
+    Return 500 (TODO change) if invalid format.
+    Return 409 if already on list.
+    """
     if request.method != 'POST':
         return HttpResponse('Endpoint supports POST method only.', status=405)
 
     party = Party.objects.get(pk=party_id)
 
-    # See if the guest already exists
     guest_name = request.POST.get('name')
     guest_gender = request.POST.get('gender')
     voucher_username = request.POST.get('vouchedForBy')
     guest = None
 
+    # See if the guest already exists.
     added_by_result = _get_added_by(party, request.user, voucher_username)
     if isinstance(added_by_result, HttpResponse):
         return added_by_result
     added_by, was_vouched_for = added_by_result
 
-    blacklist_response = _check_blacklisting(
-        guest_name,
-        guest_gender,
-        added_by,
-        was_vouched_for,
-    )
-
-    greylist_response = _check_greylisting(
-        guest_name,
-        guest_gender,
-        added_by,
-        was_vouched_for,
-    )
-
+    # Check if guest is on blacklist and/or greylist.
     force = (request.POST.get('force') == 'true')
-    if blacklist_response and not force:
-        return blacklist_response
-    if greylist_response and not force:
-        return greylist_response
+    listings = {
+        list_cls: check_bad_guest_list(list_cls, guest_name)
+        for list_cls in [BlacklistedGuest, GreylistedGuest]
+    }
 
     try:
         guest = Guest.objects.get(
@@ -176,12 +119,18 @@ def create(request, party_id):
         guest=guest,
         addedBy=added_by,
         wasVouchedFor=was_vouched_for,
-        maybeBlacklisted=(blacklist_response is not None),
-        maybeGreylisted=(greylist_response is not None),
+        potentialBlacklisting=listings[BlacklistedGuest],
+        potentialGreylisting=listings[GreylistedGuest],
     )
-    party_guest.save()
 
-    # Respond with the details on the party guest that was just added
+    reject = (not force) and (
+        party_guest.potentialBlacklisting or party_guest.potentialGreylisting
+    )
+    if not reject:
+        party_guest.save()
+
+    # Respond with the details on the party guest that was just
+    # added or rejected
     return HttpResponse(
         json.dumps(party_guest.to_json()),
         content_type="application/json",
@@ -222,88 +171,6 @@ def _get_added_by(party, requesting_user, voucher_username):
             status=422,
         )
     return voucher, True
-
-
-def _check_blacklisting(
-        guest_name,
-        guest_gender,
-        added_by,
-        was_vouched_for
-):
-    """
-    Return 4XX response iff blacklist rejects given guest.
-
-    Arguments:
-        guest_name (str)
-        guest_gender (str)
-        added_by (str)
-        was_vouched_for (bool)
-
-    Returns: (HttpResponse|NoneType)
-        HTTP response if blacklist match, else None.
-    """
-    # Check to see if guest is on the blacklist before creating it
-    for entry in BlacklistedGuest.objects.all():
-        match_strength = entry.check_match(guest_name)
-        if not match_strength:
-            continue
-        guest_dict = {
-            'maybe_blacklisted': True,
-            'blacklist_name': entry.name,
-            'blacklist_details': entry.details,
-            'blacklist_reason': entry.reason,
-            'attempted_name': guest_name,
-            'attempted_gender': guest_gender,
-        }
-        if was_vouched_for:
-            guest_dict['attempted_voucher'] = added_by.username
-        # Respond with the details on the party guest that was just added
-        return HttpResponse(
-            json.dumps(guest_dict),
-            content_type='application/json'
-        )
-    return None
-
-
-def _check_greylisting(
-        guest_name,
-        guest_gender,
-        added_by,
-        was_vouched_for
-):
-    """
-    Return 4XX response iff greylist rejects given guest.
-
-    Arguments:
-        guest_name (str)
-        guest_gender (str)
-        added_by (str)
-        was_vouched_for (bool)
-
-    Returns: (HttpResponse|NoneType)
-        HTTP response if greylist match, else None.
-    """
-    # Check to see if guest is on the greylist before creating it
-    for entry in GreylistedGuest.objects.all():
-        match_strength = entry.check_match(guest_name)
-        if not match_strength:
-            continue
-        guest_dict = {
-            'maybe_greylisted': True,
-            'greylist_name': entry.name,
-            'greylist_details': entry.details,
-            'greylist_reason': entry.reason,
-            'attempted_name': guest_name,
-            'attempted_gender': guest_gender,
-        }
-        if was_vouched_for:
-            guest_dict['attempted_voucher'] = added_by.username
-        # Respond with the details on the party guest that was just added
-        return HttpResponse(
-            json.dumps(guest_dict),
-            content_type='application/json'
-        )
-    return None
 
 
 @login_required
