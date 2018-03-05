@@ -285,7 +285,7 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 						set("list-matched-added-by", guest.addedByName);
 						set("listee-name", matchData.name);
 						if (!guest.maybeBlacklisted) {
-							set("listee-added-by", matchData.greylister);
+							set("listee-added-by", matchData.addedBy);
 						}
 						set("listee-details", matchData.details);
 						$("#" + listColor + "listee-info").modal("show");

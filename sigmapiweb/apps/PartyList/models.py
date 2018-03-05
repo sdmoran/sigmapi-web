@@ -48,7 +48,7 @@ def user_can_delete_greylisting(user, greylisting):
     Returns: bool
     """
     return (
-        greylisting.greylister == user or
+        greylisting.addedBy == user or
         user.has_perm('PartyList.can_delete_any_greylisted_guest')
     )
 
@@ -151,7 +151,7 @@ class GreylistedGuest(ModelMixin, models.Model):
     Does NOT use the Guest model; just simply stores a name and details.
     """
     name = models.CharField(max_length=100, db_index=True)
-    greylister = models.ForeignKey(
+    addedBy = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         default=None,
@@ -185,7 +185,7 @@ class GreylistedGuest(ModelMixin, models.Model):
         """
         return {
             'name': self.name,
-            'greylister': self.greylister.get_full_name(),
+            'addedBy': self.addedBy.get_full_name(),
             'details': self.details,
         }
 

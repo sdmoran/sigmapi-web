@@ -119,7 +119,7 @@ def manage_greylist(request):
             new_greylisted_guest = form.save(commit=False)
             if not form.cleaned_data['details']:
                 new_greylisted_guest.details = ''
-            new_greylisted_guest.greylister = request.user
+            new_greylisted_guest.addedBy = request.user
             new_greylisted_guest.save()
             message = 'Successfully added entry to greylist'
         else:

@@ -23,7 +23,7 @@
 		{% for person, can_delete in greylist %}
 			<tr>
 				<td>{{ person.name }}</td>
-				<td>{{ person|full_name:'greylister' }}</td>
+				<td>{{ person|full_name:'addedBy' }}</td>
 				<td>{{ person.details }}</td>
 				<td>
 					{% if can_delete %}

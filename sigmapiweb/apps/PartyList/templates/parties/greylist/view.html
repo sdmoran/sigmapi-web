@@ -21,7 +21,7 @@
 		{% for person in greylist %}
 			<tr>
 				<td>{{ person.name }}</td>
-				<td>{{ person|full_name:'greylister' }}
+				<td>{{ person|full_name:'addedBy' }}
 				<td>{{ person.details }}</td>
 			</tr>
 		{% endfor %}
