@@ -41,13 +41,12 @@ PartyModule.messageUXTimeout = null;
  */
 
 PartyModule.Guest = function(
-		id, name, addedByName, addedByID, signedIn, wasVouchedFor,
+		id, name, addedBy, signedIn, wasVouchedFor,
 		potentialBlacklisting, potentialGreylisting
 )
 {
 	this.name = name;
-	this.addedByName = addedByName;
-	this.addedByID = addedByID;
+	this.addedBy = addedBy;
 	this.signedIn = signedIn;
 	this.id = id;
 	this.wasVouchedFor = wasVouchedFor;
@@ -171,8 +170,7 @@ PartyModule.GuestList.prototype.pollServer = function()
 			var guestObj = new PartyModule.Guest(
 				currentGuest.id,
 				currentGuest.name,
-				currentGuest.addedByName,
-				currentGuest.addedByID,
+				currentGuest.addedBy,
 				currentGuest.signedIn,
 				currentGuest.wasVouchedFor,
 				currentGuest.potentialBlacklisting,
@@ -254,7 +252,7 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 	clonedTemplate.find(".name").html(guest.name);
 	clonedTemplate.find(".details").html(
 		(guest.wasVouchedFor ? "Vouched for by " : "Added by ") +
-		guest.addedByName + "."
+		guest.addedBy.name + "."
 	);
 	var listWarning = clonedTemplate.find(".list-warning").addClass(
 		guest.potentialBlacklisting ? "list-warning-blacklist" :
@@ -274,7 +272,7 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 					$("#" + listColor + "list-info-" + suffix).text(value);
 				}
 				set("matched-name", guest.name);
-				set("matched-added-by", guest.addedByName);
+				set("matched-added-by", guest.addedBy.name);
 				set("name", listing.name);
 				if (!guest.potentialBlacklisting) {
 					set("added-by", listing.addedBy);
@@ -322,7 +320,7 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 		var removeButton = clonedTemplate.find(".status.remove-guest");
 
 		// Remove the remove button if user does not have permission to remove this guest
-		if (this.userID != guest.addedByID && !this.canDestroyAnyGuest)
+		if (this.userID != guest.addedBy.id && !this.canDestroyAnyGuest)
 		{
 			removeButton.remove();
 		}
@@ -342,13 +340,13 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 	if (this.currentFilter.length > 0)
 	{
 		if(!(this.fuzzySearch(guest.name.toLowerCase(), this.currentFilter)
-			|| this.fuzzySearch(guest.addedByName.toLowerCase(), this.currentFilter)))
+			|| this.fuzzySearch(guest.addedBy.name.toLowerCase(), this.currentFilter)))
 		{
 			clonedTemplate.addClass("filtered");
 		}
 	}
 
-	if (guest.addedByID == this.userID)
+	if (guest.addedBy.id == this.userID)
 		this.userGuestCount++;
 
 	// List count changed callback
@@ -382,7 +380,7 @@ PartyModule.GuestList.prototype.removeGuest = function(guestID)
 		if (location != -1)
 		{
 			// Decrement the user's guest count if applicable
-			if (thisOuter.list[location].addedByID == thisOuter.userID)
+			if (thisOuter.list[location].addedBy.id == thisOuter.userID)
 				thisOuter.userGuestCount--;
 
 			thisOuter.list.splice(location, 1);
@@ -422,7 +420,7 @@ PartyModule.GuestList.prototype.filterList = function(query)
 			var currentGuest = this.list[i];
 
 			if (this.fuzzySearch(currentGuest.name.toLowerCase(), query)
-				|| this.fuzzySearch(currentGuest.addedByName.toLowerCase(), query))
+				|| this.fuzzySearch(currentGuest.addedBy.name.toLowerCase(), query))
 			{
 				$(".guest#" + currentGuest.id).removeClass("filtered");
 			}
@@ -485,7 +483,7 @@ PartyModule.GuestList.prototype.showMyGuests = function()
 	for (var i = 0; i < this.list.length; i++)
 	{
 		var currentGuest = this.list[i];
-		if (currentGuest.addedByID != this.userID)
+		if (currentGuest.addedBy.id != this.userID)
 		{
 			$(".guest#"+currentGuest.id).addClass("filtered-2");
 		}
@@ -751,7 +749,7 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender, voucher, 
 				$("#" + listname + "-warn-" + key).text(value);
 			}
 			set("attempted-add", data.name);
-			set("attempted-add-voucher", data.wasVouchedFor ? data.addedBy : "");
+			set("attempted-add-voucher", data.wasVouchedFor ? data.addedBy.username : "");
 			set("attempted-add-gender", gender);
 			set("name", listing.name);
 			set("details", listing.details);
@@ -767,8 +765,7 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender, voucher, 
 		var addedGuest = new PartyModule.Guest(
 			data.id,
 			data.name,
-			data.addedByName,
-			data.addedByID,
+			data.addedBy,
 			data.signedIn,
 			data.wasVouchedFor,
 			data.potentialBlacklisting,

@@ -303,8 +303,11 @@ class PartyGuest(ModelMixin, models.Model):
         data = {}
         data['id'] = self.id
         data['name'] = self.guest.name
-        data['addedByName'] = get_full_name_or_deleted(self.addedBy)
-        data['addedByID'] = get_id_or_sentinel(self.addedBy)
+        data['addedBy'] = {
+            'name': get_full_name_or_deleted(self.addedBy),
+            'id': get_id_or_sentinel(self.addedBy),
+            'username': self.addedBy.username if self.addedBy else None,
+        }
         data['signedIn'] = self.signedIn
         data['wasVouchedFor'] = self.wasVouchedFor
         data['potentialBlacklisting'] = (
