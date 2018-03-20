@@ -48,35 +48,56 @@ def summons_request_denied(summons_request):
     )
 
 
+def summons_request_denied(summons_request):
+    """
+    Get a message for a summons request denial.
+    """
+    subject = 'Standards Board: Summons Request Denied'
+    message = (
+        'Your request to summons ' +
+        summons_request.summonee.first_name + ' ' +
+        summons_request.summonee.last_name +
+        ' has been denied. If you want more details, ' +
+        'please speak with the Fourth Counselor.'
+    )
+    fourth = User.objects.get(groups__name='4th Counselor')
+    send_email(
+        subject=subject,
+        body=message,
+        to_emails=[summons_request.summoner.email],
+        cc_emails=[fourth.email],
+    )
+
+
 def summons_sent(summons):
     """
     Get a message for receiving a summons.
     """
     subject = 'Standards Board: Summons'
-    message = (
-        'Date: ' + summons.dateSummonsSent.strftime('%Y-%m-%d') + '. ' +
-        'You are receiving this email because you are being summoned by ' +
-        summons.summonee.first_name + ' ' + summons.summonee.last_name + '. '
-    )
+
     if summons.spokeWith:
-        message += (
-            ' The recorded outcome of your conversation with the summoner ' +
-            'is: ' + summons.outcomes +
-            '. The summoner has requested this case be ' +
-            'sent to Standards Board for the following reason: ' +
-            summons.standards_action + '. '
-        )
+        summons_info = (
+            'The recorded outcome of your conversation with the summoner is:\n\n{}.'
+            'The summoner has requested this case be sent to the Standards Board for the following reason:\n\n{}'
+        ).format(summons.outcomes, summons.standards_action)
     else:
-        message += (
-            'The reason for your summon is as follows: ' +
-            summons.special_circumstance + '. '
+        summons_info = (
+            "The reason for your summons is as follows:\n\n{}".format(summons.special_circumstance)
         )
-    message += (
-        'If you feel that you are being unfairly sanctioned, ' +
-        'you may attend the next Standards Board meeting to dispute ' +
-        'the summon. If you do not attend, you will automatically be given ' +
-        'a punishment by standards.'
-    )
+
+    message_context = {
+        'date': 'Date: {}.'.format(summons.dateSummonsSent.strftime('%Y-%m-%d')),
+        'summoner_info': 'You are receiving this email because you have been summoned by {} {}.'.format(
+            summons.summoner.first_name, summons.summoner.last_name
+        ),
+        'summons_info': summons_info,
+        'outcome': (
+            'Please come to the next Standards meeting, where the summons will be heard.'
+            'You will have the opportunity to make your case, after which time the Standards board will'
+            'decide on an action. If you cannot make the meeting, please speak with the Parliamentarian.'
+        ),
+    }
+    message = '{date}\n\n{summoner_info}\n\n{summons_info}\n\n{outcome}'.format(**message_context)
     fourth = User.objects.get(groups__name='4th Counselor')
     standards = User.objects.get(groups__name='Parliamentarian')
     send_email(
