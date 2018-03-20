@@ -97,7 +97,7 @@ def summons_sent(summons):
             'decide on an action. If you cannot make the meeting, please speak with the Parliamentarian.'
         ),
     }
-    message = '{date}\n\n{summoner_info}\n\n{summons_info}\n\n{outcome}'.format(message_context)
+    message = '{date}\n\n{summoner_info}\n\n{summons_info}\n\n{outcome}'.format(**message_context)
     fourth = User.objects.get(groups__name='4th Counselor')
     standards = User.objects.get(groups__name='Parliamentarian')
     send_email(
