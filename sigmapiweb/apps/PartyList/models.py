@@ -96,6 +96,7 @@ class Party(ModelMixin, models.Model):
         verbose_name = "Party"
         permissions = (
             ("manage_parties", "Can manage Parties"),
+            ("can_modify_count", "Can modify guest count"),
         )
 
 

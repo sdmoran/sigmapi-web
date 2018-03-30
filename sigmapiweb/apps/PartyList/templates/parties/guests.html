@@ -11,6 +11,14 @@
 
 {% block content %}
 
+{% if not can_modify_count %}
+	<style type="text/css">
+		.party-count-toggles {
+			visibility: hidden;
+		}
+	</style>
+{% endif %}
+
 <h3>{{ party.name }} - {{ party.date }} Guest List</h3>
 
 {% with listname='blacklist' listprefix='bl'%}
@@ -68,7 +76,7 @@
 		{% if partymode %}
 			</span>
 		</li>
-		<li>
+		<li class="party-count-toggles">
 			<button type="button" class="btn btn-default btn-sm sub-count btn-male" id="M">
 				<span class="glyphicon glyphicon-minus"></span>
 			</button>
@@ -76,7 +84,7 @@
 			 	<span class="glyphicon glyphicon-plus"></span>
 			 </button>
 		</li>
-		<li>
+		<li class="party-count-toggles">
 			<button type="button" class="btn btn-default btn-sm sub-count btn-female" id="F">
 				<span class="glyphicon glyphicon-minus"></span>
 			</button>
