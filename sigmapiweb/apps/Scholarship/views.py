@@ -277,24 +277,29 @@ def upload_resource(request):
 
         # Save the Files
         upload_resource_form = AcademicResourceForm(request.POST, mvd)
+        # Check if the resource is valid
         if upload_resource_form.is_valid():
+            # Save the resource
             resource = upload_resource_form.save(commit=False)
+            # Get the resource name and extension
+            file_name, extension = os.path.splitext(
+                os.path.basename(resource.resource_pdf.name))
+            # Set the resource name
+            resource.resource_name = file_name
+            if extension == ".pdf":
+                if request_is_from_scholarship_head(request):
+                    resource.approved = True
+                    message = file_name + ' uploaded successfully!'
+                else:
+                    resource.approved = False
+                    message = file_name + ' submitted for approval!'
+                    notify.scholarship_content_submitted()
 
-            # Set the Resource Name
-            resource.resource_name = os.path.splitext(
-                os.path.basename(resource.resource_pdf.name))[0]
-
-            if request_is_from_scholarship_head(request):
-                resource.approved = True
-                message = 'Resource uploaded successfully!'
+                resource.submittedBy = request.user
+                resource.save()
+                messages.info(request, message)
             else:
-                resource.approved = False
-                message = 'Resource submitted for approval successfully!'
-                notify.scholarship_content_submitted()
-
-            resource.submittedBy = request.user
-            resource.save()
-            messages.info(request, message)
+                messages.error(request, file_name + ' was not a pdf file.')
         else:
             message = (
                 'Failed to upload resource. Make ' +
