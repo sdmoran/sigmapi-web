@@ -111,11 +111,6 @@
 	  		<div class="modal-body">
 	  			<form enctype="multipart/form-data" method="post" action="{% url 'scholarship-upload_resource' %}" id="upload-resource-form">
 	  				{% csrf_token %}
-	  				<div class="form-group">
-						<label class="control-label">Resource Name*</label>
-						{{ upload_resource_form.resource_name }}
-					</div>
-
 					<div class="form-group">
 						<label class="control-label">Course Number*</label>
 						{{ upload_resource_form.course_number }}
@@ -138,7 +133,8 @@
 					</div>
 
 					<div class="form-group">
-						<label class="control-label">Resource File (PDF)*</label>
+						<label class="control-label">Resource Files (PDF)*</label>
+						<p class="help-block">Note: Please ensure that your files have informative names.</p>
 						<div>
 							<div class="btn btn-success fileinput-button" style="display:inline-block;">
 		   						<span>Select File...</span>
@@ -185,17 +181,20 @@
 		dataType: 'json',
 		dropZone: null, // Disable drag/drop files
 		pasteZone: null, // Disable paste files
-		singleFileUploads: true, // Upload a single file per XHR request
+		singleFileUploads: false, // Upload a single file per XHR request
 		autoUpload: false
 	});
 
 	// Bind file upload action listeners.
 	$("#id_resource_pdf")
 		.on('fileuploadadd', function (e, data) {
-			// Display the name of each file added.
-			$.each(data.files, function (index, file) {
-				$("#file-pdf-name").html(file.name);
-			});
+			// Display the name of the first 3 files, and the number of remaining files.
+			var text = ""
+			if(data.files.length >= 1) text = text + data.files[0].name;
+			if(data.files.length >= 2) text = text + ", " + data.files[1].name;
+			if(data.files.length >= 3) text = text + ", " + data.files[2].name;
+			if(data.files.length >= 4) text = text + ", and " + (data.files.length - 3) + " other files."
+			$("#file-pdf-name").html(text);
 
 			// Add an action listener for click on submit.
 			$("#submit-btn").click(function(){
@@ -223,6 +222,7 @@
 		$("#id_term").val("");
 		$("#id_year").val("");
 		$("#id_resource_pdf").val("");
+		$("#file-pdf-name").val("");
 </script>
 
 {% endblock %}
