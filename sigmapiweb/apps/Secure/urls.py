@@ -9,6 +9,7 @@ from apps.UserInfo import secure_urls as userinfo_urls
 from apps.Links import urls as links_urls
 from apps.Standards import urls as standards_urls
 from apps.Scholarship import urls as scholarship_urls
+from apps.public_content import urls as public_content_urls
 
 from . import views
 
@@ -48,4 +49,8 @@ urlpatterns = [
         regex=r'^scholarship/',
         view=include(scholarship_urls),
     ),
+    url(
+        regex=r'^public-content',
+        view=include(public_content_urls)
+    )
 ]
