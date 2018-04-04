@@ -14,15 +14,17 @@
 			<tr>
 				<th class="two wide">Name</th>
 				<th class="two wide">Added By</th>
-				<th class="six wide">Details</th>
+				<th class="five wide">Identifying Details</th>
+				<th class="three wide">Reason</th>
 			</tr>
 		</thead>
 		<tbody>
 		{% for person in greylist %}
 			<tr>
 				<td>{{ person.name }}</td>
-				<td>{{ person|full_name:'greylister' }}
+				<td>{{ person|full_name:'addedBy' }}
 				<td>{{ person.details }}</td>
+				<td>{{ person.reason }}</td>
 			</tr>
 		{% endfor %}
 		</tbody>

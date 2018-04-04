@@ -16,7 +16,8 @@ class UserInfoAdmin(admin.ModelAdmin):
         field.name
         for field in UserInfo._meta.fields
         if field.name not in UserInfo.admin_display_excluded_fields
-        ])
+    ])
+
 
 admin.site.register(UserInfo, UserInfoAdmin)
 

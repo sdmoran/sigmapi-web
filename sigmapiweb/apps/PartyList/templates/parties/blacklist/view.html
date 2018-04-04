@@ -11,7 +11,8 @@
 		<thead>
 			<tr>
 				<th class="two wide">Name</th>
-				<th class="six wide">Details</th>
+				<th class="six wide">Identifying Details</th>
+				<th class="four wide">Reason</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -19,6 +20,7 @@
 			<tr>
 				<td>{{ person.name }}</td>
 				<td>{{ person.details }}</td>
+				<td>{{ person.reason }}</td>
 			</tr>
 		{% endfor %}
 		</tbody>

@@ -40,14 +40,18 @@ PartyModule.messageUXTimeout = null;
  * Guest Class Definition
  */
 
-PartyModule.Guest = function(id, name, addedByName, addedByID, signedIn, wasVouchedFor)
+PartyModule.Guest = function(
+		id, name, addedBy, signedIn, wasVouchedFor,
+		potentialBlacklisting, potentialGreylisting
+)
 {
 	this.name = name;
-	this.addedByName = addedByName;
-	this.addedByID = addedByID;
+	this.addedBy = addedBy;
 	this.signedIn = signedIn;
 	this.id = id;
 	this.wasVouchedFor = wasVouchedFor;
+	this.potentialBlacklisting = potentialBlacklisting;
+	this.potentialGreylisting = potentialGreylisting;
 
 	this.signedInCallback = function() {};
 	this.signedOutCallback = function() {};
@@ -163,9 +167,15 @@ PartyModule.GuestList.prototype.pollServer = function()
 		{
 			var currentGuest = data.guests[i];
 
-			var guestObj = new PartyModule.Guest(currentGuest.id, currentGuest.name,
-				currentGuest.addedByName, currentGuest.addedByID, currentGuest.signedIn,
-				currentGuest.wasVouchedFor)
+			var guestObj = new PartyModule.Guest(
+				currentGuest.id,
+				currentGuest.name,
+				currentGuest.addedBy,
+				currentGuest.signedIn,
+				currentGuest.wasVouchedFor,
+				currentGuest.potentialBlacklisting,
+				currentGuest.potentialGreylisting
+			)
 
 			thisOuter.addGuest(guestObj);
 		}
@@ -242,8 +252,37 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 	clonedTemplate.find(".name").html(guest.name);
 	clonedTemplate.find(".details").html(
 		(guest.wasVouchedFor ? "Vouched for by " : "Added by ") +
-		guest.addedByName + "."
+		guest.addedBy.name + "."
 	);
+	var listWarning = clonedTemplate.find(".list-warning").addClass(
+		guest.potentialBlacklisting ? "list-warning-blacklist" :
+		guest.potentialGreylisting  ? "list-warning-greylist"  :
+                                      "list-warning-none"
+	)
+
+	if (guest.potentialBlacklisting || guest.potentialGreylisting) {
+		var listColor = guest.potentialBlacklisting ? "black" : "grey";
+		var listing = guest.potentialBlacklisting	|| guest.potentialGreylisting;
+		listWarning.attr(
+			"title",
+			"Potentially " + listColor + "listed; click for details."
+		).click(
+			function() {
+				function set(suffix, value) {
+					$("#" + listColor + "list-info-" + suffix).text(value);
+				}
+				set("matched-name", guest.name);
+				set("matched-added-by", guest.addedBy.name);
+				set("name", listing.name);
+				if (!guest.potentialBlacklisting) {
+					set("added-by", listing.addedBy);
+				}
+				set("details", listing.details);
+				set("reason", listing.reason);
+				$("#" + listColor + "list-info").modal("show");
+			}
+		)
+	}
 
 	// If not being added to the start, add after the one before.
 	if (location >= 0)
@@ -281,7 +320,7 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 		var removeButton = clonedTemplate.find(".status.remove-guest");
 
 		// Remove the remove button if user does not have permission to remove this guest
-		if (this.userID != guest.addedByID && !this.canDestroyAnyGuest)
+		if (this.userID != guest.addedBy.id && !this.canDestroyAnyGuest)
 		{
 			removeButton.remove();
 		}
@@ -301,13 +340,13 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 	if (this.currentFilter.length > 0)
 	{
 		if(!(this.fuzzySearch(guest.name.toLowerCase(), this.currentFilter)
-			|| this.fuzzySearch(guest.addedByName.toLowerCase(), this.currentFilter)))
+			|| this.fuzzySearch(guest.addedBy.name.toLowerCase(), this.currentFilter)))
 		{
 			clonedTemplate.addClass("filtered");
 		}
 	}
 
-	if (guest.addedByID == this.userID)
+	if (guest.addedBy.id == this.userID)
 		this.userGuestCount++;
 
 	// List count changed callback
@@ -341,7 +380,7 @@ PartyModule.GuestList.prototype.removeGuest = function(guestID)
 		if (location != -1)
 		{
 			// Decrement the user's guest count if applicable
-			if (thisOuter.list[location].addedByID == thisOuter.userID)
+			if (thisOuter.list[location].addedBy.id == thisOuter.userID)
 				thisOuter.userGuestCount--;
 
 			thisOuter.list.splice(location, 1);
@@ -381,7 +420,7 @@ PartyModule.GuestList.prototype.filterList = function(query)
 			var currentGuest = this.list[i];
 
 			if (this.fuzzySearch(currentGuest.name.toLowerCase(), query)
-				|| this.fuzzySearch(currentGuest.addedByName.toLowerCase(), query))
+				|| this.fuzzySearch(currentGuest.addedBy.name.toLowerCase(), query))
 			{
 				$(".guest#" + currentGuest.id).removeClass("filtered");
 			}
@@ -444,7 +483,7 @@ PartyModule.GuestList.prototype.showMyGuests = function()
 	for (var i = 0; i < this.list.length; i++)
 	{
 		var currentGuest = this.list[i];
-		if (currentGuest.addedByID != this.userID)
+		if (currentGuest.addedBy.id != this.userID)
 		{
 			$(".guest#"+currentGuest.id).addClass("filtered-2");
 		}
@@ -454,6 +493,28 @@ PartyModule.GuestList.prototype.showMyGuests = function()
 		}
 	}
 };
+
+/**
+ * Shows only the guests who are potentially blacklisted or greylisted
+ */
+PartyModule.GuestList.prototype.showListedGuests = function()
+{
+	this.viewAllGuests = false;
+
+	for (var i = 0; i < this.list.length; i++)
+	{
+		var currentGuest = this.list[i];
+		if (currentGuest.potentialBlacklisting || currentGuest.potentialBlacklisting)
+		{
+			$(".guest#"+currentGuest.id).removeClass("filtered-2");
+		}
+		else
+		{
+			$(".guest#"+currentGuest.id).addClass("filtered-2");
+		}
+	}
+};
+
 
 /*
  * Party List Class Definition
@@ -508,6 +569,30 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 	this.maleList.pollServer();
 	this.femaleList.pollServer();
 
+	function clearActive() {
+		$("#listed-guests").parent().removeClass("active");
+		$("#my-guests").parent().removeClass("active");
+		$("#all-guests").parent().removeClass("active");			
+	}
+
+	var origListedGuestsTitle = $("#listed-guests").attr("title");
+	$("#listed-guests").click(function()
+	{
+		var parent = $(this).parent();
+		if (parent.hasClass("active")) {
+			clearActive();
+			outerThis.maleList.showAllGuests();
+			outerThis.femaleList.showAllGuests();
+			$(this).attr("title", origListedGuestsTitle);
+		} else {
+			$(this).attr("title", "Click to view all guests");
+			outerThis.maleList.showListedGuests();
+			outerThis.femaleList.showListedGuests();
+			clearActive();
+			parent.addClass("active");
+		}
+	});
+
 	// Setup count listeners if in party mode
 	if (this.partyMode)
 	{
@@ -529,8 +614,8 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 			outerThis.maleList.showAllGuests();
 			outerThis.femaleList.showAllGuests();
 
+			clearActive();
 			$(this).parent().addClass("active");
-			$("#my-guests").parent().removeClass("active");
 		});
 
 		$("#my-guests").click(function()
@@ -538,8 +623,8 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 			outerThis.maleList.showMyGuests();
 			outerThis.femaleList.showMyGuests();
 
+			clearActive();
 			$(this).parent().addClass("active");
-			$("#all-guests").parent().removeClass("active");
 		});
 	}
 
@@ -598,23 +683,22 @@ PartyModule.PartyList.prototype.finishInitialization = function()
 		$("#voucher-female").keyup(clickAddMaleOnEnter);
 	}
 
-	var prefixes = ["bl", "gl"];
+	var listColors = ["black", "grey"];
 	for (var i = 0; i < 2; i++) {
-		(function(p) {
-			$(p + "override").click(function () {
+		(function(prefix) {
+			$(prefix + "override").click(function () {
 				if ($('input[name="add"]:checked').val() == "true")
 				{
-					var voucher = $(p + "attempted-add-voucher").text();
+					var voucher = $(prefix + "attempted-add-voucher").text();
 					outerThis.addGuest(
-						$(p + "attempted-add").text(),
-						$(p + "attempted-add-gender").text(),
+						$(prefix + "attempted-add").text(),
+						$(prefix + "attempted-add-gender").text(),
 						voucher ? voucher : null,
 						true
 					);
 				}
 			});
-		})("#" + prefixes[i] + "-");
-		
+		})("#" + listColors[i] + "list-warn-");
 	}
 
 	$("#blacklist-warn").on("hide.bs.modal", function (){
@@ -657,32 +741,43 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender, voucher, 
 		url: "create/",
 		data: data
 	}).done(function( data ) {
-		var addedGuest = new PartyModule.Guest(data.id, data.name, data.addedByName, data.addedByID, data.signedIn, data.wasVouchedFor);
 
-		if (data.maybe_blacklisted) {
-			$('#bl-attempted-add').text(data.attempted_name);
-			$('#bl-attempted-add-voucher').text(data.attempted_voucher || "");
-			$('#bl-attempted-add-gender').text(data.attempted_gender);
-			$('#bl-name').text(data.blacklist_name);
-			$('#bl-details').text(data.blacklist_details);
-			$('#blacklist-warn').modal('show');
-			PartyModule.displayError("Potential blacklisted guest!")
-		} else if (data.maybe_greylisted) {
-			$('#gl-attempted-add').text(data.attempted_name);
-			$('#gl-attempted-add-voucher').text(data.attempted_voucher || "");
-			$('#gl-attempted-add-gender').text(data.attempted_gender);
-			$('#gl-name').text(data.greylisted_name);
-			$('#gl-details').text(data.greylisted_details);
-			$('#greylist-warn').modal('show');
-			PartyModule.displayError("Potential greylisted guest!")
+		var listing = data.potentialBlacklisting || data.potentialGreylisting;
+		if (listing && !force) {
+			var listname = data.potentialBlacklisting ? "blacklist" : "greylist";
+			function set(key, value) {
+				$("#" + listname + "-warn-" + key).text(value);
+			}
+			set("attempted-add", data.name);
+			set("attempted-add-voucher", data.wasVouchedFor ? data.addedBy.username : "");
+			set("attempted-add-gender", gender);
+			set("name", listing.name);
+			set("details", listing.details);
+			set("reason", listing.reason);
+			if (listname === "greylist") {
+				set("added-by", listing.addedBy);
+			}
+			$("#" + listname + "-warn").modal("show");
+			PartyModule.displayError("Potential " + listname + "ed guest!");
+			return;
 		}
+
+		var addedGuest = new PartyModule.Guest(
+			data.id,
+			data.name,
+			data.addedBy,
+			data.signedIn,
+			data.wasVouchedFor,
+			data.potentialBlacklisting,
+			data.potentialGreylisting
+		);         
 
 		/*
 			PartyList.api.create does not return with data.maybe_blacklisted
 			if the person is not on the blacklist, or the create was called with force = true
 		 */
 
-		else if (gender === "M")
+		if (gender === "M")
 		{
 			thisOuter.maleList.addGuest(addedGuest);
 			PartyModule.displayMessage("Guest added.");

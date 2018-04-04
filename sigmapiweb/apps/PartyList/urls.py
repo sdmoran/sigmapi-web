@@ -64,6 +64,11 @@ urlpatterns = [
         name='partylist-edit_party',
     ),
     url(
+        regex=r'^refresh/(?P<party_id>[\d]+)/$',
+        view=views.refresh_party_listings,
+        name='partylist-refresh_party_listings',
+    ),
+    url(
         regex=r'^delete/(?P<party_id>[\d]+)/$',
         view=views.delete_party,
         name='partylist-delete_party',

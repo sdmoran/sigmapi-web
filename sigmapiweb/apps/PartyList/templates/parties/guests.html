@@ -5,8 +5,8 @@
 {% load sass_tags %}
 {% load staticfiles %}
 {% block module_includes %}
-	<script type="text/javascript" src="{% static 'js/secure/party.guest.v3.js' %}"></script>
-	<link rel='stylesheet' type='text/css' href='{% sass_src "css/secure/party-guests_v0.scss" %}' />
+	<script type="text/javascript" src="{% static 'js/secure/party.guest.v4.js' %}"></script>
+	<link rel='stylesheet' type='text/css' href='{% sass_src "css/secure/party-guests_v1.scss" %}' />
 {% endblock %}
 
 {% block content %}
@@ -14,11 +14,11 @@
 <h3>{{ party.name }} - {{ party.date }} Guest List</h3>
 
 {% with listname='blacklist' listprefix='bl'%}
-	{% include 'parties/bad_guest_modal.html' %}
+	{% include 'parties/bad_guest_modals.html' %}
 {% endwith %}
 
 {% with listname='greylist' listprefix='gl'%}
-	{% include 'parties/bad_guest_modal.html' %}
+	{% include 'parties/bad_guest_modals.html' %}
 {% endwith %}
 
 <!-- Action navigation -->
@@ -36,6 +36,11 @@
 <div class="navbar-fixed-bottom">
 	<ul class="section">
 		<li id="message-ux" style="display:none;"></li>
+		<li>
+			<a href="#" id="listed-guests" title="Click to view only potential blacklistees/greylistees">
+				<span class="badge">!</span>
+			</a>
+		</li>
 		{% if partymode %}
 		<li class="party-count-highlighted">
 			<span>In the Party
@@ -159,6 +164,7 @@
 	{% else %}
 	<span class="glyphicon glyphicon-remove status present remove-guest"></span>
 	{% endif %}
+	<div class="badge list-warning">!</div>
 	<div class="name"></div>
 	<div class="details"></div>
 </div>

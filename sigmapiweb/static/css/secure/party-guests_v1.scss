@@ -1,4 +1,11 @@
 
+@import '../common/_const';
+
+$blacklisting-fg: red;
+$blacklisting-bg: black;
+$greylisting-fg: yellow;
+$greylisting-bg: #444;
+
 @media (max-width: 768px) {
 	#guests-container {
 		margin-bottom: 100px;
@@ -97,12 +104,48 @@
     user-select: none;
 }
 
+.guest > .list-warning
+{
+	float: right;
+	margin-right: 10px;
+}
+
+.guest > .list-warning-blacklist 
+{
+	background-color: $blacklisting-bg;
+	color: $blacklisting-fg;
+
+	&:hover {
+		background-color: $blacklisting-fg;
+		color: $blacklisting-bg;
+		border: 1px solid $blacklisting-bg;
+	}
+}
+
+.guest > .list-warning-greylist 
+{
+	background-color: $greylisting-bg;
+	color: $greylisting-fg;
+
+	&:hover {
+		background-color: $greylisting-fg;
+		color: $greylisting-bg;
+		border: 1px solid $greylisting-bg;
+	}
+}
+
+.guest > .list-warning-none 
+{
+	visibility: hidden;
+}
+
 .guest > .status
 {
 	float: right;
 	font-size: 1.3em;
 
-	display: none;
+	display: inline-block;
+	visibility: hidden;
 
 	/* Disable user text selection */
 	-webkit-touch-callout: none;
@@ -120,7 +163,7 @@
 
 .guest > .status.present
 {
-	display: inline-block;
+	visibility: visible;
 }
 
 .guest-list.male > .guest
@@ -205,13 +248,13 @@
 }
 
 #blacklist-warn .modal-content {
-	h4 { color: red; }
-	background-color: black;
+	h4 { color: $blacklisting-fg; }
+	background-color: $blacklisting-bg;
 }
 
 #greylist-warn .modal-content {
-	h4 { color: yellow; }
-	background-color: #222;
+	h4 { color: $greylisting-fg; }
+	background-color: $greylisting-bg;
 }
 
 .blacklist-option
@@ -232,6 +275,11 @@
 .greylist-option > input
 {
 	margin-right: 5px;
+}
+
+.blacklist-added-by-wrapper
+{
+	display: none;
 }
 
 .party-count-highlighted
