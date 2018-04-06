@@ -57,12 +57,15 @@ class AcademicResourceForm(forms.ModelForm):
     """
     Form for an AcademicResource model.
     """
-    year = forms.IntegerField()
+    year = forms.IntegerField(min_value=1)
+
+    resource_pdf = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
     class Meta:
         model = AcademicResource
         fields = [
-            'resource_name', 'course_number', 'professor_name',
+            'course_number', 'professor_name',
             'resource_pdf', 'year', 'term'
         ]
 
