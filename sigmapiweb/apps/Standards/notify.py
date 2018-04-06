@@ -56,24 +56,24 @@ def summons_sent(summons):
     if summons.spokeWith:
         summons_info = (
             'The recorded outcome of your '
-            'conversation with the summoner is:\n\n{}.'
+            'conversation with the summoner is:\n\n{0}.'
             'The summoner has requested this case be '
             'sent to the Standards Board '
-            'for the following reason:\n\n{}').format(
+            'for the following reason:\n\n{1}').format(
                 summons.outcomes, summons.standards_action
             )
     else:
         summons_info = (
             "The reason for your summons is as follows:"
-            "\n\n{}".format(
+            "\n\n{0}".format(
                 summons.special_circumstance))
 
     message_context = {
-        'date': 'Date: {}.'.format(
+        'date': 'Date: {0}.'.format(
             summons.dateSummonsSent.strftime('%Y-%m-%d')),
         'summoner_info': (
             'You are receiving this email because you have'
-            ' been summoned by {} {}.'.format(
+            ' been summoned by {0} {1}.'.format(
                 summons.summoner.first_name,
                 summons.summoner.last_name
             )
