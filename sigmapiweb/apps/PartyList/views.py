@@ -50,6 +50,7 @@ def guests(request, party_id):
         'party': requested_party,
         'partymode': party_mode,
         'vouchers': vouchers,
+        'can_modify_count': request.user.has_perm('Party.can_modify_count'),
     }
     return render(request, 'parties/guests.html', context)
 
