@@ -51,6 +51,8 @@ $greylisting-bg: #444;
 
 	margin-bottom: 5px;
 
+	position: relative;
+
 	/* Disable user text selection */
 	-webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -94,6 +96,7 @@ $greylisting-bg: #444;
 {
 	color: #555;
 	margin-left: 10px;
+	margin-right: 55px;
 
 	/* Disable user text selection */
 	-webkit-touch-callout: none;
@@ -286,3 +289,18 @@ $greylisting-bg: #444;
 {
 	background-color: #ddd;
 }
+
+.guest > .checked-in-time
+{
+	position: absolute;
+    right: 5px;
+    bottom: 5px;
+    font-size: 9pt;
+	display: none;
+
+	&.show
+	{
+		display: initial;
+	}
+}
+

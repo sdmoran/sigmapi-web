@@ -42,7 +42,7 @@ PartyModule.messageUXTimeout = null;
 
 PartyModule.Guest = function(
 		id, name, addedBy, signedIn, wasVouchedFor,
-		potentialBlacklisting, potentialGreylisting
+		potentialBlacklisting, potentialGreylisting, timeFirstSignedIn, everSignedIn
 )
 {
 	this.name = name;
@@ -52,6 +52,8 @@ PartyModule.Guest = function(
 	this.wasVouchedFor = wasVouchedFor;
 	this.potentialBlacklisting = potentialBlacklisting;
 	this.potentialGreylisting = potentialGreylisting;
+	this.timeFirstSignedIn = timeFirstSignedIn;
+	this.everSignedIn = everSignedIn;
 
 	this.signedInCallback = function() {};
 	this.signedOutCallback = function() {};
@@ -80,10 +82,24 @@ PartyModule.Guest.prototype.toggleSignedIn = function()
 		// If succeeded, change the status accordingly
 		thisOuter.signedIn = !thisOuter.signedIn;
 
+
 		// Show the checked in status appropriately
 		if (thisOuter.signedIn)
 		{
 			$(".guest#" + thisOuter.id + " > .status.checked-in").addClass("present");
+
+			if(!thisOuter.everSignedIn)
+			{
+				var now = new Date();
+				var hours = (now.getHours()>12)? now.getHours()-12 : now.getHours();
+				if(hours == 0) hours = 12;
+				var dateString = ("0" + hours).slice(-2) +
+					":" + ("0" + now.getMinutes()).slice(-2) +
+					" " + ((now.getHours() > 12)? "PM" : "AM");
+				$(".guest#" + thisOuter.id + " > .checked-in-time").html(dateString);
+				$(".guest#" + thisOuter.id + " > .checked-in-time").addClass("show");
+			}
+
 			thisOuter.signedInCallback();
 		}
 		else
@@ -91,6 +107,7 @@ PartyModule.Guest.prototype.toggleSignedIn = function()
 			$(".guest#" + thisOuter.id + " > .status.checked-in").removeClass("present");
 			thisOuter.signedOutCallback();
 		}
+		thisOuter.everSignedIn = true;
 
 	}).fail(function( jqXHR, textStatus, errorThrown ) {
 		// If failed, we alert the user
@@ -174,7 +191,9 @@ PartyModule.GuestList.prototype.pollServer = function()
 				currentGuest.signedIn,
 				currentGuest.wasVouchedFor,
 				currentGuest.potentialBlacklisting,
-				currentGuest.potentialGreylisting
+				currentGuest.potentialGreylisting,
+				currentGuest.timeFirstSignedIn,
+				currentGuest.everSignedIn
 			)
 
 			thisOuter.addGuest(guestObj);
@@ -250,6 +269,7 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 
 	// Set the name and details to the guest's
 	clonedTemplate.find(".name").html(guest.name);
+	clonedTemplate.find(".checked-in-time").html(guest.timeFirstSignedIn);
 	clonedTemplate.find(".details").html(
 		(guest.wasVouchedFor ? "Vouched for by " : "Added by ") +
 		guest.addedBy.name + "."
@@ -303,6 +323,9 @@ PartyModule.GuestList.prototype.addGuest = function(guest)
 		// Show guest as signed in if already done so
 		if (guest.signedIn)
 			clonedTemplate.find(".status.checked-in").addClass("present");
+
+		if(guest.everSignedIn)
+			clonedTemplate.find(".checked-in-time").addClass("show");
 
 		// When template is clicked, sign the guest in
 		clonedTemplate.click(function() {
@@ -769,7 +792,8 @@ PartyModule.PartyList.prototype.addGuest = function(guestName, gender, voucher, 
 			data.signedIn,
 			data.wasVouchedFor,
 			data.potentialBlacklisting,
-			data.potentialGreylisting
+			data.potentialGreylisting,
+			data.timeFirstSignedIn
 		);         
 
 		/*

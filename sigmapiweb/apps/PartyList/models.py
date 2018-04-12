@@ -265,7 +265,7 @@ class PartyGuest(ModelMixin, models.Model):
     createdAt = models.DateTimeField(auto_now_add=True, db_index=True)
     signedIn = models.BooleanField(default=False)
     everSignedIn = models.BooleanField(default=False)
-    timeFirstSignedIn = models.DateTimeField(auto_now_add=True)
+    timeFirstSignedIn = models.DateTimeField(null=True)
     potentialBlacklisting = models.ForeignKey(
         BlacklistedGuest,
         null=True,
@@ -321,5 +321,11 @@ class PartyGuest(ModelMixin, models.Model):
             if self.potentialGreylisting
             else None
         )
+
+        data['everSignedIn'] = self.everSignedIn
+
+        if self.everSignedIn:
+            data['timeFirstSignedIn'] = \
+                self.timeFirstSignedIn.strftime("%I:%M %p")
 
         return data
