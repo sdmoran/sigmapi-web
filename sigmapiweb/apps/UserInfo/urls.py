@@ -13,6 +13,11 @@ urlpatterns = [
         name='userinfo-users',
     ),
     url(
+        regex=r'^family-tree',
+        view=views.family_tree,
+        name='userinfo-family_tree',
+    ),
+    url(
         regex=r'^password/',
         view=views.change_password,
         name='userinfo-change_password',

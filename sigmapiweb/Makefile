@@ -25,6 +25,10 @@ run: static migrate quickrun
 static:
 	$(MANAGE) collectstatic --noinput
 
+static_prod:
+	$(MANAGE) compilescss
+	$(MANAGE) collectstatic --noinput
+
 migrate:
 	$(MANAGE) migrate
 
@@ -34,12 +38,12 @@ quickrun:
 test:
 	echo lol what tests
 
-quality: pep8 pylint
+quality: pycodestyle pylint
 
-pep8:
-	pep8 common
-	pep8 apps/* --exclude='apps/*/migrations/*'
-	pep8 ../scripts
+pycodestyle:
+	pycodestyle common
+	pycodestyle apps/* --exclude='apps/*/migrations/*'
+	pycodestyle ../scripts
 
 pylint:
 	pylint common

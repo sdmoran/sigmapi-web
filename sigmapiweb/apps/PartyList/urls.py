@@ -39,6 +39,21 @@ urlpatterns = [
         name='partylist-remove_blacklisting',
     ),
     url(
+        regex=r'^greylist/$',
+        view=views.view_greylist,
+        name='partylist-view_greylist',
+    ),
+    url(
+        regex=r'^greylist/manage/$',
+        view=views.manage_greylist,
+        name='partylist-manage_greylist',
+    ),
+    url(
+        regex=r'^greylist/manage/remove/(?P<gl_id>[\d]+)/$',
+        view=views.remove_greylisting,
+        name='partylist-remove_greylisting',
+    ),
+    url(
         regex=r'^manage/$',
         view=views.manage_parties,
         name='partylist-manage_parties',
@@ -47,6 +62,11 @@ urlpatterns = [
         regex=r'^edit/(?P<party_id>[\d]+)/$',
         view=views.edit_party,
         name='partylist-edit_party',
+    ),
+    url(
+        regex=r'^refresh/(?P<party_id>[\d]+)/$',
+        view=views.refresh_party_listings,
+        name='partylist-refresh_party_listings',
     ),
     url(
         regex=r'^delete/(?P<party_id>[\d]+)/$',

@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_GET, require_POST
+from django.utils.datastructures import MultiValueDict
 from django_downloadview import sendfile
 
 from . import notify
@@ -262,28 +263,49 @@ def upload_resource(request):
     """
     TODO: Docstring
     """
-    upload_resource_form = AcademicResourceForm(request.POST, request.FILES)
 
-    if upload_resource_form.is_valid():
-        resource = upload_resource_form.save(commit=False)
+    # Retrieve the files from the MultiValueDictionary
+    files = request.FILES.getlist("resource_pdf")
+    # Iterate over the list of files, uploading them separately
+    for file in files:
+        # Build a MultiValueDictionary containing just this file
+        # This is done simply because it is the required format of the
+        # Academic Resource Form
+        mvd = MultiValueDict()
+        file_list = [file]
+        mvd.setlist("resource_pdf", file_list)
 
-        if request_is_from_scholarship_head(request):
-            resource.approved = True
-            message = 'Resource uploaded successfully!'
+        # Save the Files
+        upload_resource_form = AcademicResourceForm(request.POST, mvd)
+        # Check if the resource is valid
+        if upload_resource_form.is_valid():
+            # Save the resource
+            resource = upload_resource_form.save(commit=False)
+            # Get the resource name and extension
+            file_name, extension = os.path.splitext(
+                os.path.basename(resource.resource_pdf.name))
+            # Set the resource name
+            resource.resource_name = file_name
+            if extension == ".pdf":
+                if request_is_from_scholarship_head(request):
+                    resource.approved = True
+                    message = file_name + ' uploaded successfully!'
+                else:
+                    resource.approved = False
+                    message = file_name + ' submitted for approval!'
+                    notify.scholarship_content_submitted()
+
+                resource.submittedBy = request.user
+                resource.save()
+                messages.info(request, message)
+            else:
+                messages.error(request, file_name + ' was not a pdf file.')
         else:
-            resource.approved = False
-            message = 'Resource submitted for approval successfully!'
-            notify.scholarship_content_submitted()
-
-        resource.submittedBy = request.user
-        resource.save()
-        messages.info(request, message)
-    else:
-        message = (
-            'Failed to upload resource. Make ' +
-            'sure that you have provided all fields correctly.'
-        )
-        messages.error(request, message)
+            message = (
+                'Failed to upload resource. Make ' +
+                'sure that you have provided all fields correctly.'
+            )
+            messages.error(request, message)
 
     # Can add additional response information here if needed in the future
     response = {}

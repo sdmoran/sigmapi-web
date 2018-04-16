@@ -1,0 +1,41 @@
+{% extends 'parties/_base.html' %}
+
+{% load common_utils %}
+
+{% block title %}Sigma Pi Secure - Greylist{% endblock %}
+
+{% block content %}
+<h3>Party Greylist</h3>
+
+{% if greylist %}
+<div class="table-responsive">
+	<table class="table greylist-table">
+		<thead>
+			<tr>
+				<th class="two wide">Name</th>
+				<th class="two wide">Added By</th>
+				<th class="five wide">Identifying Details</th>
+				<th class="three wide">Reason</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for person in greylist %}
+			<tr>
+				<td>{{ person.name }}</td>
+				<td>{{ person|full_name:'addedBy' }}
+				<td>{{ person.details }}</td>
+				<td>{{ person.reason }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+{% else %}
+<p>
+	Greylist empty.
+</p>
+
+{% endif %}
+
+{% endblock %}

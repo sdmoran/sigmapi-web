@@ -17,7 +17,7 @@
 
 		{% if perms.PartyList.manage_parties %}
 
-		{% if '/manage' in request.path and 'blacklist' not in request.path %}
+		{% if '/manage' in request.path and 'blacklist' not in request.path and 'greylist' not in request.path%}
 		<li class="active">
 		{% elif '/edit' in request.path %}
 		<li class="active">
@@ -59,6 +59,24 @@
 		</li>
 		{% endif %}
 
+                <!-- GreyList -->
+	        {% if '/greylist' in request.path and 'manage' not in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'partylist-view_greylist' %}">View Greylist</a>
+		</li>
+
+		{% if perms.PartyList.add_greylistedguest %}
+		{% if '/greylist/manage' in request.path %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="{% url 'partylist-manage_greylist' %}">Manage greylist</a>
+		</li>
+		{% endif %}
 
 
 	</ul>

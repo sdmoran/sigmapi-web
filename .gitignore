@@ -5,3 +5,5 @@ __pycache__
 .idea/
 venv/
 build/
+sigmapiweb/static/css/secure/*.css
+sigmapiweb/static/css/public/*.css

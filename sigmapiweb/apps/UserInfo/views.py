@@ -1,6 +1,8 @@
 """
 Views for UserInfo app.
 """
+import json
+
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.forms import PasswordChangeForm
@@ -8,6 +10,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.template.defaultfilters import stringfilter, register
 from django.utils.html import strip_tags
+from django.core.serializers.json import DjangoJSONEncoder
 
 from . import utils
 from .forms import EditUserInfoForm
@@ -130,6 +133,78 @@ def users(request):
     }
 
     return render(request, 'userinfo/public/brothers.html', context)
+
+
+def family_tree(request):
+    """
+    Builds the family tree based on user accounts
+    """
+    user_accounts = User.objects.all().prefetch_related('userinfo')
+
+    big_list = {
+        'name': "Sigma Pi Gamma Iota",
+        'children': []
+    }
+    for user in user_accounts:
+        if "Admin" in user.first_name or user.first_name == "":
+            continue
+        new_brother = {
+            'name': user.first_name + " " + user.last_name,
+            'id': user.id,
+            'children': []
+        }
+        try:
+            new_brother['big_brother'] = user.userinfo.bigBrother.id
+
+            exists = False
+            for brothercheck in user_accounts:
+                if brothercheck.id == new_brother['big_brother']:
+                    exists = True
+            if not exists:
+                big_bro = user.userinfo.bigBrother
+                big_list['children'].append({
+                    'name': big_bro.first_name + " " + big_bro.last_name,
+                    'id': big_bro.id,
+                    'children': [],
+                    'big_brother': -1,
+                    'added': True
+                })
+
+        except UserInfo.DoesNotExist:
+            new_brother['big_brother'] = -1
+        big_list['children'].append(new_brother)
+
+    # Expand the tree so it isn't flat
+    i = 0
+    while i < len(big_list['children']):
+        print("i: " + str(i))
+        print(len(big_list['children']))
+        big_id = big_list['children'][i]['big_brother']
+        if find_big(big_list['children'], big_id, big_list['children'][i]):
+            big_list['children'].pop(i)
+            i -= 1
+        i += 1
+
+    big_list = json.dumps(big_list, cls=DjangoJSONEncoder)
+
+    context = {
+        'users': big_list,
+    }
+    return render(request, 'userinfo/public/family-tree.html', context)
+
+
+def find_big(tree, big_id, little):
+    """
+    Find the big (user) that corresponds to the given little.
+    """
+    for node in tree:
+        if node['id'] == big_id:
+            node['children'].append(little)
+            return True
+        elif not node['children']:
+            if find_big(node['children'], big_id, little):
+                return True
+    return False
 
 
 @permission_required('UserInfo.manage_users', login_url='secure-index')
@@ -274,5 +349,5 @@ def profile_image(rel_path):
     return (
         '/content/' + rel_path
         if rel_path
-        else 'static/img/user-placeholder.png'
+        else '/static/img/user-placeholder.png'
     )

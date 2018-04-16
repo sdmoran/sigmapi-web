@@ -1,5 +1,8 @@
 """
 Utility functions for notifying users about Study Hours events
+
+NOTE (changed on 3/27/18): I had to change the scholarship = scholarship[0]
+lines because they return a dango warning that scholarship is unsubscriptable.
 """
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -22,11 +25,11 @@ def scholarship_content_submitted():
     scholarship = User.objects.filter(groups__name='Scholarship Chair')
     if not scholarship.exists():
         return
-    scholarship = scholarship[0]
+    scholarship_chair = scholarship.first()
     send_email(
         subject=subject,
         body=message,
-        to_emails=[scholarship.email],
+        to_emails=[scholarship_chair.email],
         cc_emails=[],
     )
 
@@ -49,12 +52,12 @@ def study_hours_tracked(tracked_user):
     scholarship = User.objects.filter(groups__name='Scholarship Chair')
     if not scholarship.exists():
         return
-    scholarship = scholarship[0]
+    scholarship_chair = scholarship.first()
     send_email(
         subject=subject,
         body=message,
         to_emails=[tracked_user.user.email],
-        cc_emails=[scholarship.email],
+        cc_emails=[scholarship_chair.email],
     )
 
 
@@ -68,12 +71,12 @@ def study_hours_untracked(tracked_user):
     scholarship = User.objects.filter(groups__name='Scholarship Chair')
     if not scholarship.exists():
         return
-    scholarship = scholarship[0]
+    scholarship_chair = scholarship.first()
     send_email(
         subject=subject,
         body=message,
         to_emails=[tracked_user.user.email],
-        cc_emails=[scholarship.email],
+        cc_emails=[scholarship_chair.email],
     )
 
 
@@ -87,10 +90,10 @@ def social_probation(tracked_user):
     scholarship = User.objects.filter(groups__name='Scholarship Chair')
     if not scholarship.exists():
         return
-    scholarship = scholarship[0]
+    scholarship_chair = scholarship.first()
     send_email(
         subject=subject,
         body=message,
         to_emails=[tracked_user.user.email],
-        cc_emails=[scholarship.email, settings.EC_EMAIL],
+        cc_emails=[scholarship_chair.email, settings.EC_EMAIL],
     )

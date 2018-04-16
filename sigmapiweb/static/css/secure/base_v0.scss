@@ -7,6 +7,8 @@
 @-o-viewport      { width: device-width; }
 @viewport         { width: device-width; }
 
+@import '../common/_const';
+
 /**
  * Global body styling 
  */
@@ -870,4 +872,7 @@ th.twelve.wide
 
 .blacklist-table {
 	word-wrap: break-word;
+}
+.greylist-table {
+        word-wrap: break-word;
 }

@@ -1,0 +1,65 @@
+{% extends 'common/public_base.html' %}
+{% block module_includes %}
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="/static/js/public/familytree2.js"></script>
+{% endblock %}
+{% block title %}Sigma Pi Gamma Iota - Family Tree{% endblock %}
+
+{% block content %}
+    <style type="text/css">
+
+	.node {
+    cursor: pointer;
+  }
+
+  .overlay{
+      background-color:#EEE;
+  }
+
+  .node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+  }
+
+  .node text {
+    font-size:10px;
+    font-family:sans-serif;
+  }
+
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
+
+  .templink {
+    fill: none;
+    stroke: red;
+    stroke-width: 3px;
+  }
+
+  .ghostCircle.show{
+      display:block;
+  }
+
+  .ghostCircle, .activeDrag .ghostCircle{
+       display: none;
+  }
+
+</style>
+    <p>
+    Welcome to the Family Tree Beta! Use your mouse to drag around, and zoom in / out with the scroll wheel.
+    </p>
+
+    <div id="tree-container" style="min-height: 800px;">
+    </div>
+    <script>
+        let jsonData = JSON.parse(unescape("{{ users | safe | escapejs}}"));
+        $(document).ready(function(){
+            generateFamilyTree("tree-container", jsonData)
+        });
+
+    </script>
+
+{% endblock %}

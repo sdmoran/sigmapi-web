@@ -2,10 +2,10 @@
 Models for PartyList app.
 """
 from datetime import datetime
-import editdistance
 
 from django.db import models
 from django.contrib.auth.models import User
+from fuzzywuzzy import fuzz
 
 from common.mixins import ModelMixin
 from common.utils import get_id_or_sentinel, get_full_name_or_deleted
@@ -35,6 +35,22 @@ def get_party_jobs_path(_, filename):
     Returns: str
     """
     return "parties/partyjobs/" + _time_stamp_filename(filename)
+
+
+def user_can_delete_greylisting(user, greylisting):
+    """
+    Is a user allowed to remove a guest from the greylist?
+
+    Arguments:
+        user: User
+        greylisting: GreylistedGuest
+
+    Returns: bool
+    """
+    return (
+        greylisting.addedBy == user or
+        user.has_perm('PartyList.can_delete_any_greylisted_guest')
+    )
 
 
 class Party(ModelMixin, models.Model):
@@ -80,6 +96,7 @@ class Party(ModelMixin, models.Model):
         verbose_name = "Party"
         permissions = (
             ("manage_parties", "Can manage Parties"),
+            ("can_modify_count", "Can modify guest count"),
         )
 
 
@@ -90,9 +107,68 @@ class BlacklistedGuest(ModelMixin, models.Model):
     Does NOT use the Guest model; just simply stores a name and details.
     """
     name = models.CharField(max_length=100, db_index=True)
-    details = models.TextField()
+    details = models.TextField(
+        default="(No identifying details provided)"
+    )
+    reason = models.TextField(default="(No reason provided)")
 
-    MAX_MATCH_EDIT_DISTANCE = 5
+    MIN_MATCH_RATIO = 70
+
+    def __str__(self):
+        return self.name
+
+    def check_match(self, to_check):
+        """
+        Return int indicating strength of match, where 0 indicates no match.
+
+        Arguments:
+            to_check (str)
+
+        Returns: int
+        """
+        check_name = ''.join(c.lower() for c in to_check if not c.isspace())
+        bl_name = ''.join(c.lower() for c in self.name if not c.isspace())
+        match_ratio = fuzz.ratio(check_name, bl_name)
+        return match_ratio if match_ratio >= self.MIN_MATCH_RATIO else 0
+
+    def to_json(self):
+        """
+        Return a dictionary form of self.
+
+        Returns: dict
+        """
+        return {
+            'name': self.name,
+            'details': self.details,
+            'reason': self.reason,
+        }
+
+    class Meta:
+        permissions = (
+            ("manage_blacklist", "Can manage the blacklist"),
+        )
+
+
+class GreylistedGuest(ModelMixin, models.Model):
+    """
+    Model to represent a person who has been greylisted.
+
+    Does NOT use the Guest model; just simply stores a name and details.
+    """
+    name = models.CharField(max_length=100, db_index=True)
+    addedBy = models.ForeignKey(
+        User,
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
+        default=None,
+    )
+    details = models.TextField(
+        default="(No identifying details provided)"
+    )
+    reason = models.TextField(default="(No reason provided)")
+
+    MIN_MATCH_RATIO = 70
 
     def __str__(self):
         return self.name
@@ -104,20 +180,32 @@ class BlacklistedGuest(ModelMixin, models.Model):
         Arguments:
             to_check (str)
 
-        Returns: (BlacklistedGuest|NoneType)s
+        Returns: (GreylistedGuest|NoneType)s
         """
         check_name = ''.join(c.lower() for c in to_check if not c.isspace())
-        bl_name = ''.join(c.lower() for c in self.name if not c.isspace())
-        edit_distance = editdistance.eval(check_name, bl_name)
-        return (
-            self
-            if edit_distance <= self.MAX_MATCH_EDIT_DISTANCE
-            else None
-        )
+        gl_name = ''.join(c.lower() for c in self.name if not c.isspace())
+        match_ratio = fuzz.ratio(check_name, gl_name)
+        return match_ratio if match_ratio >= self.MIN_MATCH_RATIO else 0
+
+    def to_json(self):
+        """
+        Return a dictionary form of self.
+
+        Returns: dict
+        """
+        return {
+            'name': self.name,
+            'addedBy': get_full_name_or_deleted(self.addedBy),
+            'details': self.details,
+            'reason': self.reason,
+        }
 
     class Meta:
         permissions = (
-            ("manage_blacklist", "Can manage the blacklist"),
+            (
+                'can_delete_any_greylisted_guest',
+                'Can delete any greylsted guest',
+            ),
         )
 
 
@@ -168,15 +256,30 @@ class PartyGuest(ModelMixin, models.Model):
     addedBy = models.ForeignKey(
         User,
         related_name="added_by",
-        default=1,
         null=True,
+        blank=False,
+        default=None,
         on_delete=models.SET_NULL,
     )
     wasVouchedFor = models.BooleanField()
     createdAt = models.DateTimeField(auto_now_add=True, db_index=True)
     signedIn = models.BooleanField(default=False)
     everSignedIn = models.BooleanField(default=False)
-    timeFirstSignedIn = models.DateTimeField(auto_now_add=True)
+    timeFirstSignedIn = models.DateTimeField(null=True)
+    potentialBlacklisting = models.ForeignKey(
+        BlacklistedGuest,
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+    )
+    potentialGreylisting = models.ForeignKey(
+        GreylistedGuest,
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+    )
 
     def __str__(self):
         return self.guest.name
@@ -201,22 +304,28 @@ class PartyGuest(ModelMixin, models.Model):
         data = {}
         data['id'] = self.id
         data['name'] = self.guest.name
-        data['addedByName'] = get_full_name_or_deleted(self.addedBy)
-        data['addedByID'] = get_id_or_sentinel(self.addedBy)
+        data['addedBy'] = {
+            'name': get_full_name_or_deleted(self.addedBy),
+            'id': get_id_or_sentinel(self.addedBy),
+            'username': self.addedBy.username if self.addedBy else None,
+        }
         data['signedIn'] = self.signedIn
         data['wasVouchedFor'] = self.wasVouchedFor
+        data['potentialBlacklisting'] = (
+            self.potentialBlacklisting.to_json()
+            if self.potentialBlacklisting
+            else None
+        )
+        data['potentialGreylisting'] = (
+            self.potentialGreylisting.to_json()
+            if self.potentialGreylisting
+            else None
+        )
+
+        data['everSignedIn'] = self.everSignedIn
+
+        if self.everSignedIn:
+            data['timeFirstSignedIn'] = \
+                self.timeFirstSignedIn.strftime("%I:%M %p")
 
         return data
-
-    def check_blacklisted(self):
-        """
-        Return this guest's match on the blacklist if one exists, else None.
-
-        Returns: (BlacklistedGuest|NoneType)
-        """
-        match_results = (
-            blacklisted.check_match(self.guest.name)
-            for blacklisted in BlacklistedGuest.objects.all()
-        )
-        positives = (match for match in match_results if match)
-        return positives.next() if positives else None
