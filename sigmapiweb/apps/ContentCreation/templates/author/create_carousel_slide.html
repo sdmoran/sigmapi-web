@@ -1,15 +1,15 @@
 {% extends 'scholarship/_base.html' %}
 
-{% block title %}Sigma Pi Secure - Create an Article Block {% endblock %}
+{% block title %}Sigma Pi Secure - Create a Carousel Slide {% endblock %}
 
 {% load staticfiles %}
 {% block module_includes %}
 {% endblock %}
 
 {% block content %}
-<h3>Create a new Article Block</h3>
+<h3>Create a new Carousel Slide</h3>
 
-<form action="{% url 'create-article-block' %}" method="post">
+<form action="{% url 'create-carousel-slide' %}" method="post">
     {% csrf_token %}
     {{ form }}
     <input type="submit" value="Submit"/>

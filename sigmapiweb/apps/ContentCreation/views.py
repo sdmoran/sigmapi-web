@@ -48,3 +48,45 @@ def create_article_block(request):
     else:
         article_block_form = forms.ArticleBlockForm()
     return render(request, 'author/create_article_block.html',{'form' : article_block_form})
+
+def create_public_image(request):
+    """
+    View to submit form to create a public image on the pubsite
+    """
+    if request.method == 'POST':
+        public_image_form = forms.PublicImageForm(request.POST)
+
+        if public_image_form.is_valid():
+        
+            path = public_image_form.cleaned_data['path']
+            public_image = models.PublicImage.objects.create(
+                path=path,
+            )
+            public_image.save()
+    else:
+        public_image_form = forms.PublicImageForm()
+    return render(request, 'author/create_public_image.html',{'form' : public_image_form})
+
+def create_carousel_slide(request):
+    """
+    View to submit form to create a public image on the pubsite
+    """
+    if request.method == 'POST':
+        carousel_slide_form = forms.CarouselSlideForm(request.POST)
+
+        if carousel_slide_form.is_valid():
+        
+            image = carousel_slide_form.cleaned_data['image']
+            title = carousel_slide_form.cleaned_data['title']
+            description = carousel_slide_form.cleaned_data['image']
+            precedence = carousel_slide_form.cleaned_data['precedence']
+            carousel_slide = models.CarouselSlide.objects.create(
+                image=image,
+                title=title,
+                description=description,
+                precedence=precedence,
+            )
+            carousel_slide.save()
+    else:
+        carousel_slide_form = forms.CarouselSlideForm()
+    return render(request, 'author/create_carousel_slide.html',{'form' : carousel_slide_form})
