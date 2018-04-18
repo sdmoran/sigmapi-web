@@ -9,7 +9,11 @@
 {% block content %}
 <h3>Create a new Article Page</h3>
 
-
+<form action="{% url 'create-article' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit"/>
+</form>
 
 
 {% endblock %}

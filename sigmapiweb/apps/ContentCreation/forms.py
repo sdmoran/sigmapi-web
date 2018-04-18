@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from sigmapiweb.apps.PubSite.models import Article, ArticleBlock, PublicImage, CarouselSlide
+from apps.PubSite.models import Article, ArticleBlock, PublicImage, CarouselSlide
 
 
 class ArticleForm(ModelForm):

@@ -9,17 +9,12 @@ from apps.UserInfo import secure_urls as userinfo_urls
 from apps.Links import urls as links_urls
 from apps.Standards import urls as standards_urls
 from apps.Scholarship import urls as scholarship_urls
-from apps.public_content import urls as public_content_urls
+from apps.ContentCreation import urls as content_creation_urls
 
 from . import views
 
 
 urlpatterns = [
-    url(
-        regex=r'.*',
-        view=views.no_demo,
-        name='secure-no-demo',
-    ),
     url(
         regex=r'^$',
         view=views.index,
@@ -50,7 +45,7 @@ urlpatterns = [
         view=include(scholarship_urls),
     ),
     url(
-        regex=r'^public-content',
-        view=include(public_content_urls)
+        regex=r'^author/',
+        view=include(content_creation_urls)
     )
 ]
