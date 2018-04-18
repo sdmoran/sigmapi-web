@@ -1,0 +1,26 @@
+{% extends 'scholarship/_base.html' %}
+
+{% block title %}Sigma Pi Secure - Create an Article Block {% endblock %}
+
+{% load staticfiles %}
+{% block module_includes %}
+{% endblock %}
+
+{% block content %}
+<h3>Create a new Article Page</h3>
+
+<form action="{% url 'create-article-block' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit"/>
+</form>
+
+
+{% endblock %}
+
+{% block toplevel_content %}
+{% endblock %}
+
+{% block embedded_js %}
+
+{% endblock %}

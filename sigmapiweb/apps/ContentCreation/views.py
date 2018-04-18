@@ -25,3 +25,26 @@ def create_article(request):
     else:
         article_form = forms.ArticleForm()
     return render(request, 'author/create_article.html', {'form': article_form})
+
+def create_article_block(request):
+    """
+    View to submit a form to create an article block on the Pubsite
+    """
+    if request.method == 'POST':
+        article_block_form = forms.ArticleBlockForm(request.POST)
+
+        if article_block_form.is_valid():
+            page = article_block_form.cleaned_data['page']
+            title = article_block_form.cleaned_data['title']
+            anchor_id = article_block_form.cleaned_data['anchor_id']
+            body = article_block_form.cleaned_data['body']
+            article_block = models.ArticleBlock.objects.create(
+                page=page,
+                title=title,
+                anchor_id=anchor_id,
+                body=body,
+            )
+            article_block.save()
+    else:
+        article_block_form = forms.ArticleBlockForm()
+    return render(request, 'author/create_article_block.html',{'form' : article_block_form})
