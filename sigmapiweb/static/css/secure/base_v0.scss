@@ -781,6 +781,22 @@ input[type="file"]
 	width: 100px;
 }
 
+.dataTable-sort-asc
+{
+    background: url('/static/img/sort-asc.png');
+    background-position: right 1px top 12px;
+    background-size: 15px 10px;
+    background-repeat: no-repeat;
+}
+
+.dataTable-sort-desc
+{
+    background: url('/static/img/sort-desc.png');
+    background-position: right 1px top 12px;
+    background-size: 15px 10px;
+    background-repeat: no-repeat;
+}
+
 .table-responsive
 {
 	margin-top:20px;
