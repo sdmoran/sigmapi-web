@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 BASE_DIR = os.getcwd()
 
-EC_EMAIL = "sigmapi@wpi.edu"
+EC_EMAIL = "gr-sigmapi@wpi.edu"
 ACTIVES_EMAIL = "sigmapiactives@wpi.edu"
 ALUMNI_EMAIL = "sigmapialumni@wpi.edu"
 
