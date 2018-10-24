@@ -108,6 +108,7 @@ PROJECT_APPS = (
     'apps.UserInfo',
     'apps.Archive',
     'apps.PartyList',
+    'apps.PartyListV2',
     'apps.Secure',
     'apps.Links',
     'apps.Standards',

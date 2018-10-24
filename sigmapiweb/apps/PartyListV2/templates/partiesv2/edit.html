@@ -1,0 +1,130 @@
+{% extends 'partiesv2/_base.html' %}
+{% block title %}Sigma Pi Secure - Add Party{% endblock %}
+
+{% load staticfiles %}
+{% block module_includes %}
+	<script type="text/javascript" src='{% static "js/lib/moment.min.js" %}'></script>
+	<script type="text/javascript" src='{% static "js/lib/bootstrap-datetimepicker.min.js" %}'></script>
+	<link rel="stylesheet" type="text/css" href='{% static "css/lib/bootstrap-datetimepicker.min.css" %}'/>
+
+    <script src='{% static "js/lib/jquery.timepicker.min.js" %}'></script>
+    <link rel="stylesheet" type="text/css" href='{% static "css/lib/jquery.timepicker.min.css" %}'/>
+{% endblock %}
+
+{% block content %}
+<h3>
+{% if adding_new %}
+    Add a new party.
+{% else %}
+    Edit Party
+{% endif %}
+</h3>
+
+<form enctype="multipart/form-data" method="post" action="{% if adding_new %}{% url 'partylist-add_party' %}{% else %} {% url 'partylist-edit_party' requested_party.pk%}{% endif %}" role="form" class="centered medium v2form">
+	{% csrf_token %}
+	{% if message %}
+	<div class="alert alert-info">
+		{% for msg in message %}
+		<p>{{ msg }}</p>
+		{% endfor %}
+	</div>
+  {% if error_messages %}
+  <div class="alert alert-danger">
+    {% for error in error_messages %}
+    <p>{{ error }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+	{% endif %}
+    {% for field in form %}
+        <div class="field_wrapper" id="wrapper_{{ field.id_for_label }}">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}
+              <div class="alert alert-danger">
+                {{ field.errors }}
+              </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary pull-right">
+        {% if adding_new %}
+        Add Party
+        {% else %}
+        Save
+        {% endif %}
+    </button>
+</form>
+{% endblock %}
+
+{% block embedded_js %}
+
+<script type="text/javascript">
+	// Initialize all date pickers on the page.
+
+
+	$('#id_party_start_0').attr("data-date-format", "YYYY-MM-DD")
+        .datetimepicker({
+        pickTime: false,
+        showToday: true,
+        minDate: moment(),
+	});
+
+	const time_format = 'g:i A';
+
+	const party_start_1 = $('#id_party_start_1');
+	const preparty_start = $('#id_preparty_start');
+
+	if(party_start_1.val() === "")
+      party_start_1.val("10:00 PM");
+	party_start_1.timepicker({
+        'timeFormat': time_format
+    });
+
+	if(preparty_start.val() === "")
+	    preparty_start.val("9:00 PM");
+	preparty_start.timepicker({
+        'timeFormat': time_format
+    });
+
+	let prepartyElements = j3("#wrapper_id_preparty_start")
+        .add("#wrapper_id_has_preparty_invite_limits");
+
+	let slideDuration = 0;
+
+	j3("#id_has_preparty").change(function()
+    {
+        if(j3(this).is(":checked"))
+        {
+            prepartyElements.slideDown(slideDuration);
+            j3("#id_has_preparty_invite_limits").change();
+        }
+        else
+        {
+           prepartyElements.slideUp(slideDuration);
+           j3("#wrapper_id_max_preparty_invites").slideUp(slideDuration);
+        }
+    }).change();
+
+	// Only show party invite limit if the party invite is checked
+	j3("#id_has_party_invite_limits").change(function()
+    {
+        if(j3(this).is(":checked"))
+            j3("#wrapper_id_max_party_invites").slideDown(slideDuration);
+        else
+            j3("#wrapper_id_max_party_invites").slideUp(slideDuration);
+    }).change();
+
+	// Only show pre-party invite limit if the checkbox is checked
+	j3("#id_has_preparty_invite_limits").change(function()
+    {
+        if(j3(this).is(":checked"))
+            j3("#wrapper_id_max_preparty_invites").slideDown(slideDuration);
+        else
+            j3("#wrapper_id_max_preparty_invites").slideUp(slideDuration);
+    }).change();
+
+	slideDuration = 400;
+</script>
+
+{% endblock %}

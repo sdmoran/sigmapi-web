@@ -10,8 +10,8 @@
 		{% else %}
 		<li>
 		{% endif %}
-			<a href="{% url 'partylist-index' %}">
-				Parties
+			<a href="{% url 'partylist-old-index' %}">
+				Old Parties
 			</a>
 		</li>
 
@@ -24,61 +24,12 @@
 		{% else %}
 		<li>
 		{% endif %}
-			<a href="{% url 'partylist-manage_parties' %}">
-				Manage Parties
-			</a>
-		</li>
-
-		{% if '/add' in request.path %}
-		<li class="active">
-		{% else %}
-		<li>
-		{% endif %}
-			<a href="{% url 'partylist-add_party' %}">
-				Add Party
+			<a href="{% url 'partylist-old-manage_parties' %}">
+				Manage Old Parties
 			</a>
 		</li>
 
 		{% endif %}
-
-		{% if '/blacklist' in request.path and 'manage' not in request.path %}
-		<li class="active">
-		{% else %}
-		<li>
-		{% endif %}
-			<a href="{% url 'partylist-view_blacklist' %}">View Blacklist</a>
-		</li>
-
-		{% if perms.PartyList.manage_blacklist %}
-		{% if '/blacklist/manage' in request.path %}
-		<li class="active">
-		{% else %}
-		<li>
-		{% endif %}
-			<a href="{% url 'partylist-manage_blacklist' %}">Manage Blacklist</a>
-		</li>
-		{% endif %}
-
-                <!-- GreyList -->
-	        {% if '/greylist' in request.path and 'manage' not in request.path %}
-		<li class="active">
-		{% else %}
-		<li>
-		{% endif %}
-			<a href="{% url 'partylist-view_greylist' %}">View Greylist</a>
-		</li>
-
-		{% if perms.PartyList.add_greylistedguest %}
-		{% if '/greylist/manage' in request.path %}
-		<li class="active">
-		{% else %}
-		<li>
-		{% endif %}
-			<a href="{% url 'partylist-manage_greylist' %}">Manage greylist</a>
-		</li>
-		{% endif %}
-
-
 	</ul>
 </div>
 {% endblock %}

@@ -85,15 +85,17 @@
 					</li>
 					{% endif %}
 
-					{% if '/secure/parties' in request.path %}
-					<li class="active">
-					{% else %}
-					<li>
-					{% endif %}
-					<a id="party_list" href="{{ '/secure/parties' }}">
-						Parties
-					</a>
-					</li>
+                    {% if perms.PartyListV2.view_parties %}
+                        {% if '/secure/parties' in request.path %}
+                        <li class="active">
+                        {% else %}
+                        <li>
+                        {% endif %}
+                        <a id="party_list" href="{{ '/secure/parties' }}">
+                            Parties
+                        </a>
+                        </li>
+                    {% endif %}
 
 					{% if perms.UserInfo.manage_users %}
 						{% if '/secure/users' in request.path %}

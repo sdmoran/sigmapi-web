@@ -1567,14 +1567,6 @@
 		"pk":59
 	},
 	{
-		"fields":{
-			"group":1,
-			"key":"ksbbf4e9c0c646d289"
-		},
-		"model":"Secure.calendarkey",
-		"pk":1
-	},
-	{
 		 "fields":{
 		 	  "name":"Omega",
 		 	  "dateInitiated":"2000-01-01"

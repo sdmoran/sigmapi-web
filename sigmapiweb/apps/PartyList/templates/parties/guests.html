@@ -1,4 +1,4 @@
-{% extends 'parties/_base.html' %}
+{% extends 'partiesv2/_base.html' %}
 
 {% block title %}Sigma Pi Secure - {{ party.name }}{% endblock %}
 
@@ -33,7 +33,7 @@
 <div class="actions">
 	<ul class="nav nav-pills">
 		<li>
-			<a href="{% url 'partylist-api-export_list' party.pk %}">
+			<a href="{% url 'partylist-old-api-export_list' party.pk %}">
 				<span class="glyphicon glyphicon-download"></span> Export List
 			</a>
 		</li>

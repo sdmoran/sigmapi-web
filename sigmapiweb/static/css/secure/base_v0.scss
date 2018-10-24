@@ -876,3 +876,34 @@ th.twelve.wide
 .greylist-table {
         word-wrap: break-word;
 }
+
+.v2form
+{
+	label
+	{
+		display: block;
+	}
+
+	input
+	{
+      margin-bottom: 10px;
+	}
+
+	label[for='id_has_party_invite_limits'],
+	label[for='id_has_preparty'],
+	label[for='id_has_preparty_invite_limits'],
+    label[for$='clear_id']
+	{
+		display: inline;
+	}
+
+	ul.errorlist {
+		list-style: none;
+		padding-left: 0;
+	}
+}
+
+.alert>p
+{
+	margin-top: 0;
+}

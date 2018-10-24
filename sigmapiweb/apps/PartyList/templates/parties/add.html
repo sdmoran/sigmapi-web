@@ -11,7 +11,7 @@
 {% block content %}
 <h3>Add a new party.</h3>
 
-<form enctype="multipart/form-data" method="post" action="{% url 'partylist-add_party' %}" role="form" class="centered medium">
+<form enctype="multipart/form-data" method="post" action="{% url 'partylist-old-add_party' %}" role="form" class="centered medium">
 	{% csrf_token %}
 	{% if message %}
 	<div class="alert alert-info">

@@ -6,3 +6,5 @@ fuzzywuzzy[speedup]
 django-downloadview==1.9
 django-compressor
 django-sass-processor
+libsass
+python-Levenshtein

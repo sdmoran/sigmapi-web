@@ -7,54 +7,54 @@ $greylisting-fg: yellow;
 $greylisting-bg: #444;
 
 @media (max-width: 768px) {
-	#guests-container {
-		margin-bottom: 100px;
-	}
+    #guests-container {
+        margin-bottom: 100px;
+    }
 }
 
 @media (max-width:520px){
 
-	.section > li
-	{
-		display: block !important;
-	}
+    .section > li
+    {
+        display: block !important;
+    }
 }
 
 #footer
 {
-	display: none; /* Hide the footer in the guests list view */
+    display: none; /* Hide the footer in the guests list view */
 }
 
 #message-ux
 {
-	display: block;
-	margin-bottom: 5px;
+    display: block;
+    margin-bottom: 5px;
 }
 
 .loader
 {
-	background: url('/static/img/loader-large.gif') no-repeat scroll 48% 0px transparent;
+    background: url('/static/img/loader-large.gif') no-repeat scroll 48% 0px transparent;
 
-	width: 80% !important;
-	height: 100px !important;
+    width: 80% !important;
+    height: 100px !important;
 
-	text-align: center;
+    text-align: center;
 
-	padding-top: 65px;
+    padding-top: 65px;
 }
 
 .guest
 {
-	max-width: 350px;
-	padding: 10px;
-	border: 2px solid #AAA;
+    max-width: 350px;
+    padding: 10px;
+    border: 2px solid #AAA;
 
-	margin-bottom: 5px;
+    margin-bottom: 5px;
 
-	position: relative;
+    position: relative;
 
-	/* Disable user text selection */
-	-webkit-touch-callout: none;
+    /* Disable user text selection */
+    -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
@@ -64,27 +64,27 @@ $greylisting-bg: #444;
 
 .guest.filtered
 {
-	display: none;
-	visiblity: hidden;
+    display: none;
+    visiblity: hidden;
 }
 
 .guest.filtered-2
 {
-	display: none;
-	visiblity: hidden;
+    display: none;
+    visiblity: hidden;
 }
 
 .guest:hover
 {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 .guest > .name
 {
-	font-weight: bold;
+    font-weight: bold;
 
-	/* Disable user text selection */
-	-webkit-touch-callout: none;
+    /* Disable user text selection */
+    -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
@@ -94,12 +94,12 @@ $greylisting-bg: #444;
 
 .guest > .details
 {
-	color: #555;
-	margin-left: 10px;
-	margin-right: 55px;
+    color: #555;
+    margin-left: 10px;
+    margin-right: 55px;
 
-	/* Disable user text selection */
-	-webkit-touch-callout: none;
+    /* Disable user text selection */
+    -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
@@ -109,49 +109,49 @@ $greylisting-bg: #444;
 
 .guest > .list-warning
 {
-	float: right;
-	margin-right: 10px;
+    float: right;
+    margin-right: 10px;
 }
 
-.guest > .list-warning-blacklist 
+.guest > .list-warning-blacklist
 {
-	background-color: $blacklisting-bg;
-	color: $blacklisting-fg;
+    background-color: $blacklisting-bg;
+    color: $blacklisting-fg;
 
-	&:hover {
-		background-color: $blacklisting-fg;
-		color: $blacklisting-bg;
-		border: 1px solid $blacklisting-bg;
-	}
+    &:hover {
+        background-color: $blacklisting-fg;
+        color: $blacklisting-bg;
+        border: 1px solid $blacklisting-bg;
+    }
 }
 
-.guest > .list-warning-greylist 
+.guest > .list-warning-greylist
 {
-	background-color: $greylisting-bg;
-	color: $greylisting-fg;
+    background-color: $greylisting-bg;
+    color: $greylisting-fg;
 
-	&:hover {
-		background-color: $greylisting-fg;
-		color: $greylisting-bg;
-		border: 1px solid $greylisting-bg;
-	}
+    &:hover {
+        background-color: $greylisting-fg;
+        color: $greylisting-bg;
+        border: 1px solid $greylisting-bg;
+    }
 }
 
-.guest > .list-warning-none 
+.guest > .list-warning-none
 {
-	visibility: hidden;
+    visibility: hidden;
 }
 
 .guest > .status
 {
-	float: right;
-	font-size: 1.3em;
+    float: right;
+    font-size: 1.3em;
 
-	display: inline-block;
-	visibility: hidden;
+    display: inline-block;
+    visibility: hidden;
 
-	/* Disable user text selection */
-	-webkit-touch-callout: none;
+    /* Disable user text selection */
+    -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
@@ -161,146 +161,145 @@ $greylisting-bg: #444;
 
 .guest > .status.remove-guest:hover
 {
-	color: rgb(150, 150, 150);
+    color: rgb(150, 150, 150);
 }
 
 .guest > .status.present
 {
-	visibility: visible;
+    visibility: visible;
 }
 
 .guest-list.male > .guest
 {
-	background-color: rgb(130, 200, 240);
+    background-color: rgb(130, 200, 240);
 }
 
 .guest-list.male > .guest:hover
 {
-	background-color: rgb(160, 220, 255);
+    background-color: rgb(160, 220, 255);
 }
 
 .btn-male
 {
-	background-color: rgb(130, 200, 240);
+    background-color: rgb(130, 200, 240);
 }
 
 .btn-male:hover
 {
-	background-color: rgb(160, 220, 255);
+    background-color: rgb(160, 220, 255);
 }
 
 .guest-list.female > .guest
 {
-	background-color: rgb(255, 200, 255);
+    background-color: rgb(255, 200, 255);
 }
 
 .guest-list.female > .guest:hover
 {
-	background-color: rgb(255, 230, 255);
+    background-color: rgb(255, 230, 255);
 }
 
 .btn-female
 {
-	background-color: rgb(255, 200, 255);
+    background-color: rgb(255, 200, 255);
 }
 
 .btn-female:hover
 {
-	background-color: rgb(255, 230, 255);
+    background-color: rgb(255, 230, 255);
 }
 
 .add-guest-form
 {
-	display: inline-block;
-	width: 100%;
-	margin-bottom: 15px;
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 15px;
 }
 
 .add-guest-form > input
 {
-	display: inline-block;
+    display: inline-block;
 }
 
 .add-guest-form > button
 {
-	display: inline-block;
+    display: inline-block;
 
-	margin-top: -4px;
+    margin-top: -4px;
 }
 
 @media (max-width:315px){
-	.add-guest-form > button
-	{
-		display: block;
-		margin-top: 3px;
-		float:right;
-	}
+    .add-guest-form > button
+    {
+        display: block;
+        margin-top: 3px;
+        float:right;
+    }
 
-	.add-guest-form > input
-	{
-		display: block;
-		max-width: 100%;
-		width: 100%;
-	}
+    .add-guest-form > input
+    {
+        display: block;
+        max-width: 100%;
+        width: 100%;
+    }
 }
 
 #blacklist-warn .modal-content, #greylist-warn .modal-content
 {
-	color: white;
-	p { color: white; }
+    color: white;
+    p { color: white; }
 }
 
 #blacklist-warn .modal-content {
-	h4 { color: $blacklisting-fg; }
-	background-color: $blacklisting-bg;
+    h4 { color: $blacklisting-fg; }
+    background-color: $blacklisting-bg;
 }
 
 #greylist-warn .modal-content {
-	h4 { color: $greylisting-fg; }
-	background-color: $greylisting-bg;
+    h4 { color: $greylisting-fg; }
+    background-color: $greylisting-bg;
 }
 
 .blacklist-option
 {
-	display: block;
+    display: block;
 }
 
 .blacklist-option > input
 {
-	margin-right: 5px;
+    margin-right: 5px;
 }
 
 .greylist-option
 {
-	display: block;
+    display: block;
 }
 
 .greylist-option > input
 {
-	margin-right: 5px;
+    margin-right: 5px;
 }
 
 .blacklist-added-by-wrapper
 {
-	display: none;
+    display: none;
 }
 
 .party-count-highlighted
 {
-	background-color: #ddd;
+    background-color: #ddd;
 }
 
 .guest > .checked-in-time
 {
-	position: absolute;
+    position: absolute;
     right: 5px;
     bottom: 5px;
     font-size: 9pt;
-	display: none;
+    display: none;
 
-	&.show
-	{
-		display: initial;
-	}
+    &.show
+    {
+        display: initial;
+    }
 }
-

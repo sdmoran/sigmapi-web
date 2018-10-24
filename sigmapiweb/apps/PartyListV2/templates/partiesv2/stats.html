@@ -1,0 +1,26 @@
+{% extends 'partiesv2/_base.html' %}
+
+{% block title %}Sigma Pi Secure - {{ party.name }} Statistics{% endblock %}
+
+{% load sass_tags %}
+{% load staticfiles %}
+{% block module_includes %}
+
+{% endblock %}
+
+
+{% block content %}
+  <h3>{{ party.name }} - {{ party.date }} Statistics</h3>
+
+  <script>
+      const partyId = {{ party.id }};
+      const partyUrl = "{% url 'partylist-guests' party.id %}";
+
+      j3(document).ready(() => {
+          j3.ajax({
+              type: 'GET',
+              url: `${partyUrl}/`
+          })
+      });
+  </script>
+{% endblock %}

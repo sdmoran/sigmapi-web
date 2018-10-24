@@ -45,7 +45,7 @@
 
 <h3>Add to Blacklist</h3>
 
-<form method="post" action="{% url 'partylist-manage_blacklist' %}">
+<form method="post" action="{% url 'partylist-old-manage_blacklist' %}">
 	{% csrf_token %}
 	{% if message %}
 	<div class="alert alert-info">

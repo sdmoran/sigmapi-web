@@ -4,7 +4,8 @@ URLs for Secure app.
 from django.conf.urls import include, url
 
 from apps.Archive import urls as archive_urls
-from apps.PartyList import urls as parties_urls
+from apps.PartyListV2 import urls as parties_urls
+from apps.PartyList import urls as old_parties_urls
 from apps.UserInfo import secure_urls as userinfo_urls
 from apps.Links import urls as links_urls
 from apps.Standards import urls as standards_urls
@@ -22,6 +23,10 @@ urlpatterns = [
     url(
         regex=r'^archives/',
         view=include(archive_urls),
+    ),
+    url(
+        regex=r'^parties-old/',
+        view=include(old_parties_urls),
     ),
     url(
         regex=r'^parties/',

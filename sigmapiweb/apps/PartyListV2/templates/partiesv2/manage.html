@@ -1,4 +1,4 @@
-{% extends 'parties/_base.html' %}
+{% extends 'partiesv2/_base.html' %}
 {% block title %}Sigma Pi Secure - Manage Parties {% endblock %}
 
 {% block content %}
@@ -13,27 +13,20 @@
 				<th class="two wide">Party Date</th>
 				<th class="one wide">Edit</th>
 				<th class="one wide">Delete</th>
-				<th class="two wide">Refresh Blacklistings/Greylistings</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for party in all_parties reversed %}
 			<tr>
 				<td>{{ party.name }}</td>
-				<td>{{ party.date }}</td>
+				<td>{{ party.party_start.date }}</td>
 				<td>
 					<a href="{% url 'partylist-edit_party' party.pk %}">Edit</a>
 				</td>
 				<td>
-					<form method="POST" action="{% url 'partylist-old-delete_party' party.pk %}">
+					<form method="POST" action="{% url 'partylist-delete_party' party.pk %}">
 						{% csrf_token %}
 						<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
-					</form>
-				</td>
-				<td>
-					<form method="POST" action="{% url 'partylist-old-refresh_party_listings' party.pk %}">
-						{% csrf_token %}
-						<a href="#" onclick="$(this).closest('form').submit()">Refresh</a>
 					</form>
 				</td>
 			</tr>

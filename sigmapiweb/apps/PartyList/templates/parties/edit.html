@@ -11,7 +11,7 @@
 
 {% block content %}
 	<h3>Edit the fields below to change the party's info.</h3>
-	<form enctype="multipart/form-data" method="post" action="{% url 'partylist-edit_party' requested_party.pk %}" class="medium centered" role="form">
+	<form enctype="multipart/form-data" method="post" action="{% url 'partylist-old-edit_party' requested_party.pk %}" class="medium centered" role="form">
 		{% csrf_token %}
 		{% if error %}
 		<div class="alert alert-warning">

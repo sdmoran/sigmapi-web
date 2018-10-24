@@ -28,7 +28,7 @@
 				<td>{{ person.reason }}</td>
 				<td>
 					{% if can_delete %}
-						<form method="POST" action="{% url 'partylist-remove_greylisting' person.id %}">
+						<form method="POST" action="{% url 'partylist-old-remove_greylisting' person.id %}">
 							{% csrf_token %}
 							<a href="#" onclick="$(this).closest('form').submit()">Delete</a>
 						</form>
@@ -52,7 +52,7 @@
 
 <h3>Add to Greylist</h3>
 
-<form method="post" action="{% url 'partylist-manage_greylist' %}">
+<form method="post" action="{% url 'partylist-old-manage_greylist' %}">
 	{% csrf_token %}
 	{% if message %}
 	<div class="alert alert-info">

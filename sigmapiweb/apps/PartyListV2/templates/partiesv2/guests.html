@@ -1,0 +1,269 @@
+{% extends 'partiesv2/_base.html' %}
+
+{% block title %}Sigma Pi Secure - {{ party.name }}{% endblock %}
+
+{% load sass_tags %}
+{% load staticfiles %}
+{% block module_includes %}
+  <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css"/>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/lib/line-scale-pulse-out.min.css' %}"/>
+{#  <script src={% static 'js/lib/vue.js' %}></script>#}
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/v-tooltip"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+  <script src="{% static 'js/secure/csrfAjaxHelper.js' %}"></script>
+  <script src="{% static 'js/secure/party.guest.v5.js' %}"></script>
+  <script src="{% static 'js/lib/levenshtein.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+  <link rel='stylesheet' type='text/css' href='{% sass_src "css/secure/party-guests_v2.scss" %}' />
+{% endblock %}
+
+{% block body_class %}party-guests{% endblock %}
+
+{% block content %}
+  <div id="party-app">
+    <h3>{{ party.name }} - {{ party.date }} Guest List</h3>
+
+    <!-- Action navigation -->
+    <div class="actions">
+      <ul class="nav nav-pills">
+        <li>
+          <a href="{% url 'partylist-api-export_list' party.pk %}">
+            <span class="glyphicon glyphicon-download"></span> Export List
+          </a>
+        </li>
+{#        <li>#}
+{#          <a href="{% url 'partylist-stats' party.pk %}">#}
+{#            <span class="glyphicon glyphicon-stats"></span> Party Stats#}
+{#          </a>#}
+{#        </li>#}
+      </ul>
+    </div>
+
+    <party-stats
+
+    <!-- Search all guests -->
+    <party-searchbox :applied-filter="guestFilter" @apply-filter="applyFilter" @clear-filter="clearFilter"></party-searchbox>
+
+    <!-- Guest List -->
+    <div id="guests-container" class="container-fluid">
+      <div class="row">
+        <party-column
+            :guests="maleGuests" :party="party" title="Male" name="male" code="M"></party-column>
+        <party-column
+            :guests="femaleGuests" :party="party" title="Female" name="female" code="F"></party-column>
+      </div>
+    </div>
+
+    <div id="party-footer">
+      <div id="restricted-filter-container" :class="[{active: restrictedFilter}, 'footer-section']">
+        <span @click="toggleRestrictedOnly" id="restricted-filter-btn"
+              class="glyphicon glyphicon-exclamation-sign status restriction-warning"></span>
+      </div>
+      <div id="footer-counters" class="footer-section">
+        <party-counter v-if="party.listClosed" :male-count="party.guyCount" :female-count="party.girlCount">
+          In the Party
+        </party-counter>
+        <party-counter v-if="party.listClosed" :male-count="party.guysEverSignedIn" :female-count="party.girlsEverSignedIn">
+          Ever Checked In
+        </party-counter>
+        <party-counter :male-count="maleGuests.length" :female-count="femaleGuests.length">
+          On the List
+        </party-counter>
+      </div>
+      <div v-if="party.listClosed && party.permissions.youHaveDoorAccess"
+           id="party-count-toggles" class="footer-section">
+        <div class="toggles-group">
+          <button @click="modListCount('M', -1)" class="btn btn-default btn-sm btn-male" id="decrement-m">
+            <span class="glyphicon glyphicon-minus"></span>
+          </button>
+          <button @click="modListCount('M', 1)" class="btn btn-default btn-sm btn-male" id="increment-m">
+            <span class="glyphicon glyphicon-plus"></span>
+          </button>
+        </div>
+        <div class="toggles-group">
+          <button @click="modListCount('F', -1)" class="btn btn-default btn-sm btn-female" id="decrement-f">
+            <span class="glyphicon glyphicon-minus"></span>
+          </button>
+          <button @click="modListCount('F', 1)" class="btn btn-default btn-sm btn-female" id="increment-f">
+            <span class="glyphicon glyphicon-plus"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <party-modal v-if="modal" :data="modal" @primary-click="modal.primaryAction && modal.primaryAction(); modal = null;"
+                 @secondary-click="modal.secondaryAction && modal.secondaryAction(); modal = null;"
+    />
+  </div>
+
+  <!-- Templates -->
+
+  <!-- Vue Template for the male / female party list columns -->
+  <script id="party-column-template" type="text/x-template">
+    {% verbatim %}
+    <div class="col-xs-12 col-sm-6 party-column" :id="`party-column-${name}`">
+      <h4>{{ title }} Guests</h4>
+      <div v-if="showAddBox"
+           class="add-guest-form container-fluid">
+        <div class="row">
+          <div class="col-xs-12">
+            <input v-model="newGuestName" type="text" style="width: 100%;" class="form-control"
+                   :placeholder="`Add ${title} Guest`" @keyup.enter="addGuest"/>
+          </div>
+          <party-checkbox v-if="showPrepartyCheckbox" v-model="allowPreparty" :name="`preparty-${code}`">
+            Allow guest at pre-party
+          </party-checkbox>
+          <party-checkbox v-if="party.listClosed" v-model="riskApproval" :name="`risk-${code}`">
+            Vouch Limit Override
+          </party-checkbox>
+          <div v-if="showBrothers" class="col-xs-12 col-md-7 brothers-dropdown-wrapper">
+            <select v-model="selectedBrother" name="brother" class="form-control" style="width: 100%;">
+              <option value="">{{ dropdownTitle }}</option>
+              {% endverbatim %}
+              {% for brother in brothers %}
+                <option value="{{brother.0}}">{{brother.1}}</option>
+              {% endfor %}
+              {% verbatim %}
+            </select>
+          </div>
+          <div class="col-xs-12 col-md-5 add-guest-btn">
+            <button @click="addGuest" class="btn btn-default">
+              Add Guest
+            </button>
+          </div>
+        </div>
+      </div>
+      <div v-if="party.loadingGuests" class="loader">
+        <div class="la-line-scale-pulse-out">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <p>Loading {{ title }} Guest List...</p>
+      </div>
+      <div :class="`guest-list ${name}`" :id="`guest-list-${code}`" v-if="guests.length > 0">
+        <party-guest
+            v-for="guest of guests"
+            v-show="!guest.hide"
+            :guest="guest"
+            :party="party"
+            :key="guest.id"></party-guest>
+      </div>
+    </div>
+    {% endverbatim %}
+  </script>
+
+  <!-- Vue Template for the list items in the male / female lists -->
+  <script id="party-guest-template" type="text/x-template">
+    {% verbatim %}
+    <div @click="toggleSignedIn">
+      <div :class="['guest', canCheckIn?'pointer':'' ]" :id="`guest-template-${guest.id}`">
+        <span v-if="party.listClosed && guest.signedIn" class="glyphicon glyphicon-ok status checked-in"></span>
+        <span v-else-if="canRemove" @click="destroy" class="glyphicon glyphicon-remove status remove-guest"></span>
+        <span v-if="restrictedSimilarity != null"
+              class="glyphicon glyphicon-exclamation-sign status restriction-warning"
+              @click="showRestrictedModal"
+        ></span>
+
+        <span v-if="guest.inviteUsed" class="glyphicon glyphicon-info-sign status added-by-info"
+              v-tooltip="{content: `Using ${guest.inviteUsed}'s Invite`, trigger: 'hover click'}"></span>
+        <div class="name">{{ guest.name }}</div>
+        <div class="details">Added by {{ guest.addedBy.name }}</div>
+        <span v-if="guest.prepartyAccess && !guest.everSignedIn" class="preparty-label">preparty</span>
+        <span v-if="guest.timeFirstSignedIn" class="checked-in-time">{{ guest.timeFirstSignedIn }}</span>
+      </div>
+      {% endverbatim %}
+    </div>
+
+  </script>
+
+  <!-- Vue template for modals -->
+  <script id="party-modal-template" type="text/x-template">
+    {% verbatim %}
+    <transition name="modal">
+      <div class="modal-mask">
+        <div class="modal-wrapper">
+          <div class="modal-container">
+            <div class="modal-header">
+              <h4>{{ data.title }}</h4>
+            </div>
+            <div class="modal-body">
+              <div class="modal-message" v-html="data.message"></div>
+            </div>
+            <div class="modal-footer">
+              <button v-if="data.secondaryText" @click="$emit('secondary-click')" class="btn">
+                {{ data.secondaryText }}
+              </button>
+              <button v-if="data.primaryText" @click="$emit('primary-click')" class="btn btn-primary">
+                {{ data.primaryText }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+    {% endverbatim %}
+  </script>
+
+  <!-- Vue Template for a simple checkbox -->
+  <script id="party-checkbox-template" type="text/x-template">
+  {% verbatim %}
+    <div class="party-checkbox-container col-xs-12">
+      <div class="pretty p-svg p-curve p-thick p-bigger">
+        <input :value="value" :checked="value" @input="$emit('input', $event.target.checked)" type="checkbox" :id="`party-checkbox-${name}`">
+        <div class="state p-primary">
+          <svg class="svg svg-icon" viewBox="0 0 20 20">
+            <path d="M7.629,14.566c0.125,0.125,0.291,0.188,0.456,0.188c0.164,0,0.329-0.062,0.456-0.188l8.219-8.221c0.252-0.252,0.252-0.659,0-0.911c-0.252-0.252-0.659-0.252-0.911,0l-7.764,7.763L4.152,9.267c-0.252-0.251-0.66-0.251-0.911,0c-0.252,0.252-0.252,0.66,0,0.911L7.629,14.566z" style="stroke: white;fill:white;"></path>
+          </svg>
+          <label :for="`party-checkbox-${name}`"><slot></slot></label>
+        </div>
+      </div>
+    </div>
+  {% endverbatim %}
+  </script>
+
+  <!-- Vue Template for the search box -->
+  <script id="party-searchbox-template" type="text/x-template">
+    {% verbatim %}
+    <div role="form" class="search-box">
+      <label class="sr-only" for="searchbox">{{ placeholderText }}</label>
+      <input v-model="filterText" @keyup.enter="applyFilter" type="text" class="form-control"
+             id="search-box" :placeholder="placeholderText"/>
+      <button @click="applyFilter" :disabled="searchDisabled" class="btn btn-primary" id="search-btn">
+        {{ searchButtonText }}
+      </button>
+    </div>
+    {% endverbatim %}
+  </script>
+
+  <!-- Vue Template for the Party Count indicators in the bottom nav -->
+  <script id="party-counter-template" type="text/x-template">
+    {% verbatim %}
+    <div class="party-counter">
+      <span class="counter-title"><slot></slot></span>
+      <span class="counter-bubble badge bubble-total">T: <span class="counter-total">{{ totalCount }}</span></span>
+      <span class="counter-bubble badge bubble-male">M: <span class="counter-male">{{ maleCount }}</span></span>
+      <span class="counter-bubble badge bubble-female">F: <span class="counter-female">{{ femaleCount }}</span></span>
+    </div>
+    {% endverbatim %}
+  </script>
+
+  <script id="party-stats-template" type="text/x-template">
+    {% verbatim %}
+    <div class="party-stats">
+      <canvas id="created-counter"></canvas>
+    </div>
+    {% endverbatim %}
+  </script>
+
+  <!--suppress JSAnnotator -->
+  <script>
+      // Need to inject these so the front-end knows which party to request
+      // and who the current user is
+      const partyId = {{ party.id }};
+      const userId = {{ request.user.id }};
+  </script>
+{% endblock %}

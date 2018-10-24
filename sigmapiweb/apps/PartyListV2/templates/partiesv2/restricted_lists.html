@@ -1,0 +1,175 @@
+{% extends 'partiesv2/_base.html' %}
+
+{% load common_utils %}
+
+{% block title %}Sigma Pi Secure - Blacklist / Graylist{% endblock %}
+
+{% load sass_tags %}
+{% load staticfiles %}
+{% block module_includes %}
+    <link rel='stylesheet' type='text/css' href='{% sass_src "css/secure/restricted-guests.scss" %}' />
+{% endblock %}
+
+{% block content %}
+    <h3>Blacklist</h3>
+
+    {% if blacklist %}
+        <div class="table-responsive">
+            <table class="table blacklist-table">
+                <thead>
+                <tr>
+                    <th class="two wide">Name</th>
+                    <th class="five wide">Identifying Details</th>
+                    <th class="four wide">Reason</th>
+                    {% if perms.PartyListV2.manage_blacklist %}
+                        <th class="one wide"></th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for person, can_delete in blacklist %}
+                    <tr>
+                        <td>{{ person.name }}</td>
+                        <td>{{ person.details }}</td>
+                        <td>{{ person.reason }}</td>
+                        {% if perms.PartyListV2.manage_blacklist %}
+                            <td>
+                                {% if can_delete %}
+                                <form method="POST" action="{% url 'partylist-remove_blacklisting' person.id %}">
+                                    {% csrf_token %}
+                                    <a href="#" onclick="$(this).closest('form').submit()">Delete</a>
+                                </form>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% else %}
+        <p>
+            Blacklist empty.
+        </p>
+
+    {% endif %}
+
+    {% if perms.PartyListV2.manage_blacklist %}
+        <button id="blacklist-add-link" class="btn pull-right add-guest-btn">Add to Blacklist</button>
+        <div id="add-blacklist-container" style="display: none;">
+            <h3>Add to Blacklist</h3>
+
+            <form method="post" action="{% url 'partylist-restricted_lists' %}">
+                {% csrf_token %}
+                {% if message %}
+                    <div class="alert alert-info">
+                        {{ message }}
+                    </div>
+                {% endif %}
+                <div class="form-group">
+                    {{ blacklist_form.name.label_tag }}
+                    {{ blacklist_form.name }}
+                    <em>Make this similar to their name as it appears in the party guest list.</em>
+                </div>
+                <div class="form-group">
+                    {{ blacklist_form.details.label_tag }}
+                    {{ blacklist_form.details }}
+                    <em>Distinguishing details, in case someone has the same name. Physical features, class year, greek affiliation, etc.</em>
+                </div>
+                <div class="form-group">
+                    {{ blacklist_form.reason.label_tag }}
+                    {{ blacklist_form.reason }}
+                    <em>Reason for blacklisting.</em>
+                </div>
+                <button type="submit" name="blacklist" class="btn btn-primary pull-right">Add to blacklist</button>
+            </form>
+        </div>
+        <script>
+            j3("#blacklist-add-link").click(() =>
+            {
+                j3("#add-blacklist-container").slideDown();
+                j3("#blacklist-add-link").hide();
+            });
+        </script>
+    {% endif %}
+
+
+    <h3 style="clear:both;">Graylist</h3>
+    {% if graylist %}
+        <div class="table-responsive">
+            <table class="table greylist-table">
+                <thead>
+                <tr>
+                    <th class="two wide">Name</th>
+                    <th class="two wide">Added By</th>
+                    <th class="four wide">Identifying Details</th>
+                    <th class="three wide">Reason</th>
+                    <th class="one wide"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for person, can_delete in graylist %}
+                    <tr>
+                        <td>{{ person.name }}</td>
+                        <td>{{ person|full_name:'added_by' }}
+                        <td>{{ person.details }}</td>
+                        <td>{{ person.reason }}</td>
+                        <td>
+                            {% if can_delete %}
+                                <form method="POST" action="{% url 'partylist-remove_graylisting' person.id %}">
+                                    {% csrf_token %}
+                                    <a href="#" onclick="$(this).closest('form').submit()">Delete</a>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>
+            Graylist empty.
+        </p>
+    {% endif %}
+
+    {% if perms.PartyListV2.add_graylist %}
+        <button id="graylist-add-link" class="btn pull-right add-guest-btn">Add to Graylist</button>
+        <div id="add-graylist-container" style="display: none;">
+            <h3>Add to Graylist</h3>
+
+            <form method="post" action="{% url 'partylist-restricted_lists' %}">
+                {% csrf_token %}
+                {% if message %}
+                    <div class="alert alert-info">
+                        {{ message }}
+                    </div>
+                {% endif %}
+                <div class="form-group">
+                    {{ graylist_form.name.label_tag }}
+                    {{ graylist_form.name }}
+                    <em>Make this similar to their name as it appears in the party guest list.</em>
+                </div>
+                <div class="form-group">
+                    {{ graylist_form.details.label_tag }}
+                    {{ graylist_form.details }}
+                    <em>Distinguishing details, in case someone has the same name. Physical features, class year, greek affiliation, etc.</em>
+                </div>
+                <div class="form-group">
+                    {{ graylist_form.reason.label_tag }}
+                    {{ graylist_form.reason }}
+                    <em>Reason for greylisting.</em>
+                </div>
+                <button type="submit" name="graylist" class="btn btn-primary pull-right">Add to graylist</button>
+            </form>
+        </div>
+        <script>
+            j3("#graylist-add-link").click(() =>
+            {
+                j3("#add-graylist-container").slideDown();
+                j3("#graylist-add-link").hide();
+            });
+        </script>
+    {% endif %}
+{% endblock %}
