@@ -17,7 +17,7 @@ def index(request):
     context = {
         'title': 'Sigma Pi - Secure',
         'secure_index': True,
-        # 'calendar_name_url_pairs': get_name_url_pairs(request),
+        'calendar_name_url_pairs': get_name_url_pairs(request),
     }
 
     return render(request, 'calendar/view.html', context)
