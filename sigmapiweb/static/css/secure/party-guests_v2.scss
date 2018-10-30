@@ -682,3 +682,86 @@ $tooltip-background: #333;
         transition: opacity .15s;
     }
 }
+
+.fake-party-link {
+    cursor: pointer;
+    user-select: none;
+}
+
+
+$stat-background: #ddd;
+$stat-border: 1px solid gray;
+$stat-radius: 4px;
+.party-stats {
+    margin: 30px;
+
+    .stats-title {
+        text-align: center;
+    }
+
+    .ratio-info {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 10px;
+
+        .ratio-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .ratio-box-inner {
+            padding: 10px 2vw;
+            background: $stat-background;
+            border: $stat-border;
+            border-radius: $stat-radius;
+            text-align: center;
+        }
+
+        .ratio-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .ratio-number {
+            font-size: 20px;
+        }
+    }
+
+    .created-wrapper {
+        padding: 30px;
+        background: $stat-background;
+        border: $stat-border;
+        border-radius: $stat-radius;
+    }
+}
+
+.chart-title-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+[v-cloak] {
+    display: none !important;
+}
+
+@keyframes pulsing {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.pulsing {
+    animation-name: pulsing;
+    animation-iteration-count: infinite;
+    animation-duration: 2s;
+}

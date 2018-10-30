@@ -15,14 +15,16 @@
   <script src="{% static 'js/secure/csrfAjaxHelper.js' %}"></script>
   <script src="{% static 'js/secure/party.guest.v5.js' %}"></script>
   <script src="{% static 'js/lib/levenshtein.min.js' %}"></script>
+  <script src={% static 'js/lib/moment.min.js' %}></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+  <script src={% static 'js/lib/lodash.js' %}></script>
   <link rel='stylesheet' type='text/css' href='{% sass_src "css/secure/party-guests_v2.scss" %}' />
 {% endblock %}
 
 {% block body_class %}party-guests{% endblock %}
 
 {% block content %}
-  <div id="party-app">
+  <div id="party-app" v-cloak>
     <h3>{{ party.name }} - {{ party.date }} Guest List</h3>
 
     <!-- Action navigation -->
@@ -33,13 +35,15 @@
             <span class="glyphicon glyphicon-download"></span> Export List
           </a>
         </li>
-{#        <li>#}
-{#          <a href="{% url 'partylist-stats' party.pk %}">#}
-{#            <span class="glyphicon glyphicon-stats"></span> Party Stats#}
-{#          </a>#}
-{#        </li>#}
+        <li :class="statsActive? 'active':''">
+          <a class="fake-party-link" @click="toggleStats">
+            <span class="glyphicon glyphicon-stats"></span> Party Stats
+          </a>
+        </li>
       </ul>
     </div>
+
+    <party-stats v-if="statsActive" :guests="guests" :party="party"></party-stats>
 
     <!-- Search all guests -->
     <party-searchbox :applied-filter="guestFilter" @apply-filter="applyFilter" @clear-filter="clearFilter"></party-searchbox>
@@ -60,10 +64,10 @@
               class="glyphicon glyphicon-exclamation-sign status restriction-warning"></span>
       </div>
       <div id="footer-counters" class="footer-section">
-        <party-counter v-if="party.listClosed" :male-count="party.guyCount" :female-count="party.girlCount">
+        <party-counter v-if="party.listClosed===true" :male-count="party.guyCount" :female-count="party.girlCount" :show-colors="true">
           In the Party
         </party-counter>
-        <party-counter v-if="party.listClosed" :male-count="party.guysEverSignedIn" :female-count="party.girlsEverSignedIn">
+        <party-counter v-if="party.listClosed===true" :male-count="party.guysEverSignedIn" :female-count="party.girlsEverSignedIn">
           Ever Checked In
         </party-counter>
         <party-counter :male-count="maleGuests.length" :female-count="femaleGuests.length">
@@ -242,7 +246,9 @@
     {% verbatim %}
     <div class="party-counter">
       <span class="counter-title"><slot></slot></span>
-      <span class="counter-bubble badge bubble-total">T: <span class="counter-total">{{ totalCount }}</span></span>
+      <span class="counter-bubble badge bubble-total"
+        :style="showColors? `background-color: ${totalColor}` : ''">
+        T: <span class="counter-total">{{ totalCount }}</span></span>
       <span class="counter-bubble badge bubble-male">M: <span class="counter-male">{{ maleCount }}</span></span>
       <span class="counter-bubble badge bubble-female">F: <span class="counter-female">{{ femaleCount }}</span></span>
     </div>
@@ -252,7 +258,30 @@
   <script id="party-stats-template" type="text/x-template">
     {% verbatim %}
     <div class="party-stats">
-      <canvas id="created-counter"></canvas>
+      <div class="chart-title-wrapper">
+        <h4 class="stats-title">Guests on the List</h4>
+      </div>
+      <div class="created-wrapper">
+        <canvas id="created-counter"></canvas>
+      </div>
+
+      <div class="ratio-info">
+        <div class="col-sm-6 col-xs-12 ratio-box">
+          <div class="ratio-box-inner">
+            <div class="ratio-title">List Ratio (F to M)</div>
+            <div class="ratio-number">{{ ratioText }}</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xs-12 ratio-box">
+          <div class="ratio-box-inner">
+            <div class="ratio-title">Most Guests</div>
+            <template v-if="bestBrother">
+              <div class="ratio-number">{{ bestBrother.name }}</div>
+              <div class="ratio-number">{{ bestBrother.totalCount }} Guest{{ bestBrother.totalCount > 1 ? 's' : '' }} ({{ bestBrother.ratioText }} Ratio)</div>
+            </template>
+          </div>
+        </div>
+      </div>
     </div>
     {% endverbatim %}
   </script>

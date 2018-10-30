@@ -1,689 +1,4 @@
 
-class PartyList
-{
-    constructor()
-    {
-        this.initHandlebarsTemplates();
-
-        this.genderCodes = {
-            "M": "male",
-            "F": "female",
-            "male": "M",
-            "female": "F"
-        };
-
-        // Keep a reference to some commonly used elements
-        this.addGuestContainers = j3(".add-guest-form");
-
-        this.addMaleField = j3("#add-name-male");
-        this.addFemaleField = j3("#add-name-female");
-
-        this.malePrepartyCheckbox = j3("#preparty-checkbox-male");
-        this.femalePrepartyCheckbox = j3("#preparty-checkbox-female");
-        this.prepartyContainers = j3(".preparty-container");
-
-        this.maleBrothersDropdown = j3("#brothers-dropdown-male");
-        this.femaleBrothersDropdown = j3("#brothers-dropdown-female");
-        this.brothersDropdowns = this.maleBrothersDropdown.add(this.femaleBrothersDropdown);
-
-        this.searchButton =  j3("#search-btn");
-        this.searchBox =  j3("#search-box");
-
-        this.initListeners();
-        this.refreshList()
-    }
-
-    initHandlebarsTemplates()
-    {
-        let source = j3("#party-list-template").html();
-        let template = Handlebars.compile(source);
-        let maleContext = {title: "Male", name: "male", code: "M"};
-        let femaleContext = {title: "Female", name: "female", code: "F"};
-
-        // Renders the male and female columns (including the add forms)
-        j3("#guests-container > .row")
-            .append(template(maleContext))
-            .append(template(femaleContext));
-    }
-
-    initListeners()
-    {
-        // Listeners for adding new guests
-        this.addMaleField.keypress(e => {if (e.which === 13) this.addMale();});
-        j3("#add-btn-male").click(() => {this.addMale()});
-        this.addFemaleField.keypress(e => {if (e.which === 13) this.addFemale();});
-        j3("#add-btn-female").click(() => {this.addFemale()});
-
-        this.searchBox.keypress(e => {
-            if (e.which === 13)
-                this.filterGuests();
-            else
-            {
-                if(j3.trim(j3(this.searchBox).val()) !== "")
-                    this.searchButton.text("Search");
-                else
-                    this.searchBox.attr("placeholder", "Search by Guest or Brother Name");
-            }
-        });
-        this.searchButton.click(() => {
-            this.filterGuests();
-        });
-    }
-
-    filterGuests()
-    {
-        let rawQuery = j3.trim(this.searchBox.val());
-        let query = rawQuery.toLowerCase();
-
-        // If the search query is being cleared
-        if(query === "")
-        {
-            this.searchButton.text("Search");
-            this.searchBox.attr("placeholder", "Search by Guest or Brother Name");
-            j3(".guest-list .guest").show();
-        }
-        else
-        {
-            this.searchButton.text("Clear");
-            this.searchBox.val("").attr("placeholder", `Current Search: ${rawQuery}`);
-
-            // Filter the guest list
-            j3(".guest-list .guest")
-                .show()
-                .filter(function() //Return true if the names don't match
-                {
-                    let name = j3(this).children(".name").text().toLowerCase();
-                    let addedBy = j3(this).children(".details").text().toLowerCase();
-
-                    return !(PartyList.nameQueryMatches(name, query) || PartyList.nameQueryMatches(addedBy, query));
-
-                }).hide();
-        }
-    }
-
-    refreshList()
-    {
-        j3.ajax({
-            type: "GET",
-            url: "all/",
-        }).done((data, textStatus, xhr) => {
-            this.listLoaded(data)
-        }).fail((xhr, textStatus, errorThrown) => {
-            console.log(xhr.status + ": " + xhr.responseText);
-        });
-    }
-
-    listLoaded(data)
-    {
-        console.log("Data Received", data);
-
-        this.userID = data.user_id;
-        this.partyMode = data.party_mode;
-        this.prepartyMode = data.preparty_mode;
-        this.canRemoveAnyGuest = data.can_remove_any_guest;
-        this.restrictedGuests = data.restricted_guests;
-        this.minLevenshteinDist = data.min_levenshtein_dist;
-        this.doorAccess = data.you_have_door_access;
-
-        if(data.can_add_party_guests)
-            this.addGuestContainers.show();
-
-        j3("#guest-list-M").empty();
-        j3("#guest-list-F").empty();
-
-        if((data.party_mode || data.preparty_mode))
-        {
-            if(data.you_have_door_access)
-            {
-                this.brothersDropdowns.parent().show();
-            }
-        }
-        else if(data.has_party_invite_limits || data.has_preparty_invite_limits)
-        {
-            this.brothersDropdowns.parent().show();
-            this.brothersDropdowns.children("option:first-child").text("(Borrow an Invite)");
-
-            if(data.has_preparty_invite_limits)
-            {
-                this.prepartyContainers.show();
-            }
-        }
-
-        let totalMales = 0, totalFemales = 0;
-        for(let guest of data.guests)
-        {
-            let adding = new PartyGuest(guest, this);
-            adding.setRestrictedSimilarity(this.checkRestrictedList(adding.name));
-            adding.renderTemplate("#guest-list-" + guest.gender);
-
-            if(adding.gender === "M")
-                totalMales++;
-            else
-                totalFemales++;
-        }
-
-        ListCounterManager.refreshCounters(this.listClosed);
-        ListCounterManager.updateCounts(totalMales, totalFemales,
-            data.guy_count, data.girl_count,
-            data.guys_ever_signed_in, data.girls_ever_signed_in);
-
-        j3("#party-footer").slideDown();
-
-        // Hide the loading circles
-        j3(".loader").hide();
-    }
-
-    get listClosed()
-    {
-        return (this.partyMode || this.prepartyMode);
-    }
-
-    canRemoveGuest(addedByID)
-    {
-        return (this.userID === addedByID || this.canRemoveAnyGuest);
-    }
-
-    addMale()
-    {
-        this.addGuest(
-            this.addMaleField.val(),
-            "M",
-            this.malePrepartyCheckbox.is(":checked"),
-            this.maleBrothersDropdown.val(),
-            () => {
-                this.addMaleField.val("");
-                this.malePrepartyCheckbox.prop("checked", false);
-                this.maleBrothersDropdown.val("");
-            }
-        );
-    }
-
-    addFemale()
-    {
-        this.addGuest(
-            this.addFemaleField.val(),
-            "F",
-            this.femalePrepartyCheckbox.is(":checked"),
-            this.femaleBrothersDropdown.val(),
-            () => {
-                this.addFemaleField.val("");
-                this.femalePrepartyCheckbox.prop("checked", false);
-                this.femaleBrothersDropdown.val("");
-            }
-        );
-    }
-
-    addGuest(name, gender, prepartyAccess, selectedBrother, onSuccess)
-    {
-        // Creating a variable out of the function so we can first check if the guest
-        // is on the blacklist / graylist (below)
-        let actualAdd = () =>
-        {
-            let data = {
-                "name": name,
-                "gender": gender,
-                "prepartyAccess": prepartyAccess,
-                "selectedBrother": selectedBrother,
-                "forceAdd": "false"
-            };
-
-            console.log("Sending: ", data);
-
-            j3.ajax({
-                type: "POST",
-                url: "create/",
-                data: data
-            }).done((data, textStatus, xhr) => {
-
-                console.log(textStatus);
-                console.log(data);
-
-                let newGuest = new PartyGuest(data, this);
-                newGuest.setRestrictedSimilarity(this.checkRestrictedList(newGuest.name));
-
-                let container = j3("#party-column-" + this.genderCodes[data.gender]);
-
-                let added = false;
-                // Add the new guest to the list in the correct alphabetical spot
-                if(container.find(".guest").length)
-                {
-                    container.find(".guest").each(function()
-                    {
-                        if(j3(this).find(".name").text().toLowerCase() > data.name.toLowerCase())
-                        {
-                            j3(this).before(newGuest.renderTemplate());
-                            added = true;
-                            return false;
-                        }
-                    });
-                }
-                if(!added)
-                {
-                    newGuest.renderTemplate(container.children(".guest-list"));
-                }
-
-                newGuest.refreshListeners();
-
-                onSuccess();
-
-            }).fail((xhr, textStatus, errorThrown) => {
-                modal(xhr.responseText, "Close");
-                console.log(xhr.status, xhr.responseText);
-            });
-        };
-
-
-        // Check if the guest is on one of the restricted lists
-        let restrictedGuest = this.checkRestrictedList(name);
-        if(restrictedGuest != null)
-        {
-            let phrases = ["Blacklist", "blacklisted", "Blacklisted"];
-            if(restrictedGuest.graylisted)
-                phrases = ["Graylist", "graylisted", "Graylisted"];
-            let message = `The guest you are trying to add looks similar to this ${phrases[1]} guest:<br><br>` +
-                `${phrases[2]} Guest: <strong>${restrictedGuest.name}</strong><br>` +
-                `Your Guest: ${name}<br><br>` +
-                `Would you still like to add this guest to the list?`;
-            modal(message, "Cancel", ()=>{}, "Add Anyway", actualAdd, phrases[0] + " Warning");
-        }
-        else
-            actualAdd();
-
-    }
-
-    checkRestrictedList(newName)
-    {
-        for(let guest of this.restrictedGuests)
-        {
-            let dist = Levenshtein.get(newName.toLowerCase(), guest.name.toLowerCase());
-            if(dist <= this.minLevenshteinDist)
-                return guest;
-        }
-        return null;
-    }
-
-    /**
-     * Perform a word-by-word search of a query typed in the search box
-     */
-    static nameQueryMatches(name, query)
-    {
-        if(name.includes(query))
-            return true;
-
-        let split = name.split(" ");
-        for(let piece of split)
-        {
-            if(Levenshtein.get(piece, query) <= 1)
-                return true;
-        }
-
-        return false;
-    }
-}
-
-
-class PartyGuest
-{
-    constructor(jsonGuest, partyList)
-    {
-        this.jsonGuest = jsonGuest;
-        this.partyList = partyList;
-
-        if(!jsonGuest.everSignedIn)
-            jsonGuest.timeFirstSignedIn = "";
-    }
-
-    get id()
-    {
-        return this.jsonGuest.id;
-    }
-
-    get name()
-    {
-        return this.jsonGuest.name;
-    }
-
-    get gender()
-    {
-        return this.jsonGuest.gender;
-    }
-
-    get signedIn()
-    {
-        return this.jsonGuest.signedIn;
-    }
-
-    set signedIn(signedIn)
-    {
-        this.jsonGuest.signedIn = signedIn;
-        this.refreshCheck();
-    }
-
-    refreshCheck()
-    {
-        if(this.signedIn)
-            j3(this.containerID).find('.checked-in').removeClass('hidden');
-        else
-            j3(this.containerID).find('.checked-in').addClass('hidden');
-    }
-
-    toggleSignedIn()
-    {
-        const endpoint = this.signedIn ? 'signOut' : 'signIn';
-        j3.ajax({
-            type: "POST",
-            url: `${endpoint}/${this.id}/`
-        }).done((data, textStatus, xhr) => {
-            this.signedIn = !this.signedIn;
-        }).fail((xhr, textStatus, errorThrown) => {
-            modal(xhr.responseText, "Close");
-            console.log(xhr.status, xhr.responseText);
-        });
-    }
-
-    get containerID()
-    {
-        return "#guest-template-" + this.jsonGuest.id;
-    }
-
-    setRestrictedSimilarity(guest)
-    {
-        this.restrictedSimilarity = guest;
-    }
-
-    get isSimilarToRestrictedGuest()
-    {
-        return typeof(this.restrictedSimilarity) !== 'undefined'
-            && this.restrictedSimilarity != null;
-    }
-
-    renderTemplate(container)
-    {
-        PartyGuest.initHandlebars();
-
-        let context = {
-            id: this.jsonGuest.id,
-            guestName: this.jsonGuest.name,
-            gender: this.jsonGuest.gender,
-            signedIn: this.jsonGuest.signedIn,
-            timeFirstSignedIn: this.jsonGuest.timeFirstSignedIn,
-            addedBy: this.jsonGuest.addedBy.name,
-            inviteUsed: this.jsonGuest.inviteUsed,
-            canRemove: this.partyList.canRemoveGuest(this.jsonGuest.addedBy.id),
-            partyMode: this.partyList.listClosed,
-            prepartyAccess: this.jsonGuest.prepartyAccess,
-            restrictionWarning: this.isSimilarToRestrictedGuest
-        };
-
-        let html = PartyGuest.template(context);
-
-        j3(container).append(html);
-
-        this.refreshListeners();
-        this.refreshCheck();
-
-        if(this.partyList.doorAccess && this.partyList.listClosed)
-        {
-            j3(this.containerID).addClass('pointer');
-        }
-
-        return html;
-    }
-
-    refreshListeners()
-    {
-        let j3Template = j3(this.containerID);
-
-        if(this.jsonGuest.inviteUsed !== null)
-        {
-            // Tooltip library is attached to the old jQuery, so have to use $ here
-            $(this.containerID + ">.added-by-info").tooltip();
-            j3Template.children(".added-by-info").click((e) => {
-                e.stopPropagation();
-            })
-        }
-
-        if(!(this.partyList.partyMode || this.partyList.prepartyMode))
-        {
-            j3Template.children(".remove-guest")
-                .off("click").on("click", () => this.destroySelf());
-        }
-        else
-        {
-            j3Template.click(() =>
-            {
-                this.toggleSignedIn();
-            });
-        }
-
-        if(this.isSimilarToRestrictedGuest)
-        {
-            j3Template.children(".restriction-warning")
-                .click(() => {this.showRestrictedSimilarityModal();});
-        }
-    }
-
-    showRestrictedSimilarityModal()
-    {
-        let phrases = ["Blacklist", "blacklisted", "Blacklisted"];
-        if(this.restrictedSimilarity.graylisted)
-            phrases = ["Graylist", "graylisted", "Graylisted"];
-
-        let message = `This guest looks similar to this ${phrases[1]} guest:<br><br>` +
-            `${phrases[2]} Guest: <strong>${this.restrictedSimilarity.name}</strong><br>` +
-            `This Guest: ${this.name}<br>`;
-
-        modal(message, "Close", null, null, null, `${phrases[0]} Warning`)
-    }
-
-    destroySelf()
-    {
-        j3.ajax({
-            type: "DELETE",
-            url: "destroy/" + this.jsonGuest.id,
-        }).done((data, textStatus, xhr) => {
-
-            console.log(textStatus);
-            console.log(data);
-
-            j3("#guest-template-" + this.jsonGuest.id + ">.remove-guest").off();
-            j3("#guest-template-" + this.jsonGuest.id).remove();
-
-        }).fail((xhr, textStatus, errorThrown) => {
-            modal(xhr.responseText, "Close");
-            console.log(xhr.status, xhr.responseText);
-        });
-    }
-
-    static initHandlebars()
-    {
-        if(typeof PartyGuest.template === 'undefined')
-        {
-            console.log("Compiling PartyGuest Template");
-            let source = j3("#party-guest-template").html();
-            PartyGuest.template = Handlebars.compile(source);
-        }
-    }
-}
-
-
-// Helper class that creates the list counters and
-// manages their AJAX updates
-class ListCounterManager
-{
-    /**
-     * Call this to initialize the party counters, or when the party
-     * changes modes in order to show the extra counters
-     * @param listClosed True if the list is closed (party mode)
-     */
-    static refreshCounters(listClosed)
-    {
-        this.listClosed = listClosed;
-
-        // If the list is closed, we can show the extra counters
-        if(listClosed)
-        {
-            if(this.checkedIn === undefined)
-            {
-                this.checkedIn = new ListCounter("checked-in-counter", "In the Party");
-                this.checkedIn.render("#footer-counters");
-            }
-            if(this.everCheckedIn === undefined)
-            {
-                this.everCheckedIn = new ListCounter("ever-checked-in-counter", "Ever Checked In");
-                this.everCheckedIn.render("#footer-counters");
-            }
-        }
-        else
-        {
-            // This would only happen in rare cases where the party is edited
-            // after it started to be a later date, and someone still had
-            // the page open
-
-            if(this.checkedIn !== undefined)
-                this.checkedIn.remove();
-            if(this.everCheckedIn !== undefined)
-                this.everCheckedIn.remove();
-        }
-
-        if(this.allGuests === undefined)
-        {
-            this.allGuests = new ListCounter("all-guests-counter", "On the List");
-            this.allGuests.render("#footer-counters");
-        }
-    }
-
-    static updateCounts(maleTotal, femaleTotal, maleCheckedIn=0, femaleCheckedIn=0,
-                        malesEverCheckedIn=0, femalesEverCheckedIn=0)
-    {
-        if(this.listClosed)
-        {
-            this.checkedIn.updateCounts(maleCheckedIn, femaleCheckedIn);
-            this.everCheckedIn.updateCounts(malesEverCheckedIn, femalesEverCheckedIn);
-        }
-
-        this.allGuests.updateCounts(maleTotal, femaleTotal);
-    }
-}
-
-// Class representing a single list counter widget, found
-// in the bottom navigation (ex. Total in party, Total on list, etc)
-class ListCounter
-{
-    constructor(id, title)
-    {
-        this.id = id;
-        this.title = title;
-        this.maleCount = 0;
-        this.femaleCount = 0;
-    }
-
-    render(containerSelector)
-    {
-        let source = j3("#party-counter-template").html();
-        let template = Handlebars.compile(source);
-        let listContext = {
-            id: this.id,
-            title: this.title,
-        };
-        let html = template(listContext);
-
-        if(containerSelector !== null)
-            j3(containerSelector).append(html);
-
-        return html;
-    }
-
-    updateCounts(maleCount, femaleCount)
-    {
-        this.updateMaleCont(maleCount);
-        this.updateFemaleCount(femaleCount);
-    }
-
-    updateMaleCont(count)
-    {
-        this.maleCount = count;
-        j3(`#${this.id}`).find(".counter-male").text(this.maleCount);
-        this.animateCounter("bubble-male");
-        this._updateTotalCount();
-    }
-
-    updateFemaleCount(count)
-    {
-        this.femaleCount = count;
-        j3(`#${this.id}`).find(".counter-female").text(this.femaleCount);
-        this.animateCounter("bubble-female");
-        this._updateTotalCount();
-    }
-
-    _updateTotalCount()
-    {
-        let total = this.femaleCount + this.maleCount;
-        j3(`#${this.id}`).find(".counter-total").text(total);
-        this.animateCounter("bubble-total");
-    }
-
-    animateCounter(bubbleClass)
-    {
-        let bubble = j3(`#${this.id}`)
-            .find(`.${bubbleClass}`)
-            .addClass("highlight");
-        setTimeout(() => {bubble.removeClass("highlight")}, 250);
-    }
-
-    remove()
-    {
-        j3(`#${this.id}`).remove();
-    }
-}
-
-function modal(message, primaryButtonText, primaryButtonListener=null,
-               secondaryButtonText=null, secondaryButtonListener=null, title=null)
-{
-    let modal = $("#message-modal");
-
-    if(title == null)
-        modal.find(".modal-header").hide();
-    else
-    {
-        modal.find(".modal-header")
-            .show()
-            .find("h4")
-            .text(title);
-    }
-
-    j3("#modal-message").html(message);
-
-    j3("#modal-btn-primary")
-        .text(primaryButtonText)
-        .show()
-        .off('click').on('click', () =>
-    {
-        if(primaryButtonListener !== null)
-            primaryButtonListener();
-        modal.modal("hide");
-    });
-
-    if(secondaryButtonText !== null)
-    {
-        j3("#modal-btn-secondary")
-            .text(secondaryButtonText)
-            .show()
-            .off('click').on('click', () =>
-        {
-            if(secondaryButtonListener !== null)
-                secondaryButtonListener();
-            modal.modal("hide");
-        });
-    }
-    else
-    {
-        j3("#modal-btn-secondary").hide().off('click');
-    }
-
-    modal.modal();
-}
-
 function sortByName(a, b) {
     var strA = a.name.toUpperCase(); // ignore upper and lowercase
     var strB = b.name.toUpperCase(); // ignore upper and lowercase
@@ -807,11 +122,18 @@ j3(document).ready(() =>
     });
 
     Vue.component('party-counter', {
-        props: ['maleCount', 'femaleCount'],
+        props: ['maleCount', 'femaleCount', 'showColors'],
         template: "#party-counter-template",
         computed: {
             totalCount: function() {
                 return this.maleCount + this.femaleCount;
+            },
+            totalColor: function() {
+                if(this.totalCount > 275)
+                    return '#F44336';
+                else if(this.totalCount > 250)
+                    return '#FBC02D';
+                return '#43A047';
             }
         }
     });
@@ -975,6 +297,130 @@ j3(document).ready(() =>
         }
     });
 
+    Vue.component('party-stats', {
+        props: ['party', 'guests'],
+        template: "#party-stats-template",
+        data: () => ({
+            "createdChart": null,
+            "aspectRatio": window.innerWidth < 767 ? 1 : 2
+        }),
+        computed: {
+            createdData: function() {
+                let sorted = this.guests
+                    .map(g => new Date(g.createdAt))
+                    .sort((a,b) => a-b)
+                    .map((date, index) => {
+                        let time = moment(date);
+                        if(time.get('minute') >= 30)
+                            time = time.add(1, 'hour');
+                        time = time.startOf('hour');
+                        return {
+                            x: time,
+                            y: index+1
+                        };
+                    });
+                let grouped = _.map(
+                    _.groupBy(sorted, point => point.x.valueOf()),
+                    (counts, time) => ({
+                        x: counts[counts.length-1].x,
+                        y: counts[counts.length-1].y
+                    })
+                );
+                return grouped;
+            },
+            ratioText: function() {
+                let counts = _.countBy(this.guests, 'gender');
+                return this.getRatioText(counts);
+            },
+            bestBrother: function() {
+                let grouped = _.map(
+                    _.mapValues(
+                        _.groupBy(this.guests, 'addedBy.name'),
+                        x => _.mapValues(_.groupBy(x, 'gender'), 'length')
+                    ),
+                    (counts, brother) => ({
+                        ratioText: this.getRatioText(counts),
+                        ratio: this.getRatioVal(counts), // Not actually used in the end, keeping just in case
+                        totalCount: _.get(counts, 'M', 0) + _.get(counts, 'F', 0),
+                        name: brother
+                    })
+                );
+                return _.maxBy(grouped, 'totalCount');
+            }
+        },
+        methods: {
+            getAspectRatio: function() {
+                return window.innerWidth < 767 ? 1 : 2;
+            },
+            getRatioText: function(counts) {
+                const maleCount = _.get(counts, 'M', 0);
+                const femaleCount = _.get(counts, 'F', 0);
+                if(maleCount === 0 && femaleCount === 0)
+                    return "0 to 0";
+                if(maleCount > femaleCount) {
+                    if(femaleCount === 0)
+                        return "Infinitely Terrible";
+                    return `1 to ${Math.floor(maleCount/femaleCount * 10)/10}`;
+                } else {
+                    if(maleCount === 0)
+                        return "Infinitely Good";
+                    return `${Math.floor(femaleCount/maleCount * 10)/10} to 1`;
+                }
+            },
+            getRatioVal: function(counts) {
+                const maleCount = _.get(counts, 'M', 0);
+                const femaleCount = _.get(counts, 'F', 0);
+                if(maleCount == 0 && femaleCount == 0)
+                    return 0;
+                if(maleCount === 0)
+                    return Number.MAX_SAFE_INTEGER;
+                if(femaleCount == 0)
+                    return -1;
+
+                return femaleCount / maleCount;
+            }
+        },
+        mounted: function() {
+            this.createdChart = new Chart(document.getElementById("created-counter").getContext('2d'), {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        data: this.createdData,
+                        borderColor: '#3e95cd',
+                        fill: false,
+                        label: "Guests on the List",
+                        lineTension: 0.1,
+                    }]
+                },
+                options: {
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                        }]
+                    },
+                    legend: {  display: false },
+                    tooltips: {
+                        callbacks: {
+                            title: function(tooltipItem, data) {
+                                return moment(tooltipItem[0].xLabel).format('M/D/YY h:mma');
+                            }
+                        }
+                    },
+                    animation: { duration: 0 },
+                    aspectRatio: this.getAspectRatio()
+                }
+            });
+        },
+        watch: {
+            guests() {
+                // this.createdChart.data.datasets.forEach(set => set.data.push(...this.createdData));
+                this.createdChart.data.datasets[0].data = this.createdData;
+                this.createdChart.update();
+                console.log(this.createdData);
+            }
+        },
+    });
+
 
 
     const app = new Vue({
@@ -998,6 +444,7 @@ j3(document).ready(() =>
             modal: null,
             guestFilter: null,
             restrictedFilter: false,
+            statsActive: false,
         },
         methods: {
             applyFilter: function(value) {
@@ -1068,6 +515,9 @@ j3(document).ready(() =>
             },
             toggleRestrictedOnly: function() {
                 this.restrictedFilter = !this.restrictedFilter;
+            },
+            toggleStats() {
+                this.statsActive = !this.statsActive;
             }
         },
         computed: {

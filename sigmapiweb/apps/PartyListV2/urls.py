@@ -135,4 +135,9 @@ urlpatterns = [
         view=api.modify_party_count,
         name='partylist-api-modify_party_count',
     ),
+    url(
+        regex=r'^api/refresh-guest-json',
+        view=api.refresh_guest_json,
+        name='partylist-api-refresh_guest_json',
+    ),
 ]

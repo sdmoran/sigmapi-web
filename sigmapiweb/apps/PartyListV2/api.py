@@ -284,7 +284,7 @@ def create_guest(request, party_id):
         was_vouched_for = True
 
     party_guest = PartyGuest(
-        name=guest_name,
+        name=guest_name[:90],
         gender=guest_gender,
         party=party,
         added_by=added_by,
@@ -365,3 +365,10 @@ def export_list(_request, party_id):
 
     return response
 
+
+@permission_required('PartyListV2.manage_parties')
+def refresh_guest_json(request):
+    guests = PartyGuest.objects.all()
+    for guest in guests:
+        guest.save()
+    return HttpResponse("Guest JSON Refreshed.", status=200)
