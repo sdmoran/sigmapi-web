@@ -6,6 +6,10 @@ $blacklisting-bg: black;
 $greylisting-fg: yellow;
 $greylisting-bg: #444;
 
+#wrapper {
+    overflow: hidden;
+}
+
 @media (max-width: 768px) {
     #guests-container {
         margin-bottom: 100px;
