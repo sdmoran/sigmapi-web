@@ -72,6 +72,9 @@
         <party-counter :male-count="maleGuests.length" :female-count="femaleGuests.length">
           On the List
         </party-counter>
+        <party-counter class="show-mobile" v-if="party.listClosed===false" :male-count="myMaleGuests.length" :female-count="myFemaleGuests.length">
+          My Guests
+        </party-counter>
       </div>
       <div v-if="party.listClosed && party.permissions.youHaveDoorAccess"
            id="party-count-toggles" class="footer-section">
@@ -291,5 +294,6 @@
       // and who the current user is
       const partyId = {{ party.id }};
       const userId = {{ request.user.id }};
+      const userName = '{{ request.user.username }}';
   </script>
 {% endblock %}

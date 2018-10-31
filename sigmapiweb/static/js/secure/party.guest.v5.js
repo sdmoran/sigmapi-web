@@ -530,6 +530,14 @@ j3(document).ready(() =>
                 return this.guests
                     .filter(guest => guest.gender === "F")
                     .sort(sortByName);
+            },
+            myMaleGuests: function() {
+                return this.maleGuests
+                    .filter(guest => guest.addedBy.username === userName);
+            },
+            myFemaleGuests: function() {
+                return this.femaleGuests
+                    .filter(guest => guest.addedBy.username === userName);
             }
         },
         mounted: function() {

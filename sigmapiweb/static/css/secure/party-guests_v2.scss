@@ -474,13 +474,17 @@ $add-guest-spacing: 10px;
 
             @media(max-width: 767px)
             {
-                &:not(:first-child)
+                &:not(:first-child):not(.show-mobile)
                 {
                     display: none;
                 }
                 margin-top: 3px;
                 margin-bottom: 3px;
             }
+        }
+
+        @media(max-width: 767px) {
+            justify-content: center;
         }
     }
 
