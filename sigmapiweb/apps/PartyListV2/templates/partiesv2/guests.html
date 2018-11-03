@@ -12,12 +12,12 @@
   <script src="https://unpkg.com/v-tooltip"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
   <script src="{% static 'js/secure/csrfAjaxHelper.js' %}"></script>
-  <script src="{% static 'js/secure/party.guest.v5.js' %}?v=5.01"></script>
+  <script src="{% static 'js/secure/party.guest.v5.js' %}?v=5.02"></script>
   <script src="{% static 'js/lib/levenshtein.min.js' %}"></script>
   <script src={% static 'js/lib/moment.min.js' %}></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
   <script src={% static 'js/lib/lodash.js' %}></script>
-  <link rel='stylesheet' type='text/css' href='{% sass_src "css/secure/party-guests_v2.scss" %}?v=2.01' />
+  <link rel='stylesheet' type='text/css' href='{% sass_src "css/secure/party-guests_v2.scss" %}?v=2.02' />
 {% endblock %}
 
 {% block body_class %}party-guests{% endblock %}
@@ -42,7 +42,7 @@
       </ul>
     </div>
 
-    <party-stats v-if="statsActive" :guests="guests" :party="party"></party-stats>
+    <party-stats v-if="statsActive" :guests="guests" :party="party" :count-history="party.countHistory"></party-stats>
 
     <!-- Search all guests -->
     <party-searchbox :applied-filter="guestFilter" @apply-filter="applyFilter" @clear-filter="clearFilter"></party-searchbox>
@@ -260,11 +260,19 @@
   <script id="party-stats-template" type="text/x-template">
     {% verbatim %}
     <div class="party-stats">
-      <div class="chart-title-wrapper">
+
+      <div v-show="!party.listClosed" class="chart-title-wrapper">
         <h4 class="stats-title">Guests on the List</h4>
       </div>
-      <div class="created-wrapper">
+      <div v-show="!party.listClosed" class="stat-chart">
         <canvas id="created-counter"></canvas>
+      </div>
+
+      <div v-show="party.listClosed" class="chart-title-wrapper">
+        <h4 class="stats-title">Guests Signed In</h4>
+      </div>
+      <div v-show="party.listClosed" class="stat-chart">
+        <canvas id="live-counts-graph"></canvas>
       </div>
 
       <div class="ratio-info">

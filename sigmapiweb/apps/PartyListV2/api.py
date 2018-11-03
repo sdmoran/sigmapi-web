@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.http import HttpResponse, HttpRequest
 
-from apps.PartyListV2.models import Party, PartyGuest, RestrictedGuest
+from apps.PartyListV2.models import Party, PartyGuest, RestrictedGuest, PartyCountRecord
 import json
 
 
@@ -24,22 +24,7 @@ def modify_party_count(request, party_id):
         gender = request.POST.get('gender')
         sign = request.POST.get('sign')
 
-        if gender == "M":
-            if sign == "1":
-                party.guycount += 1
-            elif sign == "-1":
-                party.guycount -= 1
-            else:
-                HttpResponse('Invalid sign (must be 1 or -1)', status=400)
-        elif gender == "F":
-            if sign == "1":
-                party.girlcount += 1
-            elif sign == "-1":
-                party.girlcount -= 1
-            else:
-                HttpResponse('Invalid sign (must be 1 or -1)', status=400)
-        else:
-            return HttpResponse('Invalid gender supplied', status=400)
+        party.modify_count(gender, sign)
 
         party.save()
 
@@ -372,3 +357,11 @@ def refresh_guest_json(request):
     for guest in guests:
         guest.save()
     return HttpResponse("Guest JSON Refreshed.", status=200)
+
+@permission_required("PartyListV2.view_parties")
+def get_counts_history(request, party_id):
+    entries = PartyCountRecord.objects.filter(party__id=party_id).all()
+
+    return json_response({
+        "entries": [entry.to_json() for entry in entries]
+    })

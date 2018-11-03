@@ -140,4 +140,9 @@ urlpatterns = [
         view=api.refresh_guest_json,
         name='partylist-api-refresh_guest_json',
     ),
+    url(
+        regex=r'^api/(?P<party_id>[\d]+)/countHistory',
+        view=api.get_counts_history,
+        name='partylist-api-counts_history',
+    ),
 ]

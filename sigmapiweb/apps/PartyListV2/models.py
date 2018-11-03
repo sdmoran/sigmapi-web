@@ -166,6 +166,7 @@ class Party(ModelMixin, models.Model):
                     self.girls_ever_signed_in += 1
 
             party_guest.signed_in = True
+            self.create_partycout_entry()
 
     def sign_out(self, party_guest):
         if party_guest.signed_in is True:
@@ -175,11 +176,42 @@ class Party(ModelMixin, models.Model):
                 self.girlcount -= 1
 
             party_guest.signed_in = False
+            self.create_partycout_entry()
+
+    def modify_count(self, gender, sign):
+        if gender == "M":
+            if sign == "1":
+                self.guycount += 1
+            elif sign == "-1":
+                self.guycount -= 1
+            else:
+                return 'Invalid sign (must be 1 or -1)'
+        elif gender == "F":
+            if sign == "1":
+                self.girlcount += 1
+            elif sign == "-1":
+                self.girlcount -= 1
+            else:
+                return 'Invalid sign (must be 1 or -1)'
+        else:
+            return 'Invalid gender supplied'
+
+        self.create_partycout_entry()
+
+    def create_partycout_entry(self):
+        PartyCountRecord(
+            party=self,
+            guycount=self.guycount,
+            girlcount=self.girlcount,
+            guysever=self.guys_ever_signed_in,
+            girlsever=self.girls_ever_signed_in
+        ).save()
 
     def update_timestamp(self):
         self.last_updated = datetime.now()
 
     def to_json(self):
+        count_history = PartyCountRecord.objects.filter(party__id=self.id).all()
         return {
             "prepartyMode": self.is_preparty_mode(),
             "partyMode": self.is_party_mode(),
@@ -192,7 +224,8 @@ class Party(ModelMixin, models.Model):
             "hasPartyInviteLimits": self.has_party_invite_limits,
             "listClosed": self.is_list_closed(),
             "lastUpdated": self.last_updated.timestamp(),
-            "guestUpdateCounter": self.guest_update_counter
+            "guestUpdateCounter": self.guest_update_counter,
+            "countHistory": [entry.to_json() for entry in count_history]
         }
 
     class Meta:
@@ -204,6 +237,29 @@ class Party(ModelMixin, models.Model):
             ("door_access", "Has access to door check-in")
         )
         default_permissions = []
+
+
+class PartyCountRecord(ModelMixin, models.Model):
+    party = models.ForeignKey(
+        Party,
+        related_name="related_party",
+        default=1,
+        on_delete=models.CASCADE,
+    )
+    guycount = models.IntegerField()
+    girlcount = models.IntegerField()
+    guysever = models.IntegerField()
+    girlsever = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def to_json(self):
+        return {
+            "guyCount": self.guycount,
+            "girlCount": self.girlcount,
+            "guysEverSignedIn": self.guysever,
+            "girlsEverSignedIn": self.girlsever,
+            "timeStamp": self.created_at.isoformat()
+        }
 
 
 class PartyGuest(ModelMixin, models.Model):

@@ -1,7 +1,7 @@
 
 function sortByName(a, b) {
-    var strA = a.name.toUpperCase(); // ignore upper and lowercase
-    var strB = b.name.toUpperCase(); // ignore upper and lowercase
+    var strA = a.name.toUpperCase().trim(); // ignore upper and lowercase
+    var strB = b.name.toUpperCase().trim(); // ignore upper and lowercase
     if (strA < strB) {
         return -1;
     }
@@ -51,7 +51,8 @@ j3(document).ready(() =>
         deltaGuests: {method: 'GET', url: 'guests/delta{/updateCounter}/'},
         permissions: {method: 'GET', url: 'permissions/'},
         restrictedGuests: {method: 'GET', url: 'restricted/'},
-        updateListCount: {method: 'POST', url: 'partyCount/', emulateJSON: true}
+        updateListCount: {method: 'POST', url: 'partyCount/', emulateJSON: true},
+        countsHistory: {method: 'GET', url: 'countHistory/'}
     });
 
     const modalErrorFunc = function(response) {
@@ -171,7 +172,7 @@ j3(document).ready(() =>
                 this.newGuestName = "";
                 this.selectedBrother = "";
                 this.riskApproval = false;
-                this.prepartyAccess = false;
+                this.allowPreparty = false;
             },
             addGuest: function() {
 
@@ -298,10 +299,11 @@ j3(document).ready(() =>
     });
 
     Vue.component('party-stats', {
-        props: ['party', 'guests'],
+        props: ['party', 'guests', 'countHistory'],
         template: "#party-stats-template",
         data: () => ({
             "createdChart": null,
+            "countsChart": null,
             "aspectRatio": window.innerWidth < 767 ? 1 : 2
         }),
         computed: {
@@ -346,6 +348,12 @@ j3(document).ready(() =>
                     })
                 );
                 return _.maxBy(grouped, 'totalCount');
+            },
+            countsData: function() {
+                return this.countHistory.map(entry => ({
+                    x: moment(entry.timeStamp),
+                    y: (entry.girlCount + entry.guyCount)
+                }));
             }
         },
         methods: {
@@ -378,45 +386,64 @@ j3(document).ready(() =>
                     return -1;
 
                 return femaleCount / maleCount;
+            },
+            makeChart: function(canvasId, title, data) {
+                return new Chart(document.getElementById(canvasId).getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            data: data,
+                            borderColor: '#3e95cd',
+                            fill: false,
+                            label: title,
+                            lineTension: 0.1,
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            xAxes: [{
+                                type: 'time',
+                            }]
+                        },
+                        legend: {  display: false },
+                        tooltips: {
+                            callbacks: {
+                                title: function(tooltipItem, data) {
+                                    return moment(tooltipItem[0].xLabel).format('M/D/YY h:mma');
+                                }
+                            }
+                        },
+                        animation: { duration: 0 },
+                        aspectRatio: this.getAspectRatio()
+                    }
+                })
+            },
+            initCharts: function() {
+                if(!this.party.listClosed)
+                    this.createdChart = this.makeChart("created-counter", "Guests on the List", this.createdData);
+                if(this.party.listClosed)
+                    this.countsChart = this.makeChart("live-counts-graph", "Guests Signed In", this.countsData);
             }
         },
         mounted: function() {
-            this.createdChart = new Chart(document.getElementById("created-counter").getContext('2d'), {
-                type: 'line',
-                data: {
-                    datasets: [{
-                        data: this.createdData,
-                        borderColor: '#3e95cd',
-                        fill: false,
-                        label: "Guests on the List",
-                        lineTension: 0.1,
-                    }]
-                },
-                options: {
-                    scales: {
-                        xAxes: [{
-                            type: 'time',
-                        }]
-                    },
-                    legend: {  display: false },
-                    tooltips: {
-                        callbacks: {
-                            title: function(tooltipItem, data) {
-                                return moment(tooltipItem[0].xLabel).format('M/D/YY h:mma');
-                            }
-                        }
-                    },
-                    animation: { duration: 0 },
-                    aspectRatio: this.getAspectRatio()
-                }
-            });
+            this.initCharts();
         },
         watch: {
             guests() {
-                // this.createdChart.data.datasets.forEach(set => set.data.push(...this.createdData));
-                this.createdChart.data.datasets[0].data = this.createdData;
-                this.createdChart.update();
-                console.log(this.createdData);
+                if(!this.party.listClosed) {
+                    if(this.createdChart != null) {
+                        this.createdChart.data.datasets[0].data = this.createdData;
+                        this.createdChart.update();
+                    }
+                }
+            },
+            countHistory() {
+                if(this.party.listClosed) {
+                    if(this.countsChart != null) {
+                        this.countsChart.data.datasets[0].data = this.countsData;
+                        this.countsChart.update();
+                    }
+                }
             }
         },
     });
@@ -427,6 +454,7 @@ j3(document).ready(() =>
         el: '#party-app',
         data: {
             party: {
+                countHistory: [],
                 permissions: [],
                 restrictedGuests: [],
                 loadingGuests: true,
