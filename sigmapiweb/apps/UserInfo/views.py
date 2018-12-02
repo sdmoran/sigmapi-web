@@ -31,30 +31,50 @@ def users(request):
 
     # Get the execs.
     # Use try/catch to avoid crashing the site if an exec is missing.
+    # The "newX" positions are for when NME needs the updated list for notebooks, but
+    # permissions aren't transitioned yet (last two weeks of B-term basically)
     try:
-        sage = User.objects.get(groups__name='Sage')
+        sage = User.objects.get(groups__name='newSage')
     except User.DoesNotExist:
-        sage = None
+        try:
+            sage = User.objects.get(groups__name='Sage')
+        except User.DoesNotExist:
+            sage = None
     try:
-        second = User.objects.get(groups__name='2nd Counselor')
+        second = User.objects.get(groups__name='new2nd')
     except User.DoesNotExist:
-        second = None
+        try:
+            second = User.objects.get(groups__name='2nd Counselor')
+        except User.DoesNotExist:
+            second = None
     try:
-        third = User.objects.get(groups__name='3rd Counselor')
+        third = User.objects.get(groups__name='new3rd')
     except User.DoesNotExist:
-        third = None
+        try:
+            third = User.objects.get(groups__name='3rd Counselor')
+        except User.DoesNotExist:
+            third = None
     try:
-        fourth = User.objects.get(groups__name='4th Counselor')
+        fourth = User.objects.get(groups__name='new4th')
     except User.DoesNotExist:
-        fourth = None
+        try:
+            fourth = User.objects.get(groups__name='4th Counselor')
+        except User.DoesNotExist:
+            fourth = None
     try:
-        first = User.objects.get(groups__name='1st Counselor')
+        first = User.objects.get(groups__name='new1st')
     except User.DoesNotExist:
-        first = None
+        try:
+            first = User.objects.get(groups__name='1st Counselor')
+        except User.DoesNotExist:
+            first = None
     try:
-        herald = User.objects.get(groups__name='Herald')
+        herald = User.objects.get(groups__name='newHerald')
     except User.DoesNotExist:
-        herald = None
+        try:
+            herald = User.objects.get(groups__name='Herald')
+        except User.DoesNotExist:
+            herald = None
 
     # Get the rest of the users.  Exclude pledges or any execs.
     seniors = User.objects.filter(groups__name='Brothers')
@@ -86,50 +106,73 @@ def users(request):
         juniors = juniors.exclude(username=sage.username)
         sophomores = sophomores.exclude(username=sage.username)
         freshmen = freshmen.exclude(username=sage.username)
+        sage.title = "Sage"
 
     if second is not None:
         seniors = seniors.exclude(username=second.username)
         juniors = juniors.exclude(username=second.username)
         sophomores = sophomores.exclude(username=second.username)
         freshmen = freshmen.exclude(username=second.username)
+        second.title = "2nd Counselor"
 
     if third is not None:
         seniors = seniors.exclude(username=third.username)
         juniors = juniors.exclude(username=third.username)
         sophomores = sophomores.exclude(username=third.username)
         freshmen = freshmen.exclude(username=third.username)
+        third.title = "3rd Counselor"
 
     if fourth is not None:
         seniors = seniors.exclude(username=fourth.username)
         juniors = juniors.exclude(username=fourth.username)
         sophomores = sophomores.exclude(username=fourth.username)
         freshmen = freshmen.exclude(username=fourth.username)
+        fourth.title = "4th Counselor"
 
     if first is not None:
         seniors = seniors.exclude(username=first.username)
         juniors = juniors.exclude(username=first.username)
         sophomores = sophomores.exclude(username=first.username)
         freshmen = freshmen.exclude(username=first.username)
+        first.title = "1st Counselor"
 
     if herald is not None:
         seniors = seniors.exclude(username=herald.username)
         juniors = juniors.exclude(username=herald.username)
         sophomores = sophomores.exclude(username=herald.username)
         freshmen = freshmen.exclude(username=herald.username)
+        herald.title = "Herald"
 
     context = {
         'pages': settings.PUBLIC_PAGES,
         'current_page_name': 'Brothers',
-        'sage': sage,
-        'second': second,
-        'third': third,
-        'fourth': fourth,
-        'first': first,
-        'herald': herald,
-        'seniors': seniors,
-        'juniors': juniors,
-        'sophomores': sophomores,
-        'freshmen': freshmen
+        'brother_groups': [
+            {
+                'group_title': 'Executive Council',
+                'brothers': [sage, second, third, fourth, first, herald],
+                'count': 6
+            },
+            {
+                'group_title': 'Seniors',
+                'brothers': seniors,
+                'count': len(seniors)
+            },
+            {
+                'group_title': 'Juniors',
+                'brothers': juniors,
+                'count': len(juniors)
+            },
+            {
+                'group_title': 'Sophomores',
+                'brothers': sophomores,
+                'count': len(sophomores)
+            },
+            {
+                'group_title': 'Freshmen',
+                'brothers': freshmen,
+                'count': len(freshmen)
+            }
+        ]
     }
 
     return render(request, 'userinfo/public/brothers.html', context)
