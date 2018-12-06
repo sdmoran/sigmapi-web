@@ -468,6 +468,14 @@ $add-guest-spacing: 10px;
             white-space: nowrap;
             user-select: none;
 
+            &.clickable {
+                cursor: pointer;
+            }
+
+            &.active {
+                background: #ddd;
+            }
+
             > span {
                 user-select: none;
             }
@@ -480,6 +488,9 @@ $add-guest-spacing: 10px;
                 }
                 margin-top: 3px;
                 margin-bottom: 3px;
+            }
+            @media(min-width: 768px) {
+                padding: 8px;
             }
         }
 

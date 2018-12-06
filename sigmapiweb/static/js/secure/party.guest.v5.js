@@ -123,7 +123,7 @@ j3(document).ready(() =>
     });
 
     Vue.component('party-counter', {
-        props: ['maleCount', 'femaleCount', 'showColors'],
+        props: ['maleCount', 'femaleCount', 'showColors', 'clickable', 'active'],
         template: "#party-counter-template",
         computed: {
             totalCount: function() {
@@ -546,6 +546,12 @@ j3(document).ready(() =>
             },
             toggleStats() {
                 this.statsActive = !this.statsActive;
+            },
+            toggleMyFilter() {
+                if(this.guestFilter === userFullName)
+                    this.clearFilter();
+                else
+                    this.applyFilter(userFullName);
             }
         },
         computed: {
@@ -566,6 +572,9 @@ j3(document).ready(() =>
             myFemaleGuests: function() {
                 return this.femaleGuests
                     .filter(guest => guest.addedBy.username === userName);
+            },
+            userFullName: function() {
+                return userFullName;
             }
         },
         mounted: function() {
