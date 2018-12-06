@@ -472,10 +472,12 @@ j3(document).ready(() =>
             modal: null,
             guestFilter: null,
             restrictedFilter: false,
+            exactFilterMatch: false,
             statsActive: false,
         },
         methods: {
             applyFilter: function(value) {
+                this.exactFilterMatch = false;
                 this.restrictedFilter = false;
                 this.guestFilter = value;
             },
@@ -514,24 +516,39 @@ j3(document).ready(() =>
                     this.guestFilter = null;
                 }
                 else {
-                    for(let i = 1; i < 8; i++) {
+                    if(this.exactFilterMatch) {
                         for(let guest of this.guests) {
                             if(this.guestFilter == null ||
-                                this.wordMatch(guest.name, this.guestFilter, i) ||
-                                this.wordMatch(guest.addedBy.name, this.guestFilter, i) ||
-                                this.wordMatch(guest.inviteUsed, this.guestFilter, i))
+                                guest.addedBy.name === this.guestFilter)
                             {
                                 this.$set(guest, 'hide', false);
-                                amountShowing++;
                             }
                             else
                             {
                                 this.$set(guest, 'hide', true);
                             }
                         }
+                    }
+                    else {
+                        for(let i = 1; i < 8; i++) {
+                            for(let guest of this.guests) {
+                                if(this.guestFilter == null ||
+                                    this.wordMatch(guest.name, this.guestFilter, i) ||
+                                    this.wordMatch(guest.addedBy.name, this.guestFilter, i) ||
+                                    this.wordMatch(guest.inviteUsed, this.guestFilter, i))
+                                {
+                                    this.$set(guest, 'hide', false);
+                                    amountShowing++;
+                                }
+                                else
+                                {
+                                    this.$set(guest, 'hide', true);
+                                }
+                            }
 
-                        if(amountShowing > 0)
-                            break;
+                            if(amountShowing > 0)
+                                break;
+                        }
                     }
                 }
             },
@@ -550,8 +567,10 @@ j3(document).ready(() =>
             toggleMyFilter() {
                 if(this.guestFilter === userFullName)
                     this.clearFilter();
-                else
+                else {
                     this.applyFilter(userFullName);
+                    this.exactFilterMatch = true;
+                }
             }
         },
         computed: {
@@ -604,6 +623,9 @@ j3(document).ready(() =>
                 this.refreshGuestFilters();
             },
             guests() {
+                this.refreshGuestFilters();
+            },
+            exactFilterMatch() {
                 this.refreshGuestFilters();
             }
         }
