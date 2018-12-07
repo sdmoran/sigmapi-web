@@ -693,7 +693,9 @@ j3(document).ready(() =>
                 });
             }
             else
-                setTimeout(pollFunc, pollTime)
+                setTimeout(pollFunc, pollTime);
+        }, errorReason => {
+            setTimeout(pollFunc, pollTime * 10);
         });
     };
 

@@ -183,14 +183,14 @@ class Party(ModelMixin, models.Model):
             if sign == "1":
                 self.guycount += 1
             elif sign == "-1":
-                self.guycount -= 1
+                self.guycount = max(self.guycount-1, 0)
             else:
                 return 'Invalid sign (must be 1 or -1)'
         elif gender == "F":
             if sign == "1":
                 self.girlcount += 1
             elif sign == "-1":
-                self.girlcount -= 1
+                self.girlcount = max(self.girlcount-1, 0)
             else:
                 return 'Invalid sign (must be 1 or -1)'
         else:
