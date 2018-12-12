@@ -50,6 +50,9 @@ STATICFILES_FINDERS = (
 
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
+PRIVATE_STORAGE_ROOT = '/content/auth-required/'
+PRIVATE_STORAGE_AUTH_FUNCTION = 'private_storage.permissions.allow_authenticated'
+
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/secure/'
 
@@ -99,6 +102,7 @@ PREREQ_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'sass_processor',
+    'private_storage',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )

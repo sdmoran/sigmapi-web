@@ -8,3 +8,4 @@ django-compressor
 django-sass-processor
 libsass
 python-Levenshtein
+django-private-storage
