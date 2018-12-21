@@ -9,8 +9,6 @@ from datetime import datetime
 from common.mixins import ModelMixin
 from common.utils import get_full_name_or_deleted
 
-from private_storage.fields import PrivateFileField
-
 
 def _time_stamp_filename(fname, fmt='%Y-%m-%d_{fname}'):
     """
@@ -35,7 +33,7 @@ def get_party_jobs_path(model_instance, filename):
 
     Returns: str
     """
-    return "partyjobs/" + _time_stamp_filename(filename)
+    return "protected/partyjobs/" + _time_stamp_filename(filename)
 
 
 class Party(ModelMixin, models.Model):
@@ -66,15 +64,11 @@ class Party(ModelMixin, models.Model):
     # it doesn't know about yet from the guest list
     guest_update_counter = models.IntegerField(default=0)
 
-    # jobs = models.FileField(
-    #     upload_to=get_party_jobs_path,
-    #     blank=True,
-    #     null=True
-    # )
-
-    jobs = PrivateFileField("PartyJobs", upload_to=get_party_jobs_path, blank=True, null=True)
-
-
+    jobs = models.FileField(
+        upload_to=get_party_jobs_path,
+        blank=True,
+        null=True
+    )
 
     # Not strictly enforced, but shows a warning
     # to the door when this is reached

@@ -37,8 +37,6 @@ DOWNLOADVIEW_BACKEND = 'django_downloadview.lighttpd.XSendfileMiddleware'
 # Todo: These should probably be absolute paths in prod.
 MEDIA_ROOT = './content/'
 
-PRIVATE_STORAGE_ROOT = './content/auth-required/'
-
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.

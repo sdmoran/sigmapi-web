@@ -11,7 +11,6 @@ from django.contrib import admin
 from apps.PubSite import urls as public_urls
 from apps.Secure import urls as secure_urls
 from apps.UserInfo import urls as userinfo_urls
-import private_storage.urls
 
 
 admin.autodiscover()
@@ -42,7 +41,6 @@ urlpatterns = [
         regex=r'^',
         view=include(public_urls),
     ),
-    url('^auth-required/', include(private_storage.urls)),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
