@@ -220,13 +220,17 @@ def download_jobs(request, party_id):
     """
     View for downloading a resource
     """
-    party = Party.objects.get(pk=party_id)
-    path = party.jobs.path
-    _, extension = os.path.splitext(path)
-    name = party.name + " - Jobs" + extension
-    return sendfile(
-        request,
-        path,
-        attachment=True,
-        attachment_filename=name
-    )
+    try:
+        party = Party.objects.get(pk=party_id)
+        path = party.jobs.path
+        _, extension = os.path.splitext(path)
+        name = party.name + " - Jobs" + extension
+        return sendfile(
+            request,
+            path,
+            attachment=True,
+            attachment_filename=name
+        )
+    except (ValueError, Party.DoesNotExist):
+        return redirect("partylist-index")
+
