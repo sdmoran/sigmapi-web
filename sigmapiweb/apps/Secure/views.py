@@ -3,6 +3,7 @@ Views for Secure app.
 """
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.db import OperationalError
 from django.shortcuts import render
 
 from .models import CalendarKey
@@ -45,6 +46,8 @@ def get_name_url_pairs(request):
             pairs.append((group.name, url_template % cal_key.key))
             return True
         except CalendarKey.DoesNotExist:
+            pass
+        except OperationalError:
             pass
         return False
 

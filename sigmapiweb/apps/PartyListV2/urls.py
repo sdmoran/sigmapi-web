@@ -59,11 +59,13 @@ urlpatterns = [
         name='partylist-guests',
     ),
     url(
-        regex=r'^view/(?P<party_id>[\d]+)/stats/$',
-        view=views.stats,
-        name='partylist-stats',
+        regex=r'^view/(?P<party_id>[\d]+)/jobs/$',
+        view=views.download_jobs,
+        name='partylist-download_jobs',
     ),
-    # API ENDPOINTS
+
+    ### API ENDPOINTS ###
+
     url(
         regex=r'^api/(?P<party_id>[\d]+)/details/$',
         view=api.get_details,

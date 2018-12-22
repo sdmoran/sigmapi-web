@@ -23,7 +23,7 @@
 			  	<td>{{ p.party_start.date }}</td>
 			  	<td>
 				  	{% if p.jobs %}
-					<a href="{{ p.jobs.url }}">
+					<a href="{% url 'partylist-download_jobs' p.pk %}">
 					Jobs
 					</a>
 				  	{% else %}

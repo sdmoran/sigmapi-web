@@ -4,6 +4,9 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django import forms
+from django_downloadview import sendfile
+from django.views.decorators.http import require_GET, require_POST
+import os
 
 from apps.PartyListV2.forms import EditPartyForm, RestrictedGuestForm
 from apps.PartyListV2.models import Party, RestrictedGuest
@@ -120,6 +123,7 @@ def manage_parties(request):
     'PartyListV2.manage_parties',
     login_url='pub-permission_denied'
 )
+@require_POST
 def add_party(request):
 
     context = {
@@ -128,14 +132,12 @@ def add_party(request):
         'form': EditPartyForm()
     }
 
-    if request.method == 'POST':
-
-        form = EditPartyForm(request.POST, request.FILES)
-        if form.is_valid():
-            party = form.save()
-            context['message'].append(party.name + " successfully added.")
-        else:
-            context['message'].append("Error adding party.")
+    form = EditPartyForm(request.POST, request.FILES)
+    if form.is_valid():
+        party = form.save()
+        context['message'].append(party.name + " successfully added.")
+    else:
+        context['message'].append("Error adding party.")
 
     return render(request, 'partiesv2/edit.html', context)
 
@@ -213,9 +215,18 @@ def restricted_lists(request):
 
 @login_required
 @permission_required("PartyListV2.view_parties")
-def stats(request, party_id):
+@require_GET
+def download_jobs(request, party_id):
+    """
+    View for downloading a resource
+    """
     party = Party.objects.get(pk=party_id)
-    context = {
-        'party': party
-    }
-    return render(request, 'partiesv2/stats.html', context)
+    path = party.jobs.path
+    _, extension = os.path.splitext(path)
+    name = party.name + " - Jobs" + extension
+    return sendfile(
+        request,
+        path,
+        attachment=True,
+        attachment_filename=name
+    )
