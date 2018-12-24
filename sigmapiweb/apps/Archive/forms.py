@@ -16,7 +16,8 @@ class BylawsForm(ModelForm):
     # Meta information about this form.
     class Meta:
         model = Bylaws
-        exclude = ['date']
+        # exclude = ['date']
+        fields = ['filepath']
 
 
 class HouseRulesForm(ModelForm):
@@ -28,7 +29,8 @@ class HouseRulesForm(ModelForm):
     # Meta information about this form.
     class Meta:
         model = HouseRules
-        exclude = ['date']
+        # exclude = ['date']
+        fields = ['filepath']
 
 
 class GuideForm(ModelForm):
@@ -42,4 +44,5 @@ class GuideForm(ModelForm):
     # Meta information about this form.
     class Meta:
         model = Guide
-        exclude = ['path', 'datePosted']
+        # exclude = ['path', 'datePosted']
+        fields = ['name', 'description', 'filepath']
