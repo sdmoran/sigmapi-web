@@ -17,4 +17,4 @@ class LinkForm(ModelForm):
 
     class Meta:
         model = Link
-        exclude = ['poster', 'date', 'likeCount', 'commentCount']
+        fields = ['title', 'url', 'promoted']
