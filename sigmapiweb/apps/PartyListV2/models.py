@@ -80,7 +80,8 @@ class Party(ModelMixin, models.Model):
     def is_preparty_mode(self):
         if not self.has_preparty:
             return False
-        preparty_start = datetime.combine(self.party_start.date(), self.preparty_start)
+        preparty_start = datetime.combine(self.party_start.date(),
+                                          self.preparty_start)
         return (preparty_start < datetime.now()) and (not self.is_party_mode())
 
     def is_party_mode(self):
@@ -89,7 +90,7 @@ class Party(ModelMixin, models.Model):
     def is_list_closed(self):
         return self.is_preparty_mode() or self.is_party_mode()
 
-    def user_reached_preparty_limit(self, user : User):
+    def user_reached_preparty_limit(self, user: User):
         """
         Determines if a user has reached their pre-party invite limit
         :param user: The user to check
@@ -115,7 +116,8 @@ class Party(ModelMixin, models.Model):
             has_preparty_access=True
         ).count()
 
-        return invites >= self.max_preparty_invites and self.has_preparty_invite_limits
+        return invites >= self.max_preparty_invites and
+        self.has_preparty_invite_limits
 
     def user_reached_party_limit(self, user: User):
         """
@@ -141,7 +143,8 @@ class Party(ModelMixin, models.Model):
             invite_used=user,
         ).count()
 
-        return invites >= self.max_party_invites and self.has_party_invite_limits
+        return invites >= self.max_party_invites and
+        self.has_party_invite_limits
 
     def user_reached_vouching_limit(self, user: User):
         if user is None:
@@ -211,7 +214,8 @@ class Party(ModelMixin, models.Model):
         self.last_updated = datetime.now()
 
     def to_json(self):
-        count_history = PartyCountRecord.objects.filter(party__id=self.id).all()
+        count_history = PartyCountRecord.objects.filter(
+            party__id=self.id).all()
         return {
             "prepartyMode": self.is_preparty_mode(),
             "partyMode": self.is_party_mode(),
@@ -376,6 +380,7 @@ class PartyGuest(ModelMixin, models.Model):
             'createdAt': self.created_at.isoformat()
         }
 
+
 class RestrictedGuest(ModelMixin, models.Model):
     """
     Model to represent a person who has been blacklisted or graylisted.
@@ -402,7 +407,8 @@ class RestrictedGuest(ModelMixin, models.Model):
         return self.name
 
     def matches(self, name):
-        return distance(self.name, name) <= RestrictedGuest.MIN_LEVENSHTEIN_DIST
+        return distance(self.name,
+                        name) <= RestrictedGuest.MIN_LEVENSHTEIN_DIST
 
     def to_json(self):
         """
@@ -420,7 +426,8 @@ class RestrictedGuest(ModelMixin, models.Model):
 
     def can_be_deleted_by(self, user):
         if self.graylisted:
-            return self.added_by == user or user.has_perm("PartyListV2.manage_graylist")
+            return self.added_by == user or
+            user.has_perm("PartyListV2.manage_graylist")
         else:
             return user.has_perm("PartyListV2.manage_blacklist")
 
@@ -432,6 +439,7 @@ class RestrictedGuest(ModelMixin, models.Model):
             ("manage_graylist", "Can manage any Graylisted Guest")
         )
         default_permissions = []
+
 
 class SearchLogEntry(ModelMixin, models.Model):
     user = models.ForeignKey(

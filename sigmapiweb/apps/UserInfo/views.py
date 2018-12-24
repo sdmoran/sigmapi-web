@@ -31,8 +31,9 @@ def users(request):
 
     # Get the execs.
     # Use try/catch to avoid crashing the site if an exec is missing.
-    # The "newX" positions are for when NME needs the updated list for notebooks, but
-    # permissions aren't transitioned yet (last two weeks of B-term basically)
+    # The "newX" positions are for when NME needs the updated list for
+    # notebooks, but permissions aren't transitioned yet
+    # (last two weeks of B-term basically)
     try:
         sage = User.objects.get(groups__name='newSage')
     except User.DoesNotExist:
