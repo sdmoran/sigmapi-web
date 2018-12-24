@@ -8,7 +8,7 @@
   The latest version is recommended.
 * [Python 3.6.*](https://www.python.org/downloads/): The primary language
   used in the development of the website.
-  * [Library: venv](https://docs.python.org/3.6/library/venv.html): Used to 
+  * [Library: venv](https://docs.python.org/3.6/library/venv.html): Used to
     create a virtual environment to isolate the development python from the
     system-wide python.
 
@@ -18,7 +18,7 @@ Developers using Windows should consider using the Windows Subsystem for Linux. 
 the installation and setup documentation [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
 Choosing Ubuntu as your subsystem is recommended if you're new to Linux.
 
-After installing the subsystem, you can access the Linux bash by opening a 
+After installing the subsystem, you can access the Linux bash by opening a
 command prompt or PowerShell and entering:
 ```bash
 > bash
@@ -52,19 +52,26 @@ $ sudo update-alternatives --config python3
 These steps will walk you through deploying the site on your local machine for the first time.
 
 ### 1. Clone the repository.
-
+If you use ssh keys to authenticate with github, use the following (If you don't know what this means, use the alternate method below):
+```bash
+$ git clone git@github.com:sigmapi-gammaiota/sigmapi-web.git
+...
+$ cd sigmapi-web
+```
+Alternate method using HTTPS:
 ```bash
 $ git clone https://github.com/sigmapi-gammaiota/sigmapi-web.git
 ...
 $ cd sigmapi-web
 ```
 
+
 ### 2. Create and activate the Python virtual environment.
 
 This creates a local python virtualenv and activates it.
 
 ```bash
-$ python3 -m venv ./venv
+$ python3.6 -m venv ./venv
 $ source venv/bin/activate
 ```
 
@@ -74,6 +81,7 @@ You will only have to do this once. This installs requirements, loads initial
 data for the database, and collects static files.
 
 ```bash
+$ cd sigmapiweb
 $ make dev
 ```
 
@@ -87,7 +95,7 @@ $ make run
 
 You can make changes to the code and your running instance will be updated automatically. You can log into the site with the admin account credentials you created earlier.  **NOTE:** Though changes will automatically update, JS and CSS resources will get cached and require a redownload using `ctrl-F5`
 
-When you're done, you can kill the server with `ctrl-c`. Then, deactivate the python virtualenv with: 
+When you're done, you can kill the server with `ctrl-c`. Then, deactivate the python virtualenv with:
 
 ```bash
 $ deactivate
