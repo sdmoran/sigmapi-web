@@ -11,6 +11,7 @@ class CustomModelChoiceField(forms.ModelChoiceField):
     """
     Custom choice field for User models that displays as last_name, first_name.
     """
+
     def label_from_instance(self, obj):
         """
         Get label for choice field.
@@ -41,7 +42,8 @@ class SummonsRequestForm(forms.ModelForm):
 
     class Meta:
         model = SummonsRequest
-        exclude = ['summoner', 'dateRequestSent']
+        fields = ['summonee', 'spokeWith', 'outcomes', 'standards_action',
+                  'special_circumstance']
 
 
 class ArchiveSummonsForm(forms.ModelForm):
@@ -53,4 +55,4 @@ class ArchiveSummonsForm(forms.ModelForm):
 
     class Meta:
         model = SummonsHistoryRecord
-        exclude = ['summoner', 'summonee', 'saved_by', 'date']
+        fields = ['details', 'resultReason', 'rejected']

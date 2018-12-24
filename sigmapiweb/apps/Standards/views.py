@@ -84,13 +84,13 @@ def send_summons_request(request):
                 'You must include outcomes of the conversation.'
             )
             return redirect(index)
-        elif not standards_action.strip():
+        if not standards_action.strip():
             request.session['standards_index_error'] = (
                 'Summons request failed to send. ' +
                 'You must include suggested further action by standards.'
             )
             return redirect(index)
-    elif not special_circumstance.strip():
+    if not special_circumstance.strip():
         request.session['standards_index_error'] = (
             'Summons request failed to send. ' +
             'You must include the special circumstance.'
@@ -336,11 +336,10 @@ def delete_summons(request, summons):
     try:
         summons_obj = Summons.objects.get(pk=summons)
     except Summons.DoesNotExist:
-        request.session[
-            'standards_summons_error'] = (
-                'Sorry, that summons no longer exists. ' +
-                'It may have been approved or rejected already.'
-            )
+        request.session['standards_summons_error'] = (
+            'Sorry, that summons no longer exists. ' +
+            'It may have been approved or rejected already.'
+        )
         return redirect(manage_summons)
 
     form = ArchiveSummonsForm(request.POST)
