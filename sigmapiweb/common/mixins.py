@@ -3,7 +3,7 @@ General utility mixins to be used across project.
 """
 
 
-class ModelMixin(object):
+class ModelMixin:
     """
     Generic mixin to be used on all models in project.
     """
