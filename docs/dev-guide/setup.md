@@ -6,13 +6,11 @@
 
 * [Git](https://git-scm.com/downloads): Version control system.
   The latest version is recommended.
-* [Virtualbox](https://www.virtualbox.org/wiki/Downloads): Virtualization software
-  for local development. The latest version is recommended.
-* [Vagrant](https://releases.hashicorp.com/vagrant/): Used to keep
-  the build environment standard between developers.
-  Version 1.9.7 is recommended.
-* [vagrant-vbguest](https://github.com/dotless-de/vagrant-vbguest): For integration
-  between Virtualbox and Vagrant. The latest version is recommended.
+* [Python 3.6.*](https://www.python.org/downloads/): The primary language
+  used in the development of the website.
+  * [Library: venv](https://docs.python.org/3.6/library/venv.html): Used to 
+    create a virtual environment to isolate the development python from the
+    system-wide python.
 
 
 ## First Time Setup
@@ -27,25 +25,16 @@ $ git clone https://github.com/sigmapi-gammaiota/sigmapi-web.git
 $ cd sigmapi-web
 ```
 
-### 2. Create the Vagrant VM.
+### 2. Create and activate the Python virtual environment.
 
-Note that this may take a few minutes, and a lot of text will fly by.
-
-```bash
-$ vagrant up
-```
-
-### 3. Open up a shell on the virtual machine, and navigate to the shared folder.
+This creates a local python virtualenv and activates it.
 
 ```bash
-$ vagrant ssh
-```
-You should land in the /vagrant/sigmapiweb/ directory but if you don't:
-```bash
-$ cd /vagrant/sigmapiweb
+$ python3 -m venv ./venv
+$ source venv/bin/activate
 ```
 
-### 4. Set up development environment
+### 3. Set up the development environment
 
 You will only have to do this once. This installs requirements, loads initial
 data for the database, and collects static files.
@@ -64,7 +53,11 @@ $ make run
 
 You can make changes to the code and your running instance will be updated automatically. You can log into the site with the admin account credentials you created earlier.  **NOTE:** Though changes will automatically update, JS and CSS resources will get cached and require a redownload using `ctrl-F5`
 
-When you are done working, it is best to run `vagrant suspend` from your host (not from the VM) in order to stop the VM from running in the background. Later you can `vagrant resume` to bring the VM back to the state it was in previously.
+When you're done, you can kill the server with `ctrl-c`. Then, deactivate the python virtualenv with: 
+
+```bash
+$ deactivate
+```
 
 ## Fixture Data
 
