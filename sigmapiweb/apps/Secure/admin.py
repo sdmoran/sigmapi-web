@@ -7,7 +7,6 @@ from .models import CalendarKey
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 
-
 class LogEntryAdmin(admin.ModelAdmin):
     readonly_fields = ('content_type',
                        'user',
@@ -25,7 +24,6 @@ class LogEntryAdmin(admin.ModelAdmin):
         actions = super(LogEntryAdmin, self).get_actions(request)
         del actions['delete_selected']
         return actions
-
 
 admin.site.register(LogEntry, LogEntryAdmin)
 

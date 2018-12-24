@@ -12,41 +12,6 @@
     create a virtual environment to isolate the development python from the
     system-wide python.
 
-### Additional Dependencies for Windows Developers
-
-Developers using Windows should consider using the Windows Subsystem for Linux. You can find
-the installation and setup documentation [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
-Choosing Ubuntu as your subsystem is recommended if you're new to Linux.
-
-After installing the subsystem, you can access the Linux bash by opening a 
-command prompt or PowerShell and entering:
-```bash
-> bash
-```
-
-Run the following to update your packages and install all development dependencies:
-```bash
-$ sudo apt update && sudo apt upgrade
-$ sudo add-apt-repository ppa:deadsnakes/ppa
-$ sudo apt update
-$ sudo apt-get install python3.6 python3-pip python3.6-dev python3.6-venv
-```
-
-In some cases, the subsystem will refuse to recognize Python 3.6 as the correct version
-when you run `$ python3 -V`. This can be solved with Ubuntu's update-alternatives, which allows
-you to select which version of Python 3 the `$ python3` command references.
-```bash
-$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
-$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
-$ curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-$ python3 get-pip.py --force-reinstall
-```
-You can then toggle between each version of python with the following command. Beware: you may
-have to re-install pip with the final two commands above each time you switch.
-```bash
-$ sudo update-alternatives --config python3
-```
-
 
 ## First Time Setup
 
