@@ -6,51 +6,82 @@
 
 * [Git](https://git-scm.com/downloads): Version control system.
   The latest version is recommended.
-* [Virtualbox](https://www.virtualbox.org/wiki/Downloads): Virtualization software
-  for local development. The latest version is recommended.
-* [Vagrant](https://releases.hashicorp.com/vagrant/): Used to keep
-  the build environment standard between developers.
-  Version 1.9.7 is recommended.
-* [vagrant-vbguest](https://github.com/dotless-de/vagrant-vbguest): For integration
-  between Virtualbox and Vagrant. The latest version is recommended.
+* [Python 3.6.*](https://www.python.org/downloads/): The primary language
+  used in the development of the website.
+  * [Library: venv](https://docs.python.org/3.6/library/venv.html): Used to
+    create a virtual environment to isolate the development python from the
+    system-wide python.
 
+### Additional Dependencies for Windows Developers
+
+Developers using Windows should consider using the Windows Subsystem for Linux. You can find
+the installation and setup documentation [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
+Choosing Ubuntu as your subsystem is recommended if you're new to Linux.
+
+After installing the subsystem, you can access the Linux bash by opening a
+command prompt or PowerShell and entering:
+```bash
+> bash
+```
+
+Run the following to update your packages and install all development dependencies:
+```bash
+$ sudo apt update && sudo apt upgrade
+$ sudo add-apt-repository ppa:deadsnakes/ppa
+$ sudo apt update
+$ sudo apt-get install python3.6 python3-pip python3.6-dev python3.6-venv
+```
+
+In some cases, the subsystem will refuse to recognize Python 3.6 as the correct version
+when you run `$ python3 -V`. This can be solved with Ubuntu's update-alternatives, which allows
+you to select which version of Python 3 the `$ python3` command references.
+```bash
+$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
+$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
+$ curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+$ python3 get-pip.py --force-reinstall
+```
+You can then toggle between each version of python with the following command. Beware: you may
+have to re-install pip with the final two commands above each time you switch.
+```bash
+$ sudo update-alternatives --config python3
+```
 
 ## First Time Setup
 
 These steps will walk you through deploying the site on your local machine for the first time.
 
 ### 1. Clone the repository.
-
+If you use ssh keys to authenticate with github, use the following (If you don't know what this means, use the alternate method below):
+```bash
+$ git clone git@github.com:sigmapi-gammaiota/sigmapi-web.git
+...
+$ cd sigmapi-web
+```
+Alternate method using HTTPS:
 ```bash
 $ git clone https://github.com/sigmapi-gammaiota/sigmapi-web.git
 ...
 $ cd sigmapi-web
 ```
 
-### 2. Create the Vagrant VM.
 
-Note that this may take a few minutes, and a lot of text will fly by.
+### 2. Create and activate the Python virtual environment.
 
-```bash
-$ vagrant up
-```
-
-### 3. Open up a shell on the virtual machine, and navigate to the shared folder.
+This creates a local python virtualenv and activates it.
 
 ```bash
-$ vagrant ssh
-```
-You should land in the /vagrant/sigmapiweb/ directory but if you don't:
-```bash
-$ cd /vagrant/sigmapiweb
+$ python3.6 -m venv ./venv
+$ source venv/bin/activate
 ```
 
-### 4. Set up development environment
+### 3. Set up the development environment
 
 You will only have to do this once. This installs requirements, loads initial
 data for the database, and collects static files.
 
 ```bash
+$ cd sigmapiweb
 $ make dev
 ```
 
@@ -64,7 +95,11 @@ $ make run
 
 You can make changes to the code and your running instance will be updated automatically. You can log into the site with the admin account credentials you created earlier.  **NOTE:** Though changes will automatically update, JS and CSS resources will get cached and require a redownload using `ctrl-F5`
 
-When you are done working, it is best to run `vagrant suspend` from your host (not from the VM) in order to stop the VM from running in the background. Later you can `vagrant resume` to bring the VM back to the state it was in previously.
+When you're done, you can kill the server with `ctrl-c`. Then, deactivate the python virtualenv with:
+
+```bash
+$ deactivate
+```
 
 ## Fixture Data
 
