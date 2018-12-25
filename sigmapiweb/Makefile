@@ -41,9 +41,9 @@ test:
 quality: pycodestyle pylint
 
 pycodestyle:
-	pycodestyle common
-	pycodestyle apps/* --exclude='apps/*/migrations/*'
-	pycodestyle ../scripts
+	pycodestyle common --max-line-length=120
+	pycodestyle apps/* --exclude='apps/*/migrations/*' --max-line-length=120
+	pycodestyle ../scripts --max-line-length=120
 
 pylint:
 	pylint common

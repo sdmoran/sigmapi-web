@@ -66,6 +66,7 @@ def delete_party(request, party_id):
             party.delete()
     return redirect("partylist-manage_parties")
 
+
 @login_required
 @permission_required(
     'PartyListV2.manage_parties',
@@ -142,7 +143,6 @@ def add_party(request):
     return render(request, 'partiesv2/edit.html', context)
 
 
-
 def remove_graylisting(request, gl_id):
     guest = RestrictedGuest.objects.get(pk=gl_id, graylisted=True)
 
@@ -163,6 +163,7 @@ def remove_blacklisting(request, bl_id):
 
 def manage_restricted_lists(request):
     return None
+
 
 @permission_required(
     'PartyListV2.view_restricted_guests',
@@ -233,4 +234,3 @@ def download_jobs(request, party_id):
         )
     except (ValueError, Party.DoesNotExist):
         return redirect("partylist-index")
-

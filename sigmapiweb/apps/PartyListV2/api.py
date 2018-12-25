@@ -50,7 +50,6 @@ def party_pulse(request, party_id):
         return HttpResponse('Requested Party ID does not exist.', status=404)
 
 
-
 @permission_required('PartyListV2.door_access', raise_exception=True)
 def sign_out(request, party_id, party_guest_id):
     if request.method != 'POST':
@@ -106,6 +105,7 @@ def sign_in(request, party_id, party_guest_id):
             status=409
         )
 
+
 @login_required
 def destroy_guest(request, party_id, party_guest_id):
 
@@ -138,7 +138,6 @@ def destroy_guest(request, party_id, party_guest_id):
         return HttpResponse("You do not have permission to delete this guest", status=401)
 
 
-
 @permission_required("PartyListV2.view_parties")
 def get_details(request, party_id):
     try:
@@ -153,7 +152,8 @@ def get_details(request, party_id):
 
 @permission_required("PartyListV2.view_parties")
 def get_guests(request, party_id):
-    guests = PartyGuest.objects.filter(party__id=party_id).order_by(Lower("name")).only("_cached_json")
+    guests = PartyGuest.objects.filter(party__id=party_id).order_by(
+        Lower("name")).only("_cached_json")
     response = {
         "guests": [guest.cached_json for guest in guests]
     }
@@ -162,8 +162,10 @@ def get_guests(request, party_id):
 
 @permission_required("PartyListV2.view_parties")
 def get_delta_guests(request, party_id, update_counter):
-    guests = PartyGuest.objects.filter(party__id=party_id, update_counter__gt=update_counter)
-    guest_ids = PartyGuest.objects.filter(party__id=party_id).values_list('id', flat=True).all()
+    guests = PartyGuest.objects.filter(
+        party__id=party_id, update_counter__gt=update_counter)
+    guest_ids = PartyGuest.objects.filter(
+        party__id=party_id).values_list('id', flat=True).all()
     response = {
         "guests": [guest.cached_json for guest in guests],
         "guestIds": [id for id in guest_ids]
@@ -190,6 +192,7 @@ def get_permissions(request, party_id):
         }
     }
     return json_response(response)
+
 
 @permission_required(
     "PartyListV2.add_party_guests"
@@ -228,7 +231,8 @@ def create_guest(request, party_id):
     selected_brother_username = request.POST.get('selectedBrother')
     if selected_brother_username is not None and not selected_brother_username.strip() == "":
         try:
-            selected_brother = User.objects.get(username=selected_brother_username)
+            selected_brother = User.objects.get(
+                username=selected_brother_username)
         except User.DoesNotExist:
             selected_brother = None
     else:
@@ -238,7 +242,8 @@ def create_guest(request, party_id):
     if not party.is_list_closed():
         preparty_access = request.POST.get("prepartyAccess") == "true"
 
-        limit_check = __check_invite_limit(preparty_access, party, selected_brother, request)
+        limit_check = __check_invite_limit(
+            preparty_access, party, selected_brother, request)
         if limit_check:
             return limit_check  # User reached some type of invite limit, return the message
 
@@ -340,13 +345,15 @@ def export_list(_request, party_id):
     writer.writerow(['Name', 'Signed In', 'Time First Signed In'])
     female_guests = party_guests.filter(gender__exact='F')
     for party_guest in female_guests:
-        writer.writerow([party_guest.name, str(party_guest.signed_in), str(party_guest.formatted_time_first_signed_in())])
+        writer.writerow([party_guest.name, str(party_guest.signed_in), str(
+            party_guest.formatted_time_first_signed_in())])
 
     writer.writerow(['Male Guests'])
     writer.writerow(['Name', 'Signed In', 'Time First Signed In'])
     male_guests = party_guests.filter(gender__exact='M')
     for party_guest in male_guests:
-        writer.writerow([party_guest.name, str(party_guest.signed_in), str(party_guest.formatted_time_first_signed_in())])
+        writer.writerow([party_guest.name, str(party_guest.signed_in), str(
+            party_guest.formatted_time_first_signed_in())])
 
     return response
 
@@ -357,6 +364,7 @@ def refresh_guest_json(request):
     for guest in guests:
         guest.save()
     return HttpResponse("Guest JSON Refreshed.", status=200)
+
 
 @permission_required("PartyListV2.view_parties")
 def get_counts_history(request, party_id):

@@ -80,7 +80,8 @@ class Party(ModelMixin, models.Model):
     def is_preparty_mode(self):
         if not self.has_preparty:
             return False
-        preparty_start = datetime.combine(self.party_start.date(), self.preparty_start)
+        preparty_start = datetime.combine(
+            self.party_start.date(), self.preparty_start)
         return (preparty_start < datetime.now()) and (not self.is_party_mode())
 
     def is_party_mode(self):
@@ -89,7 +90,7 @@ class Party(ModelMixin, models.Model):
     def is_list_closed(self):
         return self.is_preparty_mode() or self.is_party_mode()
 
-    def user_reached_preparty_limit(self, user : User):
+    def user_reached_preparty_limit(self, user: User):
         """
         Determines if a user has reached their pre-party invite limit
         :param user: The user to check
@@ -211,7 +212,8 @@ class Party(ModelMixin, models.Model):
         self.last_updated = datetime.now()
 
     def to_json(self):
-        count_history = PartyCountRecord.objects.filter(party__id=self.id).all()
+        count_history = PartyCountRecord.objects.filter(
+            party__id=self.id).all()
         return {
             "prepartyMode": self.is_preparty_mode(),
             "partyMode": self.is_party_mode(),
@@ -376,6 +378,7 @@ class PartyGuest(ModelMixin, models.Model):
             'createdAt': self.created_at.isoformat()
         }
 
+
 class RestrictedGuest(ModelMixin, models.Model):
     """
     Model to represent a person who has been blacklisted or graylisted.
@@ -432,6 +435,7 @@ class RestrictedGuest(ModelMixin, models.Model):
             ("manage_graylist", "Can manage any Graylisted Guest")
         )
         default_permissions = []
+
 
 class SearchLogEntry(ModelMixin, models.Model):
     user = models.ForeignKey(
