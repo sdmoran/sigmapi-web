@@ -1,14 +1,20 @@
 """
 Admin config for Secure app.
 """
+from django.contrib import admin
+from django.contrib.admin.models import LogEntry
 from common.utils import register_model_admins
 
 from .models import CalendarKey
-from django.contrib import admin
-from django.contrib.admin.models import LogEntry
 
 
 class LogEntryAdmin(admin.ModelAdmin):
+    """
+    Class that logs Admin actions.
+
+    @TODO: Is this an accurate assessment?
+    """
+
     readonly_fields = ('content_type',
                        'user',
                        'action_time',

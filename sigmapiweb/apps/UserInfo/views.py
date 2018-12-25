@@ -173,7 +173,7 @@ def family_tree(request):
         user_dict[user.id] = new_brother
 
     # Expand the dict into a tree structure
-    for id, user in user_dict.items():
+    for user in user_dict.items():
         if user['big_brother'] in user_dict:
             user_dict[user['big_brother']]['children'].append(user)
         else:

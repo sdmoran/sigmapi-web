@@ -152,6 +152,7 @@ class LibraryItem(ModelMixin, models.Model):
     """
     Model for a library item.
     """
+
     def __str__(self):
         return str(self.isbn_number) + ": " + str(self.title)
 

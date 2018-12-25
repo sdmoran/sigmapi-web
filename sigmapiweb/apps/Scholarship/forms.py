@@ -16,6 +16,7 @@ class CustomModelChoiceField(forms.ModelChoiceField):
     """
     TODO: Docstring.
     """
+
     def label_from_instance(self, obj):
         """
         TODO: Docstring.
@@ -50,7 +51,7 @@ class StudyHoursRecordForm(forms.ModelForm):
 
     class Meta:
         model = StudyHoursRecord
-        exclude = ['user', 'time_stamp']
+        fields = ['date', 'number_of_hours']
 
 
 class AcademicResourceForm(forms.ModelForm):

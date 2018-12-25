@@ -3,11 +3,10 @@ API for PartyList app.
 """
 import csv
 from datetime import datetime
-import json
 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import GuestForm
@@ -131,10 +130,7 @@ def create(request, party_id):
 
     # Respond with the details on the party guest that was just
     # added or rejected
-    return HttpResponse(
-        json.dumps(party_guest.to_json()),
-        content_type="application/json",
-    )
+    return JsonResponse(party_guest.to_json())
 
 
 def _get_added_by(party, requesting_user, voucher_username):
@@ -211,10 +207,7 @@ def update_manual_delta(request, party_id):
     response['guycount'] = party.guycount + party.guy_delta
     response['girlcount'] = party.girlcount + party.girl_delta
 
-    return HttpResponse(
-        json.dumps(response),
-        content_type='application/json',
-    )
+    return JsonResponse(response)
 
 
 @login_required
@@ -233,7 +226,7 @@ def poll_count(_request, party_id):
         'guys_ever_signed_in': party.guys_ever_signed_in,
         'girls_ever_signed_in': party.girls_ever_signed_in,
     }
-    return HttpResponse(json.dumps(response), content_type="application/json")
+    return JsonResponse(response)
 
 
 @login_required
@@ -270,11 +263,10 @@ def sign_in(
             party.save()
         party_guest.save()
         return HttpResponse('Guest signed in.', status=200)
-    else:
-        return HttpResponse(
-            'Guest already signed in. Refresh to see updated list.',
-            status=409
-        )
+    return HttpResponse(
+        'Guest already signed in. Refresh to see updated list.',
+        status=409
+    )
 
 
 @login_required
@@ -397,7 +389,7 @@ def poll(request, party_id):
     )
     response = {}
     response['guests'] = [guest.to_json() for guest in guests]
-    return HttpResponse(json.dumps(response), content_type="application/json")
+    return JsonResponse(response)
 
 
 @login_required
@@ -412,7 +404,7 @@ def init_pulse(request, party_id):
     response['canDestroyAnyGuest'] = request.user.has_perm(
         'PartyList.can_destroy_any_party_guest'
     )
-    return HttpResponse(json.dumps(response), content_type="application/json")
+    return JsonResponse(response)
 
 
 def _modify_count(party, gender, delta):
