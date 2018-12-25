@@ -1,11 +1,14 @@
-
+""" Forms used in the PartyList V2 app """
 from django import forms
-from django.forms import ModelForm, DateTimeField, TimeField, SplitDateTimeField, FileField
+from django.forms import ModelForm, TimeField, SplitDateTimeField, FileField
 
 from apps.PartyListV2.models import Party, RestrictedGuest
 
 
 class EditPartyForm(ModelForm):
+    """
+    Form to edit party details.
+    """
 
     party_start = SplitDateTimeField(input_date_formats=["%m/%d/%Y", "%Y-%m-%d"],
                                      input_time_formats=["%I:%M %p"], label="Party Start Date / Time:")

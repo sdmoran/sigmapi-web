@@ -1,19 +1,22 @@
+""" V2 of the API for the PartyList app. """
 import csv
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
-from django.http import HttpResponse, HttpRequest
+from django.http import JsonResponse, HttpResponse, HttpRequest
 
 from apps.PartyListV2.models import Party, PartyGuest, RestrictedGuest, PartyCountRecord
-import json
-
-
-def json_response(response):
-    return HttpResponse(json.dumps(response), content_type="application/json", status=200)
 
 
 def modify_party_count(request, party_id):
+    """
+    Method to modify the running party count.
+    Params: request - The HTTP request to modify the count
+            party_id - The ID of the party to modify
+    Returns: HTTP response update
+    """
+
     if request.method != 'POST':
         return HttpResponse('Endpoint supports POST method only.', status=405)
     try:
@@ -28,7 +31,7 @@ def modify_party_count(request, party_id):
 
         party.save()
 
-        return json_response({
+        return JsonResponse({
             "party": party.to_json()
         })
     except Party.DoesNotExist:
@@ -37,11 +40,15 @@ def modify_party_count(request, party_id):
 
 @login_required
 def party_pulse(request, party_id):
+    """
+    Get the current status of the party.
+    """
+
     if request.method != 'GET':
         return HttpResponse('Endpoint supports GET method only.', status=405)
     try:
         party = Party.objects.get(pk=party_id)
-        return json_response({
+        return JsonResponse({
             "lastUpdated": party.last_updated.timestamp(),
             "guestUpdateCounter": party.guest_update_counter,
             "listClosed": party.is_list_closed()
@@ -52,6 +59,10 @@ def party_pulse(request, party_id):
 
 @permission_required('PartyListV2.door_access', raise_exception=True)
 def sign_out(request, party_id, party_guest_id):
+    """
+    Sign a guest out of a party.
+    """
+
     if request.method != 'POST':
         return HttpResponse('Endpoint supports POST method only.', status=405)
     try:
@@ -70,16 +81,17 @@ def sign_out(request, party_id, party_guest_id):
 
         party.save()
         party_guest.save()
-        return json_response(party_guest.to_json())
-    else:
-        return HttpResponse(
-            'Guest already signed out. Refresh to see updated list.',
-            status=409
-        )
+        return JsonResponse(party_guest.to_json())
+
+    return HttpResponse('Guest already signed out. Refresh to see updated list.', status=409)
 
 
 @permission_required('PartyListV2.door_access', raise_exception=True)
 def sign_in(request, party_id, party_guest_id):
+    """
+    Sign guest into party.
+    """
+
     if request.method != 'POST':
         return HttpResponse('Endpoint supports POST method only.', status=405)
     try:
@@ -98,16 +110,16 @@ def sign_in(request, party_id, party_guest_id):
 
         party.save()
         party_guest.save()
-        return json_response(party_guest.to_json())
-    else:
-        return HttpResponse(
-            'Guest already signed in. Refresh to see updated list.',
-            status=409
-        )
+        return JsonResponse(party_guest.to_json())
+
+    return HttpResponse('Guest already signed in. Refresh to see updated list.', status=409)
 
 
 @login_required
 def destroy_guest(request, party_id, party_guest_id):
+    """
+    Delete guest from a list.
+    """
 
     if request.method != 'DELETE':
         return HttpResponse('Endpoint supports DELETE method only.', status=405)
@@ -134,34 +146,47 @@ def destroy_guest(request, party_id, party_guest_id):
         party.save()
 
         return HttpResponse("The guest has been deleted.", status=200)
-    else:
-        return HttpResponse("You do not have permission to delete this guest", status=401)
+
+    return HttpResponse("You do not have permission to delete this guest", status=401)
 
 
 @permission_required("PartyListV2.view_parties")
 def get_details(request, party_id):
+    """
+    Get details of a specific party.
+    """
+
     try:
         requested_party = Party.objects.get(pk=party_id)
     except Party.DoesNotExist:
         return HttpResponse('Requested Party ID does not exist.', status=404)
 
-    return json_response({
+    return JsonResponse({
         "party": requested_party.to_json()
     })
 
 
 @permission_required("PartyListV2.view_parties")
 def get_guests(request, party_id):
+    """
+    Get list of guests on the partylist.
+    """
+
     guests = PartyGuest.objects.filter(party__id=party_id).order_by(
         Lower("name")).only("_cached_json")
     response = {
         "guests": [guest.cached_json for guest in guests]
     }
-    return json_response(response)
+    return JsonResponse(response)
 
 
 @permission_required("PartyListV2.view_parties")
 def get_delta_guests(request, party_id, update_counter):
+    """
+    Get change in guests over time.
+    @TODO: Is this an accurate description?
+    """
+
     guests = PartyGuest.objects.filter(
         party__id=party_id, update_counter__gt=update_counter)
     guest_ids = PartyGuest.objects.filter(
@@ -170,20 +195,28 @@ def get_delta_guests(request, party_id, update_counter):
         "guests": [guest.cached_json for guest in guests],
         "guestIds": [id for id in guest_ids]
     }
-    return json_response(response)
+    return JsonResponse(response)
 
 
 @permission_required("PartyListV2.view_parties")
 def get_restricted_guests(request, party_id):
+    """
+    Get list of guests that are marked as restricted.
+    """
+
     response = {
         "restrictedGuests": [guest.to_json() for guest in RestrictedGuest.objects.all()]
     }
-    return json_response(response)
+    return JsonResponse(response)
 
 
 @login_required
 def get_permissions(request, party_id):
-    # These are enforced server side as well
+    """
+    Get user partylist permissions
+    These are enforced server side as well
+    """
+
     response = {
         "permissions": {
             "canRemoveAnyGuest": request.user.has_perm("PartyListV2.can_destroy_any_party_guest"),
@@ -191,12 +224,10 @@ def get_permissions(request, party_id):
             "youHaveDoorAccess": request.user.has_perm("PartyListV2.door_access"),
         }
     }
-    return json_response(response)
+    return JsonResponse(response)
 
 
-@permission_required(
-    "PartyListV2.add_party_guests"
-)
+@permission_required("PartyListV2.add_party_guests")
 def create_guest(request, party_id):
     """
     Create a guest and party guest object for the given party.
@@ -212,12 +243,12 @@ def create_guest(request, party_id):
 
     # Retrieve the new guest's name
     guest_name = request.POST.get('name')
-    if guest_name is None or guest_name.strip() is "":
+    if guest_name is None or guest_name.strip() == "":
         return HttpResponse("Must supply guest name.", status=400)
 
     # Retrieve the new guest's gender
     guest_gender = request.POST.get('gender')
-    if guest_gender is None or not (guest_gender is "M" or guest_gender is "F"):
+    if guest_gender is None or guest_gender not in ("M", "F"):
         return HttpResponse('Guest gender must be "M" or "F".', status=400)
 
     # Check if the guest is already on the list
@@ -287,7 +318,7 @@ def create_guest(request, party_id):
     party.update_timestamp()
     party.save()
 
-    return json_response(party_guest.to_json())
+    return JsonResponse(party_guest.to_json())
 
 
 def __check_invite_limit(preparty_access: bool, party: Party, selected_brother: User, request: HttpRequest):
@@ -297,28 +328,27 @@ def __check_invite_limit(preparty_access: bool, party: Party, selected_brother: 
         if party.has_preparty_invite_limits:
             if selected_brother is None and party.user_reached_preparty_limit(request.user):
                 return HttpResponse("You have reached your pre-party invite limit.", status=403)
-            elif selected_brother is not None and party.user_reached_preparty_limit(selected_brother):
+            if selected_brother is not None and party.user_reached_preparty_limit(selected_brother):
                 return HttpResponse("The brother you are trying to borrow invites from has "
                                     "reached their pre-party invite limit.", status=403)
-        elif party.has_party_invite_limits:
+        if party.has_party_invite_limits:
             if selected_brother is None and party.user_reached_party_limit(request.user):
                 return HttpResponse("You have pre-party invites left, but your total "
                                     "amount of guests has reached the limit for this party. Try "
                                     "removing a regular guest before adding another to pre-party.", status=403)
-            elif selected_brother is not None:
+            if selected_brother is not None:
                 if party.user_reached_party_limit(selected_brother):
                     return HttpResponse("The brother you are trying to borrow invites"
                                         " from has reached their party invite limit.", status=403)
-                elif party.user_reached_preparty_limit(selected_brother):
+                if party.user_reached_preparty_limit(selected_brother):
                     return HttpResponse("The brother you are trying to borrow invites"
                                         " from has reached their pre-party invite limit.", status=403)
-    else:
-        if party.has_party_invite_limits:
-            if selected_brother is None and party.user_reached_party_limit(request.user):
-                return HttpResponse("You have reached your party invite limit.", status=403)
-            elif selected_brother is not None and party.user_reached_party_limit(selected_brother):
-                return HttpResponse("The brother you are trying to borrow invites "
-                                    "from has reached their party invite limit.", status=403)
+    if party.has_party_invite_limits:
+        if selected_brother is None and party.user_reached_party_limit(request.user):
+            return HttpResponse("You have reached your party invite limit.", status=403)
+        if selected_brother is not None and party.user_reached_party_limit(selected_brother):
+            return HttpResponse("The brother you are trying to borrow invites "
+                                "from has reached their party invite limit.", status=403)
 
     return False
 
@@ -360,6 +390,8 @@ def export_list(_request, party_id):
 
 @permission_required('PartyListV2.manage_parties')
 def refresh_guest_json(request):
+    """ Refresh the guest list. """
+
     guests = PartyGuest.objects.all()
     for guest in guests:
         guest.save()
@@ -368,8 +400,10 @@ def refresh_guest_json(request):
 
 @permission_required("PartyListV2.view_parties")
 def get_counts_history(request, party_id):
+    """ Get history of previous party counts. """
+
     entries = PartyCountRecord.objects.filter(party__id=party_id).all()
 
-    return json_response({
+    return JsonResponse({
         "entries": [entry.to_json() for entry in entries]
     })

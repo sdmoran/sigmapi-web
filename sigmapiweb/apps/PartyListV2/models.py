@@ -1,10 +1,10 @@
+""" Models for the PartyList V2 app. """
 import json
+from datetime import datetime
 
 from Levenshtein._levenshtein import distance
 from django.contrib.auth.models import User
 from django.db import models
-
-from datetime import datetime
 
 from common.mixins import ModelMixin
 from common.utils import get_full_name_or_deleted
@@ -23,12 +23,12 @@ def _time_stamp_filename(fname, fmt='%Y-%m-%d_{fname}'):
     return datetime.now().strftime(fmt).format(fname=fname)
 
 
-def get_party_jobs_path(model_instance, filename):
+def get_party_jobs_path(filename):
     """
     Given a party jobs filename, return the relative path to it.
 
     Arguments:
-        model_instance: Instance of Party that this file is being saved to
+        DEPRECATED model_instance: Instance of Party that this file is being saved to
         filename (str): Name of file
 
     Returns: str
@@ -78,6 +78,8 @@ class Party(ModelMixin, models.Model):
         return self.name
 
     def is_preparty_mode(self):
+        """ Check if party is active and in pre-party. """
+
         if not self.has_preparty:
             return False
         preparty_start = datetime.combine(
@@ -85,9 +87,13 @@ class Party(ModelMixin, models.Model):
         return (preparty_start < datetime.now()) and (not self.is_party_mode())
 
     def is_party_mode(self):
+        """ Check if party is active. """
+
         return self.party_start < datetime.now()
 
     def is_list_closed(self):
+        """ Check if list is closed. """
+
         return self.is_preparty_mode() or self.is_party_mode()
 
     def user_reached_preparty_limit(self, user: User):
@@ -125,6 +131,7 @@ class Party(ModelMixin, models.Model):
         :return: True if there is an invite limit and the user has reached it,
                 False otherwise
         """
+
         if user is None:
             raise ValueError("User cannot be None")
 
@@ -145,6 +152,8 @@ class Party(ModelMixin, models.Model):
         return invites >= self.max_party_invites and self.has_party_invite_limits
 
     def user_reached_vouching_limit(self, user: User):
+        """ Indicate a brother has reached their vouching limit. """
+
         if user is None:
             raise ValueError("User cannot be None")
         vouches = PartyGuest.objects.filter(
@@ -156,6 +165,8 @@ class Party(ModelMixin, models.Model):
         return vouches >= Party.VOUCHING_WARNING
 
     def sign_in(self, party_guest):
+        """ Sign guest into party. """
+
         if party_guest.signed_in is False:
             if party_guest.gender == 'M':
                 self.guycount += 1
@@ -170,6 +181,8 @@ class Party(ModelMixin, models.Model):
             self.create_partycout_entry()
 
     def sign_out(self, party_guest):
+        """ Sign guest out of party. """
+
         if party_guest.signed_in is True:
             if party_guest.gender == 'M':
                 self.guycount -= 1
@@ -180,6 +193,8 @@ class Party(ModelMixin, models.Model):
             self.create_partycout_entry()
 
     def modify_count(self, gender, sign):
+        """ Update party count. """
+
         if gender == "M":
             if sign == "1":
                 self.guycount += 1
@@ -198,8 +213,14 @@ class Party(ModelMixin, models.Model):
             return 'Invalid gender supplied'
 
         self.create_partycout_entry()
+        return 'Party count updated!'
 
     def create_partycout_entry(self):
+        """
+        Create record for the party count.
+        @TODO: Is this misnamed?
+        """
+
         PartyCountRecord(
             party=self,
             guycount=self.guycount,
@@ -209,9 +230,13 @@ class Party(ModelMixin, models.Model):
         ).save()
 
     def update_timestamp(self):
+        """ Update timestamp with current time. """
+
         self.last_updated = datetime.now()
 
     def to_json(self):
+        """ Convert class object to JSON. """
+
         count_history = PartyCountRecord.objects.filter(
             party__id=self.id).all()
         return {
@@ -242,6 +267,8 @@ class Party(ModelMixin, models.Model):
 
 
 class PartyCountRecord(ModelMixin, models.Model):
+    """ Class to keep track of the party count. """
+
     party = models.ForeignKey(
         Party,
         related_name="related_party",
@@ -255,6 +282,8 @@ class PartyCountRecord(ModelMixin, models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def to_json(self):
+        """ Convert class object to JSON. """
+
         return {
             "guyCount": self.guycount,
             "girlCount": self.girlcount,
@@ -265,6 +294,7 @@ class PartyCountRecord(ModelMixin, models.Model):
 
 
 class PartyGuest(ModelMixin, models.Model):
+    """ Class to represent a party guest. """
 
     party = models.ForeignKey(
         Party,
@@ -303,6 +333,8 @@ class PartyGuest(ModelMixin, models.Model):
     update_counter = models.IntegerField(default=0)
 
     def get_cached_json(self):
+        """ Get cached party status. """
+
         if self._cached_json is None:
             self.save()
         return json.loads(self._cached_json)
@@ -311,9 +343,13 @@ class PartyGuest(ModelMixin, models.Model):
 
     # Defining a property here so we can figure out timestamps
     def get_signed_in(self):
+        """ Return signed-in status of guest. """
+
         return self._signed_in
 
     def set_signed_in(self, value):
+        """ Set guest as signed in. """
+
         self._signed_in = value
         if value:
             if self.ever_signed_in is False:
@@ -324,11 +360,15 @@ class PartyGuest(ModelMixin, models.Model):
     signed_in = property(get_signed_in, set_signed_in)
 
     def invite_used_name(self):
+        """ Get guest name. """
+
         if self.invite_used is not None:
             return self.invite_used.get_full_name()
         return False
 
     def formatted_time_first_signed_in(self):
+        """ Formats the time when a guest is signed in. """
+
         if self.ever_signed_in:
             return self.time_first_signed_in.strftime("%I:%M %p")
         return None
@@ -344,6 +384,8 @@ class PartyGuest(ModelMixin, models.Model):
         default_permissions = []
 
     def save(self, *args, **kwargs):
+        """  Update partylist. """
+
         if self.id is not None:
             self._cached_json = json.dumps(self.to_json())
 
@@ -405,6 +447,10 @@ class RestrictedGuest(ModelMixin, models.Model):
         return self.name
 
     def matches(self, name):
+        """
+        Determine if name matches restricted guest's name
+        """
+
         return distance(self.name, name) <= RestrictedGuest.MIN_LEVENSHTEIN_DIST
 
     def to_json(self):
@@ -422,10 +468,13 @@ class RestrictedGuest(ModelMixin, models.Model):
         }
 
     def can_be_deleted_by(self, user):
+        """
+        Determine if graylisted guest can be deleted by current user.
+        """
+
         if self.graylisted:
             return self.added_by == user or user.has_perm("PartyListV2.manage_graylist")
-        else:
-            return user.has_perm("PartyListV2.manage_blacklist")
+        return user.has_perm("PartyListV2.manage_blacklist")
 
     class Meta:
         permissions = (
@@ -438,6 +487,8 @@ class RestrictedGuest(ModelMixin, models.Model):
 
 
 class SearchLogEntry(ModelMixin, models.Model):
+    """ Model for search logs. """
+
     user = models.ForeignKey(
         User,
         null=True,
