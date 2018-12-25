@@ -1,10 +1,13 @@
 {% extends 'common/public_base.html' %}
 {% block module_includes %}
+    {% load sass_tags %}
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="/static/js/public/familytree2.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% sass_src 'css/public/family_tree.scss' %}" />
 {% endblock %}
 {% block title %}Sigma Pi Gamma Iota - Family Tree{% endblock %}
 
+{% block body_class %}family-tree{% endblock %}
 {% block content %}
     <style type="text/css">
 
@@ -48,7 +51,7 @@
   }
 
 </style>
-    <p>
+    <p class="family-tree-title">
     Welcome to the Family Tree Beta! Use your mouse to drag around, and zoom in / out with the scroll wheel.
     </p>
 

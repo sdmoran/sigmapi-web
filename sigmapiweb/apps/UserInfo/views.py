@@ -218,6 +218,8 @@ def family_tree(request):
 
     context = {
         'users': big_list,
+        'pages': settings.PUBLIC_PAGES,
+        'current_page_name': 'Brothers',
     }
     return render(request, 'userinfo/public/family-tree.html', context)
 
