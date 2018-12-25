@@ -147,15 +147,19 @@ def family_tree(request):
     """
     Builds the family tree based on user accounts
     """
-    user_accounts = User.objects.all().prefetch_related('userinfo')
+    user_accounts = User.objects\
+        .filter(groups__name__in=['Brothers', 'Alumni'])\
+        .exclude(first_name__contains='Admin')\
+        .prefetch_related('userinfo')
 
-    big_list = {
+    root_node = {
         'name': "Sigma Pi Gamma Iota",
         'children': []
     }
+
+    user_dict = dict()
+
     for user in user_accounts:
-        if "Admin" in user.first_name or user.first_name == "":
-            continue
         new_brother = {
             'name': user.first_name + " " + user.last_name,
             'id': user.id,
@@ -163,40 +167,24 @@ def family_tree(request):
         }
         try:
             new_brother['big_brother'] = user.userinfo.bigBrother.id
-
-            exists = False
-            for brothercheck in user_accounts:
-                if brothercheck.id == new_brother['big_brother']:
-                    exists = True
-            if not exists:
-                big_bro = user.userinfo.bigBrother
-                big_list['children'].append({
-                    'name': big_bro.first_name + " " + big_bro.last_name,
-                    'id': big_bro.id,
-                    'children': [],
-                    'big_brother': -1,
-                    'added': True
-                })
-
         except UserInfo.DoesNotExist:
             new_brother['big_brother'] = -1
-        big_list['children'].append(new_brother)
 
-    # Expand the tree so it isn't flat
-    i = 0
-    while i < len(big_list['children']):
-        print("i: " + str(i))
-        print(len(big_list['children']))
-        big_id = big_list['children'][i]['big_brother']
-        if find_big(big_list['children'], big_id, big_list['children'][i]):
-            big_list['children'].pop(i)
-            i -= 1
-        i += 1
+        user_dict[user.id] = new_brother
 
-    big_list = json.dumps(big_list, cls=DjangoJSONEncoder)
+    # Expand the dict into a tree structure
+    for id, user in user_dict.items():
+        if user['big_brother'] in user_dict:
+            user_dict[user['big_brother']]['children'].append(user)
+        else:
+            root_node['children'].append(user)
+
+    big_list = json.dumps(root_node, cls=DjangoJSONEncoder)
 
     context = {
         'users': big_list,
+        'pages': settings.PUBLIC_PAGES,
+        'current_page_name': 'Brothers',
     }
     return render(request, 'userinfo/public/family-tree.html', context)
 

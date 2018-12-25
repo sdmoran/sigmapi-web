@@ -64,7 +64,7 @@ urlpatterns = [
         name='partylist-download_jobs',
     ),
 
-    # API ENDPOINTS
+    ### API ENDPOINTS ###
 
     url(
         regex=r'^api/(?P<party_id>[\d]+)/details/$',
@@ -128,8 +128,7 @@ urlpatterns = [
         name='partylist-api-pulse',
     ),
     url(
-        regex=r'^api/(?P<party_id>[\d]+)/guests/'
-        r'delta/(?P<update_counter>[\d]+)',
+        regex=r'^api/(?P<party_id>[\d]+)/guests/delta/(?P<update_counter>[\d]+)',
         view=api.get_delta_guests,
         name='partylist-api-delta_guests',
     ),

@@ -93,6 +93,17 @@ h2 {
     }
 }
 
+@media only screen and (max-width: 768px){
+  .navbar-nav{
+    display:flex;
+    flex-wrap: wrap;
+    text-align:center;
+  }
+  .navbar-nav li a{
+    width:50vw;
+  }
+}
+
 .logo {
     height: 100%;
     width: auto;
