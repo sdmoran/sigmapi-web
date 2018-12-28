@@ -23,12 +23,12 @@ def _time_stamp_filename(fname, fmt='%Y-%m-%d_{fname}'):
     return datetime.now().strftime(fmt).format(fname=fname)
 
 
-def get_party_jobs_path(filename):
+def get_party_jobs_path(model_instance, filename):
     """
     Given a party jobs filename, return the relative path to it.
 
     Arguments:
-        DEPRECATED model_instance: Instance of Party that this file is being saved to
+        model_instance: Instance of Party that this file is being saved to
         filename (str): Name of file
 
     Returns: str
@@ -178,7 +178,7 @@ class Party(ModelMixin, models.Model):
                     self.girls_ever_signed_in += 1
 
             party_guest.signed_in = True
-            self.create_partycout_entry()
+            self.create_partycount_entry()
 
     def sign_out(self, party_guest):
         """ Sign guest out of party. """
@@ -190,7 +190,7 @@ class Party(ModelMixin, models.Model):
                 self.girlcount -= 1
 
             party_guest.signed_in = False
-            self.create_partycout_entry()
+            self.create_partycount_entry()
 
     def modify_count(self, gender, sign):
         """ Update party count. """
@@ -212,13 +212,12 @@ class Party(ModelMixin, models.Model):
         else:
             return 'Invalid gender supplied'
 
-        self.create_partycout_entry()
+        self.create_partycount_entry()
         return 'Party count updated!'
 
-    def create_partycout_entry(self):
+    def create_partycount_entry(self):
         """
         Create record for the party count.
-        @TODO: Is this misnamed?
         """
 
         PartyCountRecord(

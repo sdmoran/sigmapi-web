@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET
 from django_downloadview import sendfile
 
 from apps.PartyListV2.forms import EditPartyForm, RestrictedGuestForm
@@ -120,7 +120,6 @@ def manage_parties(request):
 
 @login_required
 @permission_required('PartyListV2.manage_parties', login_url='pub-permission_denied')
-@require_POST
 def add_party(request):
     """ Add party to system. """
 
@@ -130,12 +129,13 @@ def add_party(request):
         'form': EditPartyForm()
     }
 
-    form = EditPartyForm(request.POST, request.FILES)
-    if form.is_valid():
-        party = form.save()
-        context['message'].append(party.name + " successfully added.")
-    else:
-        context['message'].append("Error adding party.")
+    if request.method == 'POST':
+        form = EditPartyForm(request.POST, request.FILES)
+        if form.is_valid():
+            party = form.save()
+            context['message'].append(party.name + " successfully added.")
+        else:
+            context['message'].append("Error adding party.")
 
     return render(request, 'partiesv2/edit.html', context)
 
