@@ -23,6 +23,7 @@ def _time_stamp_filename(fname, fmt='%Y-%m-%d_{fname}'):
     return datetime.now().strftime(fmt).format(fname=fname)
 
 
+# pylint: disable=W0613
 def get_party_jobs_path(model_instance, filename):
     """
     Given a party jobs filename, return the relative path to it.

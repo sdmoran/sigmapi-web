@@ -16,7 +16,9 @@ class CreateUserError(Exception):
     """
     Exception raised by create_user.
     """
-    print(Exception)
+    def __init__(self, message):
+        super(CreateUserError, self).__init__(message)
+        print(message)
 
 
 def get_senior_year():
