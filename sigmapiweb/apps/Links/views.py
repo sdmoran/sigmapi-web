@@ -45,8 +45,8 @@ def add_link(request):
             link.save()
 
         return redirect('links-view_all')
-    else:
-        return redirect('pub-permission_denied')
+
+    return redirect('pub-permission_denied')
 
 
 @permission_required('Links.delete_link', login_url='pub-permission_denied')
@@ -65,5 +65,4 @@ def delete_link(request, link):
             except PermissionDenied:
                 return redirect('pub-permission_denied')
         return redirect('links-view_all')
-    else:
-        return redirect('pub-permission_denied')
+    return redirect('pub-permission_denied')

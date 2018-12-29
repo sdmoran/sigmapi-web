@@ -2,12 +2,11 @@
 Views for Scholarship app.
 """
 import csv
-import json
 import os
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_GET, require_POST
 from django.utils.datastructures import MultiValueDict
@@ -309,12 +308,12 @@ def upload_resource(request):
 
     # Can add additional response information here if needed in the future
     response = {}
-    if request.META['HTTP_ACCEPT'] == 'application/json':
-        content_type = 'application/json'
-    else:
-        content_type = 'text/plain'
+    # if request.META['HTTP_ACCEPT'] == 'application/json':
+    #     content_type = 'application/json'
+    # else:
+    #     content_type = 'text/plain'
 
-    return HttpResponse(json.dumps(response), content_type=content_type)
+    return JsonResponse(response)
 
 
 @login_required
@@ -416,12 +415,12 @@ def upload_libraryitem(request):
 
     # Can add additional response information here if needed in the future
     response = {}
-    if request.META['HTTP_ACCEPT'] == 'application/json':
-        content_type = 'application/json'
-    else:
-        content_type = 'text/plain'
+    # if request.META['HTTP_ACCEPT'] == 'application/json':
+    #     content_type = 'application/json'
+    # else:
+    #     content_type = 'text/plain'
 
-    return HttpResponse(json.dumps(response), content_type=content_type)
+    return JsonResponse(response)
 
 
 @login_required

@@ -1,12 +1,13 @@
+""" Views for the PartyList V2 app. """
+import os
+
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import permission_required, login_required
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django import forms
+from django.views.decorators.http import require_GET
 from django_downloadview import sendfile
-from django.views.decorators.http import require_GET, require_POST
-import os
 
 from apps.PartyListV2.forms import EditPartyForm, RestrictedGuestForm
 from apps.PartyListV2.models import Party, RestrictedGuest
@@ -17,6 +18,8 @@ import apps.PartyList.models
 @login_required
 @permission_required("PartyListV2.view_parties")
 def index(request):
+    """ Index page for partylist. """
+
     parties = Party.objects.all().order_by("party_start")
     old_parties = apps.PartyList.models.Party.objects.all().order_by("date")
     context = {
@@ -29,6 +32,8 @@ def index(request):
 @login_required
 @permission_required("PartyListV2.view_parties")
 def guests(request, party_id):
+    """ Get list of party guests. """
+
     try:
         requested_party = Party.objects.get(pk=party_id)
     except Party.DoesNotExist:
@@ -49,10 +54,7 @@ def guests(request, party_id):
 
 
 @login_required
-@permission_required(
-    'PartyListV2.manage_parties',
-    login_url='pub-permission_denied'
-)
+@permission_required('PartyListV2.manage_parties', login_url='pub-permission_denied')
 def delete_party(request, party_id):
     """
         Deletes the party with the ID that is sent in the post request
@@ -66,12 +68,11 @@ def delete_party(request, party_id):
             party.delete()
     return redirect("partylist-manage_parties")
 
+
 @login_required
-@permission_required(
-    'PartyListV2.manage_parties',
-    login_url='pub-permission_denied'
-)
+@permission_required('PartyListV2.manage_parties', login_url='pub-permission_denied')
 def edit_party(request, party_id):
+    """ Edit existing party details. """
 
     try:
         requested_party = Party.objects.get(pk=party_id)
@@ -106,11 +107,10 @@ def edit_party(request, party_id):
 
 
 @login_required
-@permission_required(
-    'PartyListV2.manage_parties',
-    login_url='pub-permission_denied'
-)
+@permission_required('PartyListV2.manage_parties', login_url='pub-permission_denied')
 def manage_parties(request):
+    """ Manage listed parties. """
+
     all_parties = Party.objects.all().order_by("party_start")
     context = {
         'all_parties': all_parties,
@@ -119,12 +119,9 @@ def manage_parties(request):
 
 
 @login_required
-@permission_required(
-    'PartyListV2.manage_parties',
-    login_url='pub-permission_denied'
-)
-@require_POST
+@permission_required('PartyListV2.manage_parties', login_url='pub-permission_denied')
 def add_party(request):
+    """ Add party to system. """
 
     context = {
         'message': [],
@@ -132,18 +129,20 @@ def add_party(request):
         'form': EditPartyForm()
     }
 
-    form = EditPartyForm(request.POST, request.FILES)
-    if form.is_valid():
-        party = form.save()
-        context['message'].append(party.name + " successfully added.")
-    else:
-        context['message'].append("Error adding party.")
+    if request.method == 'POST':
+        form = EditPartyForm(request.POST, request.FILES)
+        if form.is_valid():
+            party = form.save()
+            context['message'].append(party.name + " successfully added.")
+        else:
+            context['message'].append("Error adding party.")
 
     return render(request, 'partiesv2/edit.html', context)
 
 
-
 def remove_graylisting(request, gl_id):
+    """ Remove guest from graylist. """
+
     guest = RestrictedGuest.objects.get(pk=gl_id, graylisted=True)
 
     if guest.can_be_deleted_by(request.user):
@@ -153,6 +152,8 @@ def remove_graylisting(request, gl_id):
 
 
 def remove_blacklisting(request, bl_id):
+    """ Remove guest from blacklist. """
+
     guest = RestrictedGuest.objects.get(pk=bl_id, graylisted=False)
 
     if guest.can_be_deleted_by(request.user):
@@ -162,13 +163,15 @@ def remove_blacklisting(request, bl_id):
 
 
 def manage_restricted_lists(request):
+    """ Manage a specified restricted list. """
     return None
 
-@permission_required(
-    'PartyListV2.view_restricted_guests',
-    login_url='pub-permission_denied'
-)
+
+@permission_required('PartyListV2.view_restricted_guests', login_url='pub-permission_denied')
 def restricted_lists(request):
+    """
+    Get restricted list specified in the request.
+    """
 
     if request.method == "POST":
         if request.POST.get('blacklist') is not None:
@@ -233,4 +236,3 @@ def download_jobs(request, party_id):
         )
     except (ValueError, Party.DoesNotExist):
         return redirect("partylist-index")
-

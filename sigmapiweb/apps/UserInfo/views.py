@@ -31,50 +31,15 @@ def users(request):
 
     # Get the execs.
     # Use try/catch to avoid crashing the site if an exec is missing.
-    # The "newX" positions are for when NME needs the updated list for notebooks, but
-    # permissions aren't transitioned yet (last two weeks of B-term basically)
-    try:
-        sage = User.objects.get(groups__name='newSage')
-    except User.DoesNotExist:
-        try:
-            sage = User.objects.get(groups__name='Sage')
-        except User.DoesNotExist:
-            sage = None
-    try:
-        second = User.objects.get(groups__name='new2nd')
-    except User.DoesNotExist:
-        try:
-            second = User.objects.get(groups__name='2nd Counselor')
-        except User.DoesNotExist:
-            second = None
-    try:
-        third = User.objects.get(groups__name='new3rd')
-    except User.DoesNotExist:
-        try:
-            third = User.objects.get(groups__name='3rd Counselor')
-        except User.DoesNotExist:
-            third = None
-    try:
-        fourth = User.objects.get(groups__name='new4th')
-    except User.DoesNotExist:
-        try:
-            fourth = User.objects.get(groups__name='4th Counselor')
-        except User.DoesNotExist:
-            fourth = None
-    try:
-        first = User.objects.get(groups__name='new1st')
-    except User.DoesNotExist:
-        try:
-            first = User.objects.get(groups__name='1st Counselor')
-        except User.DoesNotExist:
-            first = None
-    try:
-        herald = User.objects.get(groups__name='newHerald')
-    except User.DoesNotExist:
-        try:
-            herald = User.objects.get(groups__name='Herald')
-        except User.DoesNotExist:
-            herald = None
+    # The "newX" positions are for when NME needs the updated list for
+    # notebooks, but permissions aren't transitioned yet
+    # (last two weeks of B-term basically)
+    sage = check_user_exists('Sage', 'newSage')
+    second = check_user_exists('2nd Counselor', 'new2nd')
+    third = check_user_exists('3rd Counselor', 'new3rd')
+    fourth = check_user_exists('4th Counselor', 'new4th')
+    first = check_user_exists('1st Counselor', 'new1st')
+    herald = check_user_exists('Herald', 'newHerald')
 
     # Get the rest of the users.  Exclude pledges or any execs.
     seniors = User.objects.filter(groups__name='Brothers')
@@ -208,7 +173,7 @@ def family_tree(request):
         user_dict[user.id] = new_brother
 
     # Expand the dict into a tree structure
-    for id, user in user_dict.items():
+    for user in user_dict.items():
         if user['big_brother'] in user_dict:
             user_dict[user['big_brother']]['children'].append(user)
         else:
@@ -232,10 +197,26 @@ def find_big(tree, big_id, little):
         if node['id'] == big_id:
             node['children'].append(little)
             return True
-        elif not node['children']:
-            if find_big(node['children'], big_id, little):
-                return True
+        if not node['children'] and find_big(node['children'], big_id, little):
+            return True
     return False
+
+
+def check_user_exists(name, new_name):
+    """
+    Helper function to check if the EC role is assigned within the system.
+    """
+    user = None
+
+    try:
+        user = User.objects.get(groups__name=new_name)
+    except User.DoesNotExist:
+        try:
+            user = User.objects.get(groups__name=name)
+        except User.DoesNotExist:
+            user = None
+
+    return user
 
 
 @permission_required('UserInfo.manage_users', login_url='secure-index')

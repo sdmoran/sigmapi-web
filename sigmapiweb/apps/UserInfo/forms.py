@@ -24,4 +24,5 @@ class EditUserInfoForm(ModelForm):
 
     class Meta:
         model = UserInfo
-        exclude = ['picture', 'graduationYear', 'user', 'bigBrother']
+        fields = ['phoneNumber', 'major', 'hometown', 'activities',
+                  'interests', 'favoriteMemory', 'pledgeClass']
