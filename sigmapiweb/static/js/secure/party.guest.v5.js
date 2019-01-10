@@ -1,3 +1,18 @@
+/*
+ * This file uses Vue.js heavily, if you aren't familiar with it,
+ * go read the docs for a couple hours: https://vuejs.org/
+ *
+ * No seriously, go read them.
+ *
+ * It also uses a Vue plugin for http requests:
+ * https://github.com/pagekit/vue-resource
+ *
+ * The code here is tied to the templates in guests.html, as such
+ * any IDE warnings about unused variables, functions, etc. are probably
+ * incorrect, go look in guests.html before you start trying to optimize
+ * things.
+ */
+
 
 function sortByName(a, b) {
     var strA = a.name.toUpperCase().trim(); // ignore upper and lowercase
