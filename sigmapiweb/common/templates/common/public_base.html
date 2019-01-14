@@ -3,122 +3,112 @@
 {% load common_utils %}
 
 {% block local_includes %}
-    {% load staticfiles %}
-    {% load sass_tags %}
+  {% load staticfiles %}
+  {% load sass_tags %}
 
-    <link rel="stylesheet" type="text/css" href="{% sass_src 'css/public/base_v1.scss' %}"/>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="{% sass_src 'css/public/base.scss' %}?v=1"/>
 
-    {% block module_includes %}
-    {% endblock %}
+
+  {% block module_includes %}
+  {% endblock %}
 {% endblock %}
 
 {% block body %}
 
-    <!-- Navigation -->
-    <nav id="navbar" class="navbar navbar-inverse sp-bg-color navbar-fixed-top" role="navigation">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <a class="navbar-brand" href="/">
-                    <img class="logo" src="{% static 'img/logo.png' %}"/>
+  <!-- Navigation -->
+  <div id="header" role="navigation">
+    <div class="container">
+      <div class="row">
+        <div class="logo-wrapper">
+          <a href="/">
+            <div class="logo">
+              <img src="{% static 'img/logo.svg' %}"/>
+            </div>
+          </a>
+        </div>
+        <div id="menu-toggle">
+          <svg aria-hidden="true" data-prefix="fas" data-icon="bars" class="svg-inline--fa fa-bars fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg>
+        </div>
+        <div id="desktop-menu" class="menu-wrapper d-none d-md-inline-flex">
+          <div class="menu">
+            {% for page in PUBLIC_LINKS %}
+            <div class="menu-item{% if page.title == current_page_name %} active{% endif %}">
+              {% if page.view == "pub-login" and user.is_authenticated %}
+                <a href='{% url 'secure-index' %}'>
+                  Secure
                 </a>
-                <button type="button" class="navbar-toggle" data-toggle="collapse"
-                        data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
+              {% elif page.url %}
+                <a href='{{ page.url }}' target="{{ page.target }}">
+                  {{ page.title }}
+                </a>
+              {% else %}
+                <a href='{% url page.view %}'>
+                  {{ page.title }}
+                </a>
+              {% endif %}
             </div>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    {% for page_name, page_info in pages.items %}
-                        {% if page_name == current_page_name %}
-                            <li class="child sibling navbar-active">
-                        {% else %}
-                            <li class="child sibling">
-                        {% endif %}
-
-                            {% if page_info.0 == "pub-login" and user.is_authenticated %}
-                                <a id="nav-home child" href='{% url 'secure-index' %}'>
-                                Secure
-                                </a>
-                            {% else %}
-                                <a id="nav-home child" href='{% url page_info.0 %}'>
-                                {{page_name}}
-                                </a>
-                            {% endif %}
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <!-- /.navbar-collapse -->
+            {% endfor %}
+          </div>
         </div>
-        <!-- /.container -->
-    </nav>
-
-    {% block subnav %}
-    {% endblock %}
-
-    <div id="content-wrapper">
-	    {% if pages|lookup:current_page_name|lookup:1 %}
-	        <div id="content-bkg-lowres"
-	             class="content-bkg" 
-	             style="background-image: url('{% static pages|lookup:current_page_name|lookup:1|prepend:'img/bkg/low-res/' %}')">
-	    {% else %}
-	    	<div id="content-bkg-lowres" class="content-bkg">
-	    {% endif %}
-	    </div>
-	    <div id="content-bkg-highres" class="content-bkg"></div>
-        <div id="main-content" style="opacity: 0.99;">
-        	{% block content %}{% endblock %}
+        <div id="mobile-menu" class="menu-wrapper container-fluid" style="display: none;">
+          <div class="menu row">
+            {% for page in PUBLIC_LINKS %}
+              <div class="col-6 menu-item{% if page.title == current_page_name %} active{% endif %}">
+                {% if page.view == "pub-login" and user.is_authenticated %}
+                  <a href='{% url 'secure-index' %}'>
+                    Secure
+                  </a>
+                {% elif page.url %}
+                  <a href='{{ page.url }}' target="{{ page.target }}">
+                    {{ page.title }}
+                  </a>
+                {% else %}
+                  <a href='{% url page.view %}'>
+                    {{ page.title }}
+                  </a>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Block included for any content that must be rendered at the top level of the body -->
-    {% block toplevel_content %}
+  <div id="content">
+    {% block content %}
     {% endblock %}
+  </div>
 
-    <!-- Embedded JS -->
-    <script type="text/javascript">
-    (function() {
-        // Line up top of content with bottom of fixed navbar
-        function lineUpContent() {
-            var navbar = $('#navbar');
-            var content = $('#content-wrapper');
-            var margin = 0; //window.innerWidth * 0.02; TODO
-            var contentPlacement = navbar.position().top + navbar.height() + margin;
-            content.css('margin-top', contentPlacement);
-            $('body').css('height', $('html').height() - navbar.height() - margin - 1);
-        }
-        $(document).ready(lineUpContent);
-        $(window).resize(lineUpContent);
+  <div id="footer">
+    <div id="values-title">
+      Our Values
+    </div>
+    <div id="values">
+      Scholarship | Chivalry | Culture | Character | Service
+    </div>
+    <div id="copyright">
+      Copyright 2019 Gamma Iota Chapter of Sigma Pi Fraternity
+    </div>
+  </div>
 
-        // Hack to fix Windows Phone 8 IE rendering bug
-        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
-          var msViewportStyle = document.createElement('style')
-          msViewportStyle.appendChild(
-            document.createTextNode(
-              '@-ms-viewport{width:auto!important}'
-            )
-          )
-          document.querySelector('head').appendChild(msViewportStyle)
-        }
+  <script>
+    $(document).ready(() => {
+        let toggleBtn = $('#menu-toggle');
+        let mobileMenu = $('#mobile-menu');
+        toggleBtn.click(() => {
+            if(mobileMenu.hasClass('show')) {
+                mobileMenu.slideUp();
+            } else {
+                mobileMenu.slideDown();
+            }
+            mobileMenu.toggleClass('show');
+            toggleBtn.toggleClass('active');
+        });
 
-        // Replace low-res background image with high-res one
-	    window.onload = function() {
-	    	var cbLow = $($('#content-bkg-lowres')[0]);
-	    	var cbHigh = $($('#content-bkg-highres')[0]);
-	    	var urlLow = cbLow.css('background-image');
-	    	if (!urlLow) return;
-	    	var urlHigh = urlLow.replace('low-res', 'high-res');
-	    	var img = new Image();
-	    	img.src = urlHigh.replace('url("', "").replace('")', '');
-	    	cbHigh.css('background-image', urlHigh);
-	    	setTimeout(function() { cbHigh.css('opacity', '1'); }, 1000);
-	    };
-    })();
-    </script>
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 {% endblock %}

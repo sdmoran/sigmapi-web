@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # This script will deploy the latest code to production.
 # This script does NOT apply migrations. Do those yourself carefully.
 set -x
@@ -19,7 +20,7 @@ ENV_SETTINGS_SRC_FNAME=prod.py
 ENV_SETTINGS_DST_FNAME=prod.py
 
 PYTHON=python3.6
-DJANGO_LIB=Django-1.11.4-py3.6.egg/django
+DJANGO_LIB=Django-1.11.18-py3.6.egg/django
 PIP=pip3.6
 
 echo "Copying REPO $REPO/$DJANGOAPP TO PROD $PROD_PYTHON_WEBAPP/$DJANGOAPP";

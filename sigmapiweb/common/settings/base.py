@@ -3,7 +3,6 @@ Base settings for Sigma Pi, Gamma Iota chapter website.
 """
 
 import os
-from collections import OrderedDict
 
 BASE_DIR = os.getcwd()
 
@@ -64,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'sigmapiweb.apps.PubSite.processors.menu_items'
             ],
         },
     }
@@ -152,11 +152,14 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 SASS_PROCESSOR_AUTO_INCLUDE = False
 SASS_PRECISION = 8
 
-PUBLIC_PAGES = OrderedDict([
-    ('Home', ('pub-index', None)),
-    ('About', ('pub-about', 'summer-house.jpg')),
-    ('Service & Activities', ('pub-activities', 'volleyball.jpg')),
-    ('Brothers', ('userinfo-users', 'seniors-2017.jpg')),
-    ('Donate', ('pub-donate', None)),
-    ('Log In', ('pub-login', None)),  # This is hard-coded into login_v1.scss
-])
+PUBLIC_PAGES = [
+    {'title': 'Home', 'view': 'pub-index'},
+    {'title': 'About', 'view': 'pub-about'},
+    {'title': 'Service & Activities', 'view': 'pub-service'},
+    {'title': 'Brothers', 'view': 'userinfo-users'},
+    {'title': 'Donate', 'target': '_blank',
+     'url': ('https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=gammaiota3c@sigmapi.org&lc=US&item_name='
+             'Donation+to+Help+The+Brotherhood&no_note=0&cn=&currency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:'
+             'NonHosted')},  # reasons why I hate python, this single string looks like three
+    {'title': 'Log In', 'view': 'pub-login'},  # This is hard-coded into login.scss
+]

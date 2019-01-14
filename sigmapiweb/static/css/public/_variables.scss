@@ -1,0 +1,48 @@
+$sm-min: 576px;
+$md-min: 768px;
+$lg-min: 992px;
+$xl-min: 1200px;
+
+$xs-max: 575.98px;
+$sm-max: 767.98px;
+$md-max: 991.98px;
+$lg-max: 1199.98px;
+
+@mixin media-xs {
+  @media (max-width: $xs-max) {
+    @content;
+  }
+}
+
+@mixin media-sm {
+  @media (min-width: $sm-min) and (max-width: $sm-max) {
+    @content;
+  }
+}
+
+@mixin media-md {
+  @media (min-width: $md-min) and (max-width: $md-max) {
+    @content;
+  }
+}
+
+@mixin media-lg {
+  @media (min-width: $lg-min) and (max-width: $lg-max) {
+    @content;
+  }
+}
+
+@mixin media-xl {
+  @media (min-width: $xl-min) {
+    @content;
+  }
+}
+
+$sp-purple: #3f3a5f;
+$sp-gray: #d8d8d5;
+$sp-gold: #d0b786;
+$sp-lavendar: #8c88a3;
+$sp-black: #101820;
+$sp-emerald: #007840;
+$sp-blue: #4196ca;
+$light-gray: #f1f1f2;

@@ -1,0 +1,40 @@
+@import "variables";
+
+.article {
+  margin-bottom: 30px;
+
+  h1, h2, h3, h4, h5, h6 {
+    color: $sp-purple;
+  }
+
+  font-size: 16px;
+
+  .image-wrapper {
+    padding: 0 20px 5px 20px;
+
+    &.full-width {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    @media(max-width: $sm-max) {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    @media(min-width: $md-min) {
+      &.float-md-right,
+      &.float-md-left {
+        max-width: 60%;
+      }
+    }
+
+    img {
+      width: 100%;
+    }
+    .caption {
+      text-align: center;
+      font-size: 13px;
+    }
+  }
+}

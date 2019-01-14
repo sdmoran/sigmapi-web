@@ -3,6 +3,11 @@
 {% load staticfiles %}
 {% load sass_tags %}
 {% block local_includes %}
+  <script type='text/javascript' src='{% static "js/lib/jquery-1.11.1.min.js" %}'></script>
+  <script type="text/javascript" src='{% static "bootstrap/js/bootstrap.min.js" %}'></script>
+
+  <link rel="stylesheet" type="text/css" href='{% static "bootstrap/css/bootstrap.min.css" %}'/>
+
  	<link rel="stylesheet" type="text/css" href='{% sass_src "css/secure/base_v0.scss" %}'/>
 	<script type="text/javascript" src="{% static 'js/secure/common.js' %}"></script>
 	{% block module_includes %}

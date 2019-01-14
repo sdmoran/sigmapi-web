@@ -27,7 +27,7 @@ let _disablePollingFlag = false;
 const disablePolling = () => {_disablePollingFlag = true};
 const enablePolling = () => {_disablePollingFlag = false};
 
-j3(document).ready(() =>
+$(document).ready(() =>
 {
     //partyId is a global set in the template by django
     Vue.http.options.root = `/secure/parties/api/${partyId}`;

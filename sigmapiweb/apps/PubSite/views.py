@@ -37,15 +37,6 @@ def activities(request):
     )
 
 
-def donate(request):
-    """
-    View for the static donate page.
-    """
-    return render(
-        request, 'public/donate.html', _get_context('Donate'),
-    )
-
-
 def permission_denied(request):
     """
     View for 403 (Permission Denied) error.

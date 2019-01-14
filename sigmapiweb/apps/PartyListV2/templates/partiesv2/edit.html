@@ -87,41 +87,41 @@
         'timeFormat': time_format
     });
 
-	let prepartyElements = j3("#wrapper_id_preparty_start")
+	let prepartyElements = $("#wrapper_id_preparty_start")
         .add("#wrapper_id_has_preparty_invite_limits");
 
 	let slideDuration = 0;
 
-	j3("#id_has_preparty").change(function()
+	$("#id_has_preparty").change(function()
     {
-        if(j3(this).is(":checked"))
+        if($(this).is(":checked"))
         {
             prepartyElements.slideDown(slideDuration);
-            j3("#id_has_preparty_invite_limits").change();
+            $("#id_has_preparty_invite_limits").change();
         }
         else
         {
            prepartyElements.slideUp(slideDuration);
-           j3("#wrapper_id_max_preparty_invites").slideUp(slideDuration);
+           $("#wrapper_id_max_preparty_invites").slideUp(slideDuration);
         }
     }).change();
 
 	// Only show party invite limit if the party invite is checked
-	j3("#id_has_party_invite_limits").change(function()
+	$("#id_has_party_invite_limits").change(function()
     {
-        if(j3(this).is(":checked"))
-            j3("#wrapper_id_max_party_invites").slideDown(slideDuration);
+        if($(this).is(":checked"))
+            $("#wrapper_id_max_party_invites").slideDown(slideDuration);
         else
-            j3("#wrapper_id_max_party_invites").slideUp(slideDuration);
+            $("#wrapper_id_max_party_invites").slideUp(slideDuration);
     }).change();
 
 	// Only show pre-party invite limit if the checkbox is checked
-	j3("#id_has_preparty_invite_limits").change(function()
+	$("#id_has_preparty_invite_limits").change(function()
     {
-        if(j3(this).is(":checked"))
-            j3("#wrapper_id_max_preparty_invites").slideDown(slideDuration);
+        if($(this).is(":checked"))
+            $("#wrapper_id_max_preparty_invites").slideDown(slideDuration);
         else
-            j3("#wrapper_id_max_preparty_invites").slideUp(slideDuration);
+            $("#wrapper_id_max_preparty_invites").slideUp(slideDuration);
     }).change();
 
 	slideDuration = 400;

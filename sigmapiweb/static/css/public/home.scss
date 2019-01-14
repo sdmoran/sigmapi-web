@@ -1,0 +1,87 @@
+@import "variables";
+
+#main-slider {
+  margin-bottom: 40px;
+
+  @media(max-width: $sm-max) {
+    margin-bottom: 20px;
+  }
+}
+
+.carousel-item {
+  img {
+    height: 30vw;
+    width: 100%;
+    object-fit: cover;
+
+    @media(max-width: $sm-max) {
+      height: 55vw;
+    }
+  }
+
+  .carousel-text {
+    font-weight: 300;
+    position: absolute;
+    background: rgba(0,0,0,0.6);
+    padding: 5px;
+    font-size: 37px;
+    color: white;
+    width: 100%;
+    text-align: center;
+    bottom: 40px;
+
+    @media (max-width: $sm-max) {
+      font-size: 25px;
+      bottom: 30px;
+    }
+
+    @media(max-width: $xs-max) {
+      font-size: 20px;
+      padding: 2px;
+    }
+  }
+}
+
+#home-content {
+  margin-bottom: 40px;
+
+  .welcome-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    @media(max-width: $sm-max) {
+      text-align: center;
+    }
+
+    h2 {
+      color: $sp-purple;
+      font-size: 25px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 0;
+      @media(max-width: $md-max) {
+        font-size: 14px;
+      }
+    }
+  }
+
+  img {
+    width: 100%;
+  }
+}
+
+#social {
+  padding: 30px 10px;
+  display: flex;
+  justify-content: space-around;
+
+  svg {
+    $icon-size: 40px;
+    width: $icon-size;
+    height: $icon-size;
+    color: $sp-purple;
+  }
+}

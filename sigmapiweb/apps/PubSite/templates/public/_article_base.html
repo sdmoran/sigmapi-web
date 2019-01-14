@@ -2,5 +2,18 @@
 
 {% load sass_tags %}
 {% block module_includes %}
-	<link rel="stylesheet" href="{% sass_src 'css/public/article_v2.scss' %}">
+	<link rel="stylesheet" href="{% sass_src 'css/public/article.scss' %}?v=1">
+{% endblock %}
+
+{% block content %}
+  <div class="content-header">
+    <div class="container">
+      <h1>{% block article_title %}{% endblock %}</h1>
+    </div>
+  </div>
+
+  <div class="article">
+    {% block article %}
+    {% endblock %}
+  </div>
 {% endblock %}
