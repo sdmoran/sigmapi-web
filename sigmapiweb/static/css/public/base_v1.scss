@@ -316,8 +316,10 @@ h1 {
   position:relative;
 }
 
-.navbar-nav > li:last-child
-{
-  position: absolute;
-  right: 0;
+@media (min-width:768px){
+  .navbar-nav > li:last-child
+  {
+    position: absolute;
+    right: 0;
+  }
 }
