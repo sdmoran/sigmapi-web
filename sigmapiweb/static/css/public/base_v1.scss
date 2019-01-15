@@ -299,3 +299,25 @@ h1 {
 {
     width: 100% !important;
 }
+
+.lock
+{
+  width: 18px;
+  vertical-align: middle;
+
+  >path
+  {
+    fill: #ccd;
+  }
+}
+
+.menulinks
+{
+  position:relative;
+}
+
+.navbar-nav > li:last-child
+{
+  position: absolute;
+  right: 0;
+}
