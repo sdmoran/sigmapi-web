@@ -30,7 +30,7 @@ DATABASES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 DOWNLOADVIEW_BACKEND = 'django_downloadview.lighttpd.XSendfileMiddleware'
 
@@ -63,3 +63,5 @@ EMAIL_HOST_USER = None
 EMAIL_HOST_PASSWORD = None
 DEFAULT_FROM_EMAIL = None
 SERVER_EMAIL = None
+
+SIGMA_POLLS_SLACK_CLIENT_SECRET = b'NotARealSecret'

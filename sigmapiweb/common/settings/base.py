@@ -113,6 +113,7 @@ PROJECT_APPS = (
     'apps.Links',
     'apps.Standards',
     'apps.Scholarship',
+    'apps.Slack'
 )
 INSTALLED_APPS = PREREQ_APPS + PROJECT_APPS
 

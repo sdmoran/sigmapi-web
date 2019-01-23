@@ -11,6 +11,7 @@ from django.contrib import admin
 from apps.PubSite import urls as public_urls
 from apps.Secure import urls as secure_urls
 from apps.UserInfo import urls as userinfo_urls
+from apps.Slack import urls as slack_urls
 
 
 admin.autodiscover()
@@ -36,6 +37,10 @@ urlpatterns = [
     url(
         regex=r'^secure/',
         view=include(secure_urls),
+    ),
+    url(
+        regex=r'^slack/',
+        view=include(slack_urls),
     ),
     url(
         regex=r'^',
