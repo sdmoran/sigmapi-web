@@ -90,7 +90,7 @@ def send_summons_request(request):
                 'You must include suggested further action by standards.'
             )
             return redirect(index)
-    if not special_circumstance.strip():
+    elif not special_circumstance.strip():
         request.session['standards_index_error'] = (
             'Summons request failed to send. ' +
             'You must include the special circumstance.'
@@ -136,7 +136,7 @@ def send_summons_request(request):
     else:
         request.session['standards_index_error'] = (
             'Summons request failed to send. ' +
-            'You must include atleast 1 recipient with the request.'
+            'You must include at least 1 recipient with the request.'
         )
     return redirect(index)
 
