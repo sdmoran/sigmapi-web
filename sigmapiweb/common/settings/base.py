@@ -63,7 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'sigmapiweb.apps.PubSite.processors.menu_items'
+                'apps.PubSite.processors.menu_items'
             ],
         },
     }
