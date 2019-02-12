@@ -214,6 +214,8 @@ def run_command(command, executed_functions):
         except TypeError:
             assert isinstance(r, str), 'Command list values must be callables or strings'
             run_command(r, executed_functions)
+        except KeyboardInterrupt:
+            pass
 
 
 def run(command):
