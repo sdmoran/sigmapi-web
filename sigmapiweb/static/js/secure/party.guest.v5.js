@@ -251,7 +251,12 @@ $(document).ready(() =>
 
     Vue.component('party-checkbox', {
         props: ['value', 'name'],
-        template: '#party-checkbox-template'
+        template: '#party-checkbox-template',
+        watch: {
+            value: function(val) {
+                this.$emit('input', val);
+            }
+        }
     });
 
     Vue.component('party-searchbox', {
