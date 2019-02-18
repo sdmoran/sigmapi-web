@@ -1,16 +1,20 @@
 """
 General utility functions to be used across project.
 """
+from typing import List, Tuple, Generic, TypeVar
+
 from django.conf import settings
 from django.contrib import admin
 from django.core.mail import EmailMessage
 
+from common.mixins import ModelMixin
+from django.db import models
 
 DELETED_STRING = '[deleted]'
 NONE_SENTINEL_ID = -1
 
 
-def register_model_admins(*model_classes):
+def register_model_admins(*model_classes: Tuple[ModelMixin, ...]):
     """
     Register a model with the admin site with a default list display.
 
@@ -27,10 +31,18 @@ def register_model_admins(*model_classes):
             for field in model_class._meta.fields
             if field.name not in model_class.admin_display_excluded_fields
         ]
+
+        model_admin_fields = {
+            'list_display': tuple(display_fields),
+            'search_fields': model_class.admin_search_fields
+        }
+        if model_class.admin_form is not None:
+            model_admin_fields['form'] = model_class.admin_form
+
         model_admin_class = type(
             model_class.__name__ + 'Admin',
             (admin.ModelAdmin,),
-            {'list_display': tuple(display_fields)},
+            model_admin_fields
         )
         admin.site.register(model_class, model_admin_class)
 

@@ -21,6 +21,4 @@ class UserInfoAdmin(admin.ModelAdmin):
 
 admin.site.register(UserInfo, UserInfoAdmin)
 
-register_model_admins(
-    PledgeClass,
-)
+register_model_admins(PledgeClass)

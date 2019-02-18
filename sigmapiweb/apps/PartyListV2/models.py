@@ -3,6 +3,8 @@ import json
 from datetime import datetime
 
 from Levenshtein._levenshtein import distance
+from django import forms
+from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -69,6 +71,12 @@ class Party(ModelMixin, models.Model):
         upload_to=get_party_jobs_path,
         blank=True,
         null=True
+    )
+
+    admin_display_excluded_fields = (
+        'id', 'has_party_invite_limits', 'max_party_invites', 'has_preparty', 'preparty_start',
+        'has_preparty_invite_limits', 'max_preparty_invites', 'guycount', 'girlcount', 'guys_ever_signed_in',
+        'girls_ever_signed_in', 'last_updated', 'guest_update_counter'
     )
 
     # Not strictly enforced, but shows a warning
@@ -293,8 +301,18 @@ class PartyCountRecord(ModelMixin, models.Model):
         }
 
 
+class PartyGuestAdminForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(PartyGuestAdminForm, self).__init__(*args, **kwargs)
+
+    gender = forms.ChoiceField(widget=forms.Select, choices=(('M', 'Male'), ('F', 'Female')))
+
+
 class PartyGuest(ModelMixin, models.Model):
     """ Class to represent a party guest. """
+
+    name = models.CharField(max_length=100, db_index=True)
+    gender = models.CharField(max_length=5)
 
     party = models.ForeignKey(
         Party,
@@ -316,26 +334,28 @@ class PartyGuest(ModelMixin, models.Model):
         User,
         related_name="invites_used_for",
         null=True,
-        blank=False,
+        blank=True,
         default=None,
         on_delete=models.CASCADE,
     )
 
-    name = models.CharField(max_length=100, db_index=True)
-    gender = models.CharField(max_length=5)
     has_preparty_access = models.BooleanField(default=False)
     was_vouched_for = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     _signed_in = models.BooleanField(default=False, db_column='signedIn')
     ever_signed_in = models.BooleanField(default=False)
-    time_first_signed_in = models.DateTimeField(null=True)
-    _cached_json = models.TextField(null=True)
+    time_first_signed_in = models.DateTimeField(null=True, blank=True,)
+    _cached_json = models.TextField(null=True, blank=True)
     update_counter = models.IntegerField(default=0)
+
+    admin_display_excluded_fields = ('id', '_cached_json', 'update_counter')
+    admin_search_fields = ('name',)
+    admin_form = PartyGuestAdminForm
 
     def get_cached_json(self):
         """ Get cached party status. """
 
-        if self._cached_json is None:
+        if self._cached_json is None or self._cached_json == "":
             self.save()
         return json.loads(self._cached_json)
 
@@ -389,6 +409,9 @@ class PartyGuest(ModelMixin, models.Model):
         if self.id is not None:
             self._cached_json = json.dumps(self.to_json())
 
+        if self._cached_json == "":
+            self._cached_json = None
+
         self.party.guest_update_counter += 1
         self.update_counter = self.party.guest_update_counter
         self.party.save()
@@ -419,6 +442,7 @@ class PartyGuest(ModelMixin, models.Model):
             'timeFirstSignedIn': self.formatted_time_first_signed_in(),
             'createdAt': self.created_at.isoformat()
         }
+
 
 
 class RestrictedGuest(ModelMixin, models.Model):
