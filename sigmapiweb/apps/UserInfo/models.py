@@ -39,7 +39,7 @@ class UserInfo(ModelMixin, models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     picture = models.FileField(upload_to=filepath, null=True, blank=True)
     phoneNumber = models.CharField(default="", max_length=100, blank=True)
-    graduationYear = models.PositiveIntegerField(default=2020)
+    graduationYear = models.PositiveIntegerField(default=2022)
     major = models.CharField(max_length=100, blank=True)
     hometown = models.CharField(max_length=100, blank=True)
     activities = models.TextField(blank=True)

@@ -27,11 +27,11 @@ urlpatterns = [
         view=admin.site.urls,
     ),
     url(
-        regex=r'^brothers/',
+        regex=r'^users/',
         view=include(userinfo_urls),
     ),
     url(
-        regex=r'^users/',
+        regex=r'^brothers/',
         view=include(userinfo_urls),
     ),
     url(
