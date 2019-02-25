@@ -1,4 +1,4 @@
-{% extends 'common/public_base.html' %}
+{% extends 'common/public_base_header.html' %}
 
 {% load sass_tags %}
 {% block module_includes %}
@@ -6,12 +6,6 @@
 {% endblock %}
 
 {% block content %}
-  <div class="content-header">
-    <div class="container">
-      <h1>{% block article_title %}{% endblock %}</h1>
-    </div>
-  </div>
-
   <div class="article">
     {% block article %}
     {% endblock %}

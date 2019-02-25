@@ -1,4 +1,4 @@
-{% extends 'common/public_base.html' %}
+{% extends 'common/public_base_header.html' %}
 
 {% load sass_tags %}
 
@@ -10,20 +10,15 @@
 
 {% load staticfiles %}
 
+{% block content_title %}
+  {% if user.is_authenticated %}
+    Already Logged In
+  {% else %}
+    Log In
+  {% endif %}
+{% endblock %}
 
 {% block content %}
-  <div class="content-header">
-    <div class="container">
-      <h1>
-        {% if user.is_authenticated %}
-          Already Logged In
-        {% else %}
-          Log In
-        {% endif %}
-      </h1>
-    </div>
-  </div>
-
   <div class="login-page">
     {% if user.is_authenticated %}
       <p class="already-in">

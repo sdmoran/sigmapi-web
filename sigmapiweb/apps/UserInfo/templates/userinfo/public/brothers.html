@@ -1,4 +1,4 @@
-{% extends 'public/_article_base.html' %}
+{% extends 'common/public_base_header.html' %}
 {% block title %}Sigma Pi Gamma Iota - Brothers{% endblock %}
 {% load sass_tags %}
 {% block module_includes %}
@@ -7,10 +7,10 @@
   <link rel="stylesheet" type="text/css" href='{% sass_src "css/public/brothers.scss" %}?v=1' />
 {% endblock %}
 
-{% block article_title %}
+{% block content_title %}
   Brothers
 {% endblock %}
-{% block article %}
+{% block content %}
   {% for group in brother_groups %}
     {% if group.count > 0 %}
       <div class="user-group-header">
