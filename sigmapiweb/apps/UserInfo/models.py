@@ -50,6 +50,7 @@ class UserInfo(ModelMixin, models.Model):
         related_name="big_brother",
         default=None,
         null=True,
+        blank=True,
         on_delete=models.SET_DEFAULT
     )
     pledgeClass = models.ForeignKey(

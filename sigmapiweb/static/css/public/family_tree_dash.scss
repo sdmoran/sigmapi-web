@@ -1,0 +1,33 @@
+.family-tree-dash {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  justify-content: center;
+  font-size: 16px;
+  max-width: 500px;
+  margin: 20px;
+  text-align: center;
+
+  select {
+    height: 50px;
+    outline: none;
+  }
+
+  button {
+    margin-top: 10px;
+    width: 100%;
+  }
+}
+
+.sp-button {
+  background: #3f3a5f;
+  border-radius: 4px;
+  color: white;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  display: inline-block;
+}

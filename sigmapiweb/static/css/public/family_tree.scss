@@ -1,11 +1,70 @@
+@import "variables";
 
-.family-tree {
-  #content-bkg-lowres,
-  #content-bkg-highres {
-    display: none;
+html {
+  width: 100%;
+  font-size: 12px;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.sp-button {
+  background: #3f3a5f;
+  border-radius: 4px;
+  color: white;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  display: inline-block;
+}
+
+body.family-tree {
+  margin: 0;
+
+  .tree-tools {
+    z-index: 2;
+    box-shadow: 0 0 5px black;
+    padding: 15px;
+
+    > .row > div {
+      display: flex;
+      align-items: center;
+    }
+
+    .tree-back a {
+      text-decoration: none;
+      color: white;
+    }
+
+    .tree-title {
+      font-size: 20px;
+      justify-content: center;
+      color: $sp-purple;
+    }
+
+    .tree-tips {
+      justify-content: flex-end;
+    }
   }
 
-  .family-tree-title {
-    text-align: center;
+  #tree-container {
+    display: flex;
+    flex: 1;
+
+    #tree {
+      height: 100vh;
+    }
+
+    canvas {
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+    }
   }
 }
+

@@ -7,10 +7,12 @@ from django.conf import settings
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.template.defaultfilters import stringfilter, register
 from django.utils.html import strip_tags
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Q
 
 from . import utils
 from .forms import EditUserInfoForm
@@ -143,13 +145,47 @@ def users(request):
     return render(request, 'userinfo/public/brothers.html', context)
 
 
+def family_tree_dashboard(request):
+    """
+    View for the family tree landing page
+    """
+
+    user_accounts = User.objects \
+        .filter(groups__name__in=['Brothers', 'Alumni']) \
+        .filter(Q(userinfo__isnull=True) | Q(userinfo__bigBrother__isnull=True))\
+        .exclude(first_name__contains='Admin') \
+        .prefetch_related('userinfo')\
+        .all()
+
+    options = ['All'] + [(u.first_name + " " + u.last_name) for u in user_accounts]
+
+    context = {
+        'options': options
+    }
+    return render(request, 'userinfo/public/family-tree-dashboard.html', context)
+
+
 def family_tree(request):
     """
-    Builds the family tree based on user accounts
+    View for the family tree page
     """
-    user_accounts = User.objects\
-        .filter(groups__name__in=['Brothers', 'Alumni'])\
-        .exclude(first_name__contains='Admin')\
+
+    context = {
+        'pages': settings.PUBLIC_PAGES,
+        'current_page_name': 'Brothers',
+    }
+    return render(request, 'userinfo/public/family-tree.html', context)
+
+
+def get_tree_json(request):
+    """
+    API endpoint for getting the list of
+    :param request:
+    :return:
+    """
+    user_accounts = User.objects \
+        .filter(groups__name__in=['Brothers', 'Alumni']) \
+        .exclude(first_name__contains='Admin') \
         .prefetch_related('userinfo')
 
     root_node = {
@@ -167,26 +203,23 @@ def family_tree(request):
         }
         try:
             new_brother['big_brother'] = user.userinfo.bigBrother.id
-        except UserInfo.DoesNotExist:
+        except (UserInfo.DoesNotExist, AttributeError):
             new_brother['big_brother'] = -1
 
         user_dict[user.id] = new_brother
 
     # Expand the dict into a tree structure
-    for user in user_dict.items():
+    for user in user_dict.values():
         if user['big_brother'] in user_dict:
             user_dict[user['big_brother']]['children'].append(user)
         else:
             root_node['children'].append(user)
 
-    big_list = json.dumps(root_node, cls=DjangoJSONEncoder)
+    # big_list = json.dumps(root_node)
 
-    context = {
-        'users': big_list,
-        'pages': settings.PUBLIC_PAGES,
-        'current_page_name': 'Brothers',
-    }
-    return render(request, 'userinfo/public/family-tree.html', context)
+    return JsonResponse({
+        'tree': root_node
+    })
 
 
 def find_big(tree, big_id, little):

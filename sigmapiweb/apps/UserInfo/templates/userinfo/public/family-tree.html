@@ -1,68 +1,36 @@
-{% extends 'common/public_base.html' %}
-{% block module_includes %}
+{% extends 'common/_base.html' %}
+{% block local_includes %}
     {% load sass_tags %}
-    <script src="https://d3js.org/d3.v3.min.js"></script>
-    <script src="/static/js/public/familytree2.js"></script>
-    <link rel="stylesheet" type="text/css" href="{% sass_src 'css/public/family_tree.scss' %}" />
+  {% load staticfiles %}
+  <link href="https://fonts.googleapis.com/css?family=Pangolin" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.22/fabric.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"
+          integrity="sha256-7/yoZS3548fXSRXqc/xYzjsmuW3sFKzuvOCHd06Pmps=" crossorigin="anonymous"></script>
+{#  <script src="/static/js/public/family-tree.js?ver=1.0"></script>#}
+  <script src="{% static 'js/public/family-tree.js' %}?ver=1.1"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="{% sass_src 'css/public/family_tree.scss' %}" />
 {% endblock %}
 {% block title %}Sigma Pi Gamma Iota - Family Tree{% endblock %}
 
 {% block body_class %}family-tree{% endblock %}
-{% block content %}
-    <style type="text/css">
 
-	.node {
-    cursor: pointer;
-  }
-
-  .overlay{
-      background-color:#EEE;
-  }
-
-  .node circle {
-    fill: #fff;
-    stroke: steelblue;
-    stroke-width: 1.5px;
-  }
-
-  .node text {
-    font-size:10px;
-    font-family:sans-serif;
-  }
-
-  .link {
-    fill: none;
-    stroke: #ccc;
-    stroke-width: 1.5px;
-  }
-
-  .templink {
-    fill: none;
-    stroke: red;
-    stroke-width: 3px;
-  }
-
-  .ghostCircle.show{
-      display:block;
-  }
-
-  .ghostCircle, .activeDrag .ghostCircle{
-       display: none;
-  }
-
-</style>
-    <p class="family-tree-title">
-    Welcome to the Family Tree Beta! Use your mouse to drag around, and zoom in / out with the scroll wheel.
-    </p>
-
-    <div id="tree-container" style="min-height: 800px;">
+{% block body %}
+  <div class="tree-tools container-fluid">
+    <div class="row">
+      <div class="col-4 tree-back">
+        <a href="{% url 'userinfo-family_tree_dashbaord' %}" class="sp-button">Back to Sigma Pi</a>
+      </div>
+      <div class="col-4 tree-title">
+        Sigma Pi Gamma Iota Family Tree
+      </div>
+      <div class="col-4 tree-tips">
+          Drag to pan, Scroll to zoom
+      </div>
     </div>
-    <script>
-        let jsonData = JSON.parse(unescape("{{ users | safe | escapejs}}"));
-        $(document).ready(function(){
-            generateFamilyTree("tree-container", jsonData)
-        });
-
-    </script>
-
+  </div>
+  <div id="tree-container">
+    <canvas id="tree"></canvas>
+  </div>
 {% endblock %}

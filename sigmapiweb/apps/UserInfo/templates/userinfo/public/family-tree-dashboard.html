@@ -1,0 +1,33 @@
+{% extends 'common/public_base_header.html' %}
+{% block module_includes %}
+  {% load sass_tags %}
+  <link rel="stylesheet" type="text/css" href="{% sass_src 'css/public/family_tree_dash.scss' %}"/>
+{% endblock %}
+
+{% block title %}Sigma Pi Gamma Iota - Family Tree{% endblock %}
+
+{% block body_class %}family-tree{% endblock %}
+
+{% block content_title %}Family Tree{% endblock %}
+{% block content %}
+  <div class="family-tree-dash">
+    <h3>Welcome to the Sigma Pi Gamma Iota Family Tree! Select the section of the tree you would like to view</h3>
+    <select id="tree-selector">
+      {% for option in options %}
+        <option value="{{ option }}">{{ option }}</option>
+      {% endfor %}
+    </select>
+    <div>
+      <button id="tree-go" class="sp-button">Go</button>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(() => {
+      let select = $('#tree-selector');
+      $('#tree-go').click(() => {
+        window.location = '/brothers/family-tree/view/?tree=' + select.val();
+      });
+    });
+  </script>
+{% endblock %}

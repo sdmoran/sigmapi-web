@@ -1,0 +1,7 @@
+{
+    "PYTHON": "/Users/colin/.local/share/virtualenvs/sigmapi-web-agBR4K95/bin/python",
+    "PIP": "sudo /Users/colin/.local/share/virtualenvs/sigmapi-web-agBR4K95/bin/python -m pip",
+    "MANAGE": "/Users/colin/.local/share/virtualenvs/sigmapi-web-agBR4K95/bin/python manage.py",
+    "DEV_DATA": "fixtures/dev_data.json",
+    "PORT": "8000"
+}
