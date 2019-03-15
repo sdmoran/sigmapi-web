@@ -257,6 +257,7 @@ class Party(ModelMixin, models.Model):
             "minLevenshteinDist": RestrictedGuest.MIN_LEVENSHTEIN_DIST,
             "hasPrepartyInviteLimits": self.has_preparty_invite_limits,
             "hasPartyInviteLimits": self.has_party_invite_limits,
+            "hasPreparty": self.has_preparty,
             "listClosed": self.is_list_closed(),
             "lastUpdated": self.last_updated.timestamp(),
             "guestUpdateCounter": self.guest_update_counter,

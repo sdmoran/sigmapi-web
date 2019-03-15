@@ -157,7 +157,7 @@ $(document).ready(() =>
                     this.party.permissions.youHaveDoorAccess;
             },
             showPrepartyCheckbox: function() {
-                return this.party.hasPrepartyInviteLimits && !this.party.listClosed;
+                return this.party.hasPrepartyInviteLimits && !this.party.listClosed && this.party.hasPreparty;
             },
             showBrothers: function() {
                 return (this.party.listClosed && this.party.permissions.youHaveDoorAccess) ||
