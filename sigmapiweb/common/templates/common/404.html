@@ -1,0 +1,19 @@
+{% extends 'public/_article_base.html' %}
+
+{% block title %}Sigma Pi Gamma Iota - Permission Denied {% endblock %}
+{%  load sass_tags %}
+{% block article_includes %}
+    <link href="https://fonts.googleapis.com/css?family=Margarine" rel="stylesheet">
+    <link href="{%sass_src 'css/public/404.scss'%}?v=1" rel="stylesheet">
+{% endblock %}
+{% load staticfiles %}
+{% block article_title %}
+  Page Not Found
+{% endblock %}
+{% block article %}
+  <div class="container content-top-margin container-404">
+    <p class="title"> Sorry Amrit put this page in the lettuce bag. Find it.</p>
+      <img src="{% static 'img/Amrit Lettuce.jpg' %}" class="amrit">
+
+  </div>
+{% endblock %}

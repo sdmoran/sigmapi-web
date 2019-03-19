@@ -13,6 +13,7 @@ from apps.Secure import urls as secure_urls
 from apps.UserInfo import urls as userinfo_urls
 from apps.Slack import urls as slack_urls
 
+from apps.PubSite import views as public_views
 
 admin.autodiscover()
 
@@ -46,7 +47,11 @@ urlpatterns = [
         regex=r'^',
         view=include(public_urls),
     ),
+    url(
+        regex=r'^404/$',
+        view=public_views.handler404
+    )
 ]
-
+handler404 = 'PubSite.views.handler404'
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

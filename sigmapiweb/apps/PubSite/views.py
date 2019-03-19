@@ -44,3 +44,10 @@ def permission_denied(request):
     return render(
         request, 'common/403.html', _get_context('Permission Denied'),
     )
+
+
+def handler404(request):
+    """
+
+    """
+    return render(request, 'common/404.html', _get_context("Page Not Found"))
