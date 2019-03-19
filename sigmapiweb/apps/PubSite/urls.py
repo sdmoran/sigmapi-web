@@ -4,11 +4,33 @@ URLs for PubSite app.
 from django.conf.urls import url
 from django.contrib.auth import views as dsl
 from django.views.generic.base import RedirectView
+from django.contrib.auth import views as auth_views
+
 
 from . import views
 
 
 urlpatterns = [
+    url(
+        r'^password_reset/$',
+        views.ResetPassword.as_view(),
+        name='password_reset'
+    ),
+    url(
+        r'^password_reset/done/$',
+        views.ResetPasswordDone.as_view(),
+        name='password_reset_done'
+    ),
+    url(
+        r'^password_reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        views.ResetPasswordConfirm.as_view(),
+        name='password_reset_confirm'
+    ),
+    url(
+        r'^password_reset/done/$',
+        auth_views.password_reset_complete,
+        name='password_reset_complete'
+    ),
     url(
         regex=r'^login',
         view=dsl.login,
