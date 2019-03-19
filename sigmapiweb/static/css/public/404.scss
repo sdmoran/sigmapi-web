@@ -1,0 +1,22 @@
+@import "variables";
+.container-404{
+  text-align: center;
+
+  .title{
+  color: $sp-purple;
+    font-size: 40px;
+    font-family: 'Margarine', sans-serif;
+
+    @media (max-width: $xs-max) {
+      font-size: 20px;
+    }
+  }
+}
+
+.amrit{
+ max-height: 500px;
+
+  @media (max-width: $xs-max) {
+    max-height: 350px;
+  }
+}
