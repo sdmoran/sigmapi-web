@@ -46,7 +46,7 @@ def permission_denied(request):
     )
 
 
-def handler404(request):
+def handler404(request, exception):
     """
 
     """
