@@ -52,6 +52,6 @@ urlpatterns = [
         view=public_views.handler404
     )
 ]
-handler404 = 'PubSite.views.handler404'
+handler404 = 'apps.PubSite.views.handler404'
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
