@@ -59,6 +59,7 @@ function initFamilyTree() {
     canvas.renderAll();
 
     // setupSearchTools(data, board);
+    $('.tree-loading').hide();
   });
 }
 

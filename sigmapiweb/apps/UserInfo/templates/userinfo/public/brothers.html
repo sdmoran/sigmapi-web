@@ -11,6 +11,11 @@
   Brothers
 {% endblock %}
 {% block content %}
+  <div class="family-tree-fab">
+    <a class="inner" href="{% url 'userinfo-family_tree_dashbaord' %}">
+      View Family Tree
+    </a>
+  </div>
   {% for group in brother_groups %}
     {% if group.count > 0 %}
       <div class="user-group-header">

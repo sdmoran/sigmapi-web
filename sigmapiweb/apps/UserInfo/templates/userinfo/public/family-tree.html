@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="{% sass_src 'css/public/family_tree.scss' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'css/lib/line-scale-pulse-out.min.css' %}"/>
 {% endblock %}
 {% block title %}Sigma Pi Gamma Iota - Family Tree{% endblock %}
 
@@ -32,5 +33,15 @@
   </div>
   <div id="tree-container">
     <canvas id="tree"></canvas>
+  </div>
+  <div class="tree-loading">
+    <div class="la-line-scale-pulse-out">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <p>Loading Family Tree</p>
   </div>
 {% endblock %}

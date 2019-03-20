@@ -68,3 +68,19 @@ body.family-tree {
   }
 }
 
+.tree-loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align: center;
+
+  .la-line-scale-pulse-out {
+    display: inline-block;
+
+    > div {
+      color: #888;
+    }
+  }
+}
