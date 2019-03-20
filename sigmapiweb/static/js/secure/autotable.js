@@ -9,13 +9,5 @@ $(document).ready(function () {
 	$.fn.dataTableExt.oStdClasses["sPageNextDisabled"] = "btn btn-primary disabled dataTable-button-right"
 
 	// Initialize all data table instances.
-	
 	$(".dataTable").DataTable();
-	// var table = $("#guidesTable").DataTable();
-
-	// table.fnDestroy();
-
-	// table = $("#guidesTable").DataTable({
-	// 	"aaSorting": [[0, 'desc']]
-	// });
 });
