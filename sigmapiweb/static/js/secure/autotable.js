@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
 	// Initialize all datatable class elements to data table.
 	$.fn.dataTableExt.oStdClasses["sFilter"] = "dataTable-filter"
 	$.fn.dataTableExt.oStdClasses["sLength"] = "dataTable-length"
@@ -7,7 +7,15 @@ $(document).ready(function() {
 	$.fn.dataTableExt.oStdClasses["sPagePrevDisabled"] = "btn btn-primary disabled dataTable-button-left"
 	$.fn.dataTableExt.oStdClasses["sPageNextEnabled"] = "btn btn-primary dataTable-button-right"
 	$.fn.dataTableExt.oStdClasses["sPageNextDisabled"] = "btn btn-primary disabled dataTable-button-right"
-	
+
 	// Initialize all data table instances.
-	$(".dataTable").dataTable();
+	
+	$(".dataTable").DataTable();
+	// var table = $("#guidesTable").DataTable();
+
+	// table.fnDestroy();
+
+	// table = $("#guidesTable").DataTable({
+	// 	"aaSorting": [[0, 'desc']]
+	// });
 });
