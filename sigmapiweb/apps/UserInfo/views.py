@@ -11,7 +11,6 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.template.defaultfilters import stringfilter, register
 from django.utils.html import strip_tags
-from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q
 
 from . import utils
@@ -46,69 +45,56 @@ def users(request):
     # Get the rest of the users.  Exclude pledges or any execs.
     seniors = User.objects.filter(groups__name='Brothers')
     seniors = seniors.filter(
-        userinfo__graduationYear__lte=senior_year
+        userinfo__graduationYear__lte=senior_year,
+        groups__name="Brothers"
     ).prefetch_related('userinfo').order_by("last_name")
 
     juniors = User.objects.filter(
-        userinfo__graduationYear=(senior_year + 1)
+        userinfo__graduationYear=(senior_year + 1),
+        groups__name="Brothers"
     ).prefetch_related('userinfo').order_by("last_name")
     juniors = juniors.exclude(groups__name='Pledges')
     juniors = juniors.exclude(groups__name='Alumni')
 
     sophomores = User.objects.filter(
-        userinfo__graduationYear=(senior_year + 2)
+        userinfo__graduationYear=(senior_year + 2),
+        groups__name="Brothers"
     ).prefetch_related('userinfo').order_by("last_name")
     sophomores = sophomores.exclude(groups__name='Pledges')
     sophomores = sophomores.exclude(groups__name='Alumni')
 
     freshmen = User.objects.filter(
-        userinfo__graduationYear=(senior_year + 3)
+        userinfo__graduationYear=(senior_year + 3),
+        groups__name="Brothers"
     ).prefetch_related('userinfo').order_by("last_name")
     freshmen = freshmen.exclude(groups__name='Pledges')
     freshmen = freshmen.exclude(groups__name='Alumni')
 
-    # Exclude the execs, if applicable.
-    if sage is not None:
-        seniors = seniors.exclude(username=sage.username)
-        juniors = juniors.exclude(username=sage.username)
-        sophomores = sophomores.exclude(username=sage.username)
-        freshmen = freshmen.exclude(username=sage.username)
-        sage.title = "Sage"
+    sweethearts = User.objects.filter(
+        userinfo__graduationYear__gte=senior_year,
+        groups__name='Sweethearts'
+    ).prefetch_related('userinfo').order_by("last_name")
+    sweethearts = sweethearts.exclude(groups__name='Pledges')
+    sweethearts = sweethearts.exclude(groups__name='Alumni')
 
-    if second is not None:
-        seniors = seniors.exclude(username=second.username)
-        juniors = juniors.exclude(username=second.username)
-        sophomores = sophomores.exclude(username=second.username)
-        freshmen = freshmen.exclude(username=second.username)
-        second.title = "2nd Counselor"
+    exec_board = [
+        (sage, "Sage"),
+        (second, "2nd Counselor"),
+        (third, "3rd Counselor"),
+        (fourth, "4th Counselor"),
+        (first, "1st Counselor"),
+        (herald, "Herald"),
+    ]
 
-    if third is not None:
-        seniors = seniors.exclude(username=third.username)
-        juniors = juniors.exclude(username=third.username)
-        sophomores = sophomores.exclude(username=third.username)
-        freshmen = freshmen.exclude(username=third.username)
-        third.title = "3rd Counselor"
-
-    if fourth is not None:
-        seniors = seniors.exclude(username=fourth.username)
-        juniors = juniors.exclude(username=fourth.username)
-        sophomores = sophomores.exclude(username=fourth.username)
-        freshmen = freshmen.exclude(username=fourth.username)
-        fourth.title = "4th Counselor"
-
-    if first is not None:
-        seniors = seniors.exclude(username=first.username)
-        juniors = juniors.exclude(username=first.username)
-        sophomores = sophomores.exclude(username=first.username)
-        freshmen = freshmen.exclude(username=first.username)
-        first.title = "1st Counselor"
-
-    if herald is not None:
-        seniors = seniors.exclude(username=herald.username)
-        juniors = juniors.exclude(username=herald.username)
-        sophomores = sophomores.exclude(username=herald.username)
-        freshmen = freshmen.exclude(username=herald.username)
-        herald.title = "Herald"
+    # Exclude exec members from their class group
+    for exec_brother in exec_board:
+        user = exec_brother[0]
+        if user is not None:
+            seniors = seniors.exclude(username=user.username)
+            juniors = juniors.exclude(username=user.username)
+            sophomores = sophomores.exclude(username=user.username)
+            freshmen = freshmen.exclude(username=user.username)
+            user.title = exec_brother[1]
 
     context = {
         'pages': settings.PUBLIC_PAGES,
@@ -138,6 +124,11 @@ def users(request):
                 'group_title': 'Freshmen',
                 'brothers': freshmen,
                 'count': len(freshmen)
+            },
+            {
+                'group_title': 'Sweethearts',
+                'brothers': sweethearts,
+                'count': len(sweethearts)
             }
         ]
     }
