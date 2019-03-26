@@ -2,6 +2,7 @@
 Views for PubSite app.
 """
 from django.conf import settings
+from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView
 from django.shortcuts import render
 
 
@@ -51,3 +52,15 @@ def handler404(request, exception):
 
     """
     return render(request, 'common/404.html', _get_context("Page Not Found"))
+
+
+class ResetPassword(PasswordResetView):
+    template_name = "password_reset/password_reset_form.html"
+
+
+class ResetPasswordDone(PasswordResetDoneView):
+    template_name = "password_reset/password_reset_done.html"
+
+
+class ResetPasswordConfirm(PasswordResetConfirmView):
+    template_name = "password_reset/password_reset_confirm.html"
