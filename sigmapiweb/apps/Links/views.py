@@ -60,6 +60,11 @@ def delete_link(request, link):
         except Link.DoesNotExist:
             desired_link = None
         if desired_link:
+            # if request.user == desired_link.poster:
+            #     desired_link.delete()
+            # else:
+            #     return redirect('pub-permission_denied')
+
             try:
                 desired_link.delete()
             except PermissionDenied:

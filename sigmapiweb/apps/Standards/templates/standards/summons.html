@@ -52,7 +52,7 @@
 	 				</tr>
 	 			</thead>
 	 			<tbody>
-	 				{% for summons in all_summons %}
+	 				{% for summons in all_summons reversed %}
 	 				<tr>
 	 					<td>{{ summons.dateSummonsSent }}</td>
 	 					<td>{{ summons|full_name:"summonee" }}</td>

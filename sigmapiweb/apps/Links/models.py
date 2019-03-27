@@ -25,5 +25,5 @@ class Link(ModelMixin, models.Model):
         verbose_name_plural = "Links"
         permissions = (
             ("promote_link", "Can promote links."),
-            ("access_link", "Can access links."),
+            ("access_link", "Can access links.")
         )
