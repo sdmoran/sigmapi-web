@@ -11,7 +11,7 @@
 			<div class="metadata">
 				Posted {{ link.date }} by {{ link|full_name:"poster" }}
 			</div>
-			<!-- Actions on a link -->
+			<!-- Actions on a link 
 			<div class="link-actions">
 				{% if perms.Links.delete_link %}
 				<form action="{% url 'links-delete_link' link.pk %}" method="post" id="delete_link_{{ link.pk }}">
@@ -19,7 +19,7 @@
 					<a href="javascript:$('#delete_link_{{ link.pk }}').submit();" name="Delete Link">Delete Link</a>
 				</form>
 				{% endif %}
-			</div>
+			</div> -->
 		</div>
 	</div>
 </div>
