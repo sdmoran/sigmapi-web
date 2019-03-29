@@ -10,4 +10,5 @@ $(document).ready(function () {
 
 	// Initialize all data table instances.
 	$(".dataTable").DataTable();
+	
 });

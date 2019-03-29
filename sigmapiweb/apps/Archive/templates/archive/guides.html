@@ -5,7 +5,6 @@
 {% block module_includes %}
 <script type='text/javascript' src='{% static "js/lib/jquery.dataTables.min.js" %}'></script>
 <script type='text/javascript' src='{% static "js/secure/autotable.js" %}'></script>
-
 {% endblock %}
 
 {% block content %}
@@ -43,7 +42,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for guide in guides reversed %}
+			{% for guide in guides %}
 			<tr>
 				<td>{{ guide.datePosted }}</td>
 				<td>{{ guide.name }}</td>
@@ -85,7 +84,8 @@
 				<h4 class="modal-title">Add New Guide/File</h4>
 			</div>
 			<div class="modal-body">
-				<form enctype="multipart/form-data" method="post" action="{% url 'archive-guides' %}" id="add-guide-form">
+				<form enctype="multipart/form-data" method="post" action="{% url 'archive-guides' %}"
+					id="add-guide-form">
 					{% csrf_token %}
 					<div class="form-group">
 						<label for="id_name" class="control-label">Title*</label>
@@ -105,7 +105,8 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button type="button" class="btn btn-primary" onclick="$('#add-guide-form').submit()">Add Guide/File</button>
+				<button type="button" class="btn btn-primary" onclick="$('#add-guide-form').submit()">Add
+					Guide/File</button>
 			</div>
 		</div>
 	</div>
