@@ -76,7 +76,7 @@
 
 	<div role="tabpanel" class="tab-pane fade" id="summons-history">
 		<div class="table-responsive">
-			<table class="table dataTable">
+			<table class="table" id="summons-history-table">
 				<thead>
 					<tr>
 						<th class="one wide">Date</th>
@@ -215,5 +215,14 @@
 
 		$("#reject-summons").modal('show');
 	});
+
+	// Disable Bootstrap sorting on the Summon History
+	$(document).ready(function () {
+		$('#summons-history-table').DataTable({
+			"bSort": false // false to disable sorting (or any other option)
+		});
+		$('.dataTables_length').addClass('bs-select');
+	});
+
 </script>
 {% endblock %}
