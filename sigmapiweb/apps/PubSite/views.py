@@ -27,6 +27,13 @@ def about(request):
     return render(request, 'public/about.html', _get_context('About'))
 
 
+def contact(request):
+    """
+    View for the contact us page.
+    """
+    return render(request, 'public/contact.html', _get_context('Contact'))
+
+
 def activities(request):
     """
     View for the static chapter service page.
