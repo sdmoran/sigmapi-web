@@ -158,9 +158,6 @@ PUBLIC_PAGES = [
     {'title': 'About', 'view': 'pub-about'},
     {'title': 'Service & Activities', 'view': 'pub-service'},
     {'title': 'Brothers', 'view': 'userinfo-users'},
-    {'title': 'Donate', 'target': '_blank',
-     'url': ('https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=gammaiota3c@sigmapi.org&lc=US&item_name='
-             'Donation+to+Help+The+Brotherhood&no_note=0&cn=&currency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:'
-             'NonHosted')},  # reasons why I hate python, this single string looks like three
+    {'title': 'Contact Us', 'view': 'pub-contact'},
     {'title': 'Log In', 'view': 'pub-login'},  # This is hard-coded into login.scss
 ]
