@@ -2,7 +2,7 @@
 
 {% block module_includes %}
     {% load sass_tags %}
-    <link rel='stylesheet' type='text/css' href='{% sass_src "css/public/home.scss" %}?v=1' />
+    <link rel='stylesheet' type='text/css' href='{% sass_src "css/public/home.scss" %}?v=1.1' />
 {% endblock %}
 
 {% block title %}
@@ -36,6 +36,21 @@ Sigma Pi Gamma Iota
       <div class="carousel-item">
         <div class="carousel-text">Join Sigma Pi</div>
         <img src="{% static 'img/home/ace.jpg' %}">
+      </div>
+    </div>
+  </div>
+  <div id="home-videos" class="container">
+    <div class="row">
+      <div class="col-md-6 order-2 orer-md-1">
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/QBOJGqixTNc" frameborder="0"
+                  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen class="video"></iframe>
+        </div>
+      </div>
+      <div class="col-md-6 order-1 order-md-2 videos-text">
+        <p class="video-title">Greeks Got Talent</p>
+        <p class="video-sub">Watch our talent show performance for Greeks Got Talent 2019!</p>
       </div>
     </div>
   </div>
