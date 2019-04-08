@@ -96,7 +96,7 @@ $(document).ready(() =>
                 }
             },
             destroy: function() {
-                if(this.canRemove) {
+                if(this.canRemove && confirm(`Are you sure you want to delete ${this.guest.name}?`)) {
                     guestResource.destroy({id: this.guest.id}, {}).then(response => {
                         this.$root.$emit('guest-destroy', this.guest);
                     }).catch(modalErrorFunc.bind(this));
