@@ -42,10 +42,10 @@
   }
 }
 
-#home-content {
+.home-post {
   margin-bottom: 40px;
 
-  .welcome-text {
+  .home-post-text {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -68,6 +68,32 @@
     }
   }
 
+  .home-post-text-large {
+    color: $sp-purple;
+
+    .post-title {
+      font-size: 30px;
+    }
+
+    .post-text {
+      font-size: 25px;
+    }
+
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    @media(max-width: $md-max) {
+      .post-title {
+        font-size: 25px;
+      }
+      .post-text {
+        font-size: 20px;
+      }
+    }
+  }
+
   img {
     width: 100%;
   }
@@ -86,47 +112,29 @@
   }
 }
 
-#home-videos {
-  margin-bottom: 60px;
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+  top: 50%;
+  transform: translateY(-50%);
+}
 
-  .video-container {
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding-bottom: 56.25%;
+.video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#greek-week-post {
+  .home-post-text-large {
+    margin-bottom: 20px;
   }
-
-  .video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .videos-text {
-    color: $sp-purple;
-
-    .video-title {
-      font-size: 30px;
-    }
-
-    .video-sub {
-      font-size: 25px;
-    }
-
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    @media(max-width: $md-max) {
-      .video-title {
-        font-size: 25px;
-      }
-      .video-sub {
-        font-size: 20px;
-      }
-    }
+  
+  .greek-week-image {
+    margin-bottom: 20px;
   }
 }
