@@ -57,6 +57,7 @@ FILE_UPLOAD_TEMP_DIR = BASE_DIR
 SECRET_KEY = 'bg#3p7$1l7i=^frmpvx!##nzsbt-eg$cy!(1-a#m9k(l0rksw7'
 
 # In dev no emails are sent.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = None
 EMAIL_PORT = None
 EMAIL_HOST_USER = None
