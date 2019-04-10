@@ -3,7 +3,6 @@ Utility functions for notifying users about Standards events
 """
 from django.conf import settings
 from django.contrib.auth.models import User
-
 from common.utils import send_email
 
 
@@ -61,7 +60,7 @@ def summons_sent(summons):
             'sent to the Standards Board '
             'for the following reason:\n\n{1}').format(
                 summons.outcomes, summons.standards_action
-            )
+        )
     else:
         summons_info = (
             "The reason for your summons is as follows:"
