@@ -27,6 +27,11 @@ let _disablePollingFlag = false;
 const disablePolling = () => {_disablePollingFlag = true};
 const enablePolling = () => {_disablePollingFlag = false};
 
+// Super important state variable with untold consequences
+let beepboop = false;
+const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+let konamiIndex = 0;
+
 $(document).ready(() =>
 {
     //partyId is a global set in the template by django
@@ -90,8 +95,14 @@ $(document).ready(() =>
             toggleSignedIn: function() {
                 if(this.canCheckIn) {
                     const resourceFunc = this.guest.signedIn? guestResource.signOut : guestResource.signIn;
+                    const bindedGuestUpdate = guestUpdateFunc.bind(this);
                     resourceFunc({id: this.guest.id}, {})
-                        .then(guestUpdateFunc.bind(this))
+                        .then((response) => {
+                            bindedGuestUpdate(response);
+                            if(beepboop) {
+                                document.getElementById('beep-boop').play();
+                            }
+                        })
                         .catch(modalErrorFunc.bind(this));
                 }
             },
@@ -707,5 +718,19 @@ $(document).ready(() =>
     loadAllData().then(() => {
         console.log("Begin Polling");
         setTimeout(pollFunc, pollTime);
+    });
+
+    $(document).keydown(e => {
+        const code = e.which;
+        if(code === konamiCode[konamiIndex]) {
+            konamiIndex++;
+            if(konamiIndex >= konamiCode.length) {
+                beepboop = !beepboop;
+                alert(`BEEP BOOP ${beepboop?"ENABLED":"DISABLED"}`);
+            }
+        }
+        else {
+            konamiIndex = 0;
+        }
     });
 });

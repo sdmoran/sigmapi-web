@@ -23,6 +23,8 @@
 {% block body_class %}party-guests{% endblock %}
 
 {% block content %}
+  <audio id="beep-boop" src="{% static 'audio/beep_boop.mp3' %}" preload="auto" style="display: none"></audio>
+
   <div id="party-app" v-cloak>
     <h3>{{ party.name }} - {{ party.date }} Guest List</h3>
 
