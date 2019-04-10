@@ -41,7 +41,6 @@ make static_prod;
 #rm -rf $PROD_PYTHON_WEBAPP/$DJANGOAPP/$STATIC;
 echo "";
 
-
 echo "Copying admin panel static files.";
 cp -r $PROD_PYTHON_WEBAPP/lib/$PYTHON/$DJANGO_LIB/contrib/admin/static/admin $PROD_STATIC_WEBAPP/;
 echo "";
