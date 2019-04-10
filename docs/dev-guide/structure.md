@@ -5,7 +5,8 @@
 ## The sigmapi-web directory
 This is the base directory for the Sigma Pi Gamma Iota website source code. 
 It contains three subdirectories and some miscellanous configuration and
-information files. 
+information files. You can read more about the overall file structure 
+[here](https://django-project-skeleton.readthedocs.io/en/latest/structure.html).
 
 ### The docs directory
 You are here! The `docs` directory contains all documentation pertaining to 
@@ -28,6 +29,12 @@ money if you see our website.
 ### The sigmapiweb directory
 The `sigmapiweb` directory contains the core applications that compose our 
 website. It contains five subdirectories and miscellanous configuration files.
+
+#### The apps directory
+The `apps` directory contains the bulk of the site's content and 
+functionality. Each subdirectory represents a different part of the site, and
+includes an individual Django application. You can read more about Django 
+applications [here](https://docs.djangoproject.com/en/1.11/ref/applications/).
 
 #### The common directory
 The `common` directory contains base functionality that is used across the
@@ -62,10 +69,12 @@ entries, and other model info.
 fake names and associated information. 
 
 #### The requirements directory
-The `requirements` directory
+The `requirements` directory contains the Python package lists the project 
+requires to run.
 
 #### The static directory
-The `static` directory
+The `static` directory contains the CSS, JS, and image resources used through 
+the site. 
 
 #### Files
 - `.pylintrc`: Used to enforce code quality/cleanliness standards across the 
