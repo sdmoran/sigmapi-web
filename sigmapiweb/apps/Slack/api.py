@@ -155,7 +155,11 @@ def process_sigma_poll_action(user_id, action, response):
 
     num_votes = len(option_users)
 
-    poll_split[option_text_index] = option_text_split[0] + ' ' + option_text_split[1]
+    if re.search(r'`\d+`', option_text_split[-1]) is not None:
+        poll_split[option_text_index] = ' '.join(option_text_split[:-1])
+    else:
+        poll_split[option_text_index] = ' '.join(option_text_split)
+
     if num_votes > 0:
         poll_split[option_text_index] += '    `' + str(num_votes) + "`"
 
