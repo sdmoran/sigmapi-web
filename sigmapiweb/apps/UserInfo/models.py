@@ -45,6 +45,10 @@ class UserInfo(ModelMixin, models.Model):
     activities = models.TextField(blank=True)
     interests = models.TextField(blank=True)
     favoriteMemory = models.TextField(blank=True)
+    # iqpLat = models.FloatField(null=True, blank=True)
+    # iqpLon = models.FloatField(null=True, blank=True)
+    iqpCity = models.TextField(null=True, blank=True)
+    iqpCountry = models.TextField(null=True, blank=True)
     bigBrother = models.ForeignKey(
         User,
         related_name="big_brother",

@@ -1573,5 +1573,15 @@
 		 },
 		 "model":"UserInfo.pledgeclass",
 		 "pk":1
+	},
+	{
+		"fields":{
+			"iqpCity":"Melbourne",
+			"iqpCountry":"Australia",
+			"user_id":4
+		},
+		"model":"UserInfo.UserInfo",
+		"pk":4
 	}
+
 ]

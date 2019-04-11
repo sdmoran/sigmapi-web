@@ -39,6 +39,8 @@ class Migration(migrations.Migration):
                 ('activities', models.TextField(blank=True)),
                 ('interests', models.TextField(blank=True)),
                 ('favoriteMemory', models.TextField(blank=True)),
+                ('iqpLat', models.FloatField(blank=True)),
+                ('iqpLon', models.FloatField(blank=True)),
                 ('bigBrother', models.ForeignKey(related_name='big_brother', default=1, to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
                 ('pledgeClass', models.ForeignKey(to='UserInfo.PledgeClass', on_delete=models.CASCADE)),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
