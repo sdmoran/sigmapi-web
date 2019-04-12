@@ -42,16 +42,6 @@
     id: 'mapbox.streets'
     }).addTo(map);
 
-  {#L.marker([51.5, -0.09]).addTo(map)#}
-  {#    .bindPopup('<b>Kyle Reese</b><br>London, England</br>');#}
-  {##}
-  {#  L.marker([42.261646, -71.8057012]).addTo(map)#}
-  {#  .bindPopup('<b>WPI</b><br>Worcester, USA</br>')#}
-  {#  .openPopup();#}
-  {##}
-  {#  L.marker([-37.9722326,144.7722751]).addTo(map)#}
-  {#  .bindPopup('<b>Drew Robert</b><br>Melbourne, Australia</br>')#}
-  {#  .openPopup();#}
 
   {% for b in brothers %}
       var s = document.createElement('script');
@@ -61,7 +51,7 @@
       function cb(json) {
           if (typeof json[0] !== 'undefined') {
               L.marker([json[0].lat, json[0].lon]).addTo(map)
-                  .bindPopup('<b>{{ b.first_name }} {{ b.last_name }}</b><br>Melbourne, Australia</br>')
+                  .bindPopup('<b>{{ b.first_name }} {{ b.last_name }}</b><br>{{ b.userinfo.iqpCity }}, {{ b.userinfo.iqpCountry }}</br>')
                   .openPopup();
               console.log({{ b.userinfo.first_name }});
               console.log({{ b.userinfo.iqpLon }});
