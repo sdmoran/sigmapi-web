@@ -67,6 +67,11 @@ urlpatterns = [
         name='pub-activities',
     ),
     url(
+        regex=r'^iqpmap[/]$',
+        view=views.iqpmap,
+        name='pub-iqpmap',
+    ),
+    url(
         regex=r'^403/',
         view=views.permission_denied,
         name='pub-permission_denied',
