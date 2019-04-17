@@ -58,3 +58,11 @@ def verify_sigma_poll_sig(func):
     :param func: The function to wrap
     """
     return verify_slack_signature(func, settings.SIGMA_POLLS_SLACK_CLIENT_SECRET)
+
+
+def verify_clique_sig(func):
+    """
+    A decorator that verifies a message was sent from the Clique app
+    :param func: The function to wrap
+    """
+    return verify_slack_signature(func, settings.CLIQUE_SLACK_SIGNING_SECRET)

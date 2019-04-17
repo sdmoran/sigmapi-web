@@ -39,7 +39,7 @@
 	<!-- Summons -->
 	<div role="tabpanel" class="tab-pane fade in active" id="summons">
 		<div class="table-responsive nospaced">
-	 		<table class="dataTable table">
+	 		<table class="dataTable-nosort table">
 	 			<thead>
 	 				<tr>
 	 					<th class="two wide">Date</th>
@@ -76,7 +76,7 @@
 
 	<div role="tabpanel" class="tab-pane fade" id="summons-history">
 		<div class="table-responsive">
-			<table class="table" id="summons-history-table">
+			<table class="dataTable-nosort table">
 				<thead>
 					<tr>
 						<th class="one wide">Date</th>
@@ -214,14 +214,6 @@
 		$("#reject-summons #reject-summons-description textarea").val($("#reason_" + id).html());
 
 		$("#reject-summons").modal('show');
-	});
-
-	// Disable Bootstrap sorting on the Summon History
-	$(document).ready(function () {
-		$('#summons-history-table').DataTable({
-			"bSort": false // false to disable sorting (or any other option)
-		});
-		$('.dataTables_length').addClass('bs-select');
 	});
 
 </script>

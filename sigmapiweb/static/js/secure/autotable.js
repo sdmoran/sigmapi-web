@@ -9,6 +9,13 @@ $(document).ready(function () {
 	$.fn.dataTableExt.oStdClasses["sPageNextDisabled"] = "btn btn-primary disabled dataTable-button-right"
 
 	// Initialize all data table instances.
+
 	$(".dataTable").DataTable();
-	
+
+	// NOTE: THIS IS A CUSTOM CLASS BECAUSE WE DO NOT WANT AUTOSORTING
+	// MOST OF THE TIME
+	// TAGS: dataTable DataTable bSort sorting tablesort data-table
+	$(".dataTable-nosort").DataTable({
+		"bSort": false // false to disable sorting
+	});
 });

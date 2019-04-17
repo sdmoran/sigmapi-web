@@ -27,8 +27,8 @@ urlpatterns = [
         name='password_reset_confirm'
     ),
     url(
-        r'^password_reset/done/$',
-        auth_views.password_reset_complete,
+        r'^password_reset/complete/$',
+        views.ResetPasswordComplete.as_view(),
         name='password_reset_complete'
     ),
     url(
