@@ -239,6 +239,14 @@ def clique_create(request):
             new_user.save()
             group_users.append(new_user)
 
+    # Case where the owner is 1) new and 2) not in the group
+    try:
+        CliqueUser.objects.get(slack_id=requesting_user_id)
+    except CliqueUser.DoesNotExist:
+        # This is the first time that we've seen this user
+        # we need to add them to the db
+        CliqueUser(slack_id=requesting_user_id).save()
+
     new_group = CliqueGroup(
         creator=CliqueUser.objects.get(slack_id=requesting_user_id),
         name=args[0]
