@@ -4,9 +4,16 @@ API Endpoints for Slack Apps
 import json
 import re
 
+from django.conf import settings
 from django.http import JsonResponse, HttpResponse
+from requests import post
 
-from .utils import verify_sigma_poll_sig
+from .utils import verify_sigma_poll_sig, verify_clique_sig
+from .models import CliqueGroup, CliqueUser
+
+SLACK_ID_REGEX = r"@(.*?)\|"
+# TODO(Tom): Find a regex that works for single and double quote
+DOUBLE_QUOTE_ARG_REGEX = r"\"(.*?)\""
 
 
 def make_poll_usage_error(message, user_text):
@@ -189,4 +196,257 @@ def sigma_poll_update(request):
         if not process_sigma_poll_action(user, action, response):
             break
 
+    return JsonResponse(response)
+
+############################################
+### Clique integration specific functions
+############################################
+
+def make_clique_group_error(msg):
+    """
+    Helper to pass along error messages encountered during Clique operations
+    :param msg: Error message for the integration to report
+    """
+    return JsonResponse({"response_type": "ephermal", "text": msg})
+
+
+@verify_clique_sig
+def clique_create(request):
+    """
+    Creates a new grouping in the database (this integration must be stored in the db to be useful)
+    Arguments: /group-create "groupname" "@user1 @user2"
+    """
+    requesting_user_id = request.POST.get('user_id')
+    args = re.findall(DOUBLE_QUOTE_ARG_REGEX, request.POST.get("text"))
+    # Check to see if everything looks right
+    if len(args) != 2:
+        return make_clique_group_error("Error in arguments (Double quotes are required!). Usage:\n"
+                                        "`/group-create \"groupName\" \"@user1 @user2\"")
+
+    if CliqueGroup.objects.filter(name=args[0]).count() > 0:
+        return make_clique_group_error("This group <{}> already exists!".format(args[0]))
+
+    # Move on to creating the group
+    raw_group_members = re.findall(SLACK_ID_REGEX, args[1])
+    group_users = []
+    for slack_id in raw_group_members:
+        try:
+            group_users.append(CliqueUser.objects.get(slack_id=slack_id))
+        except CliqueUser.DoesNotExist:
+            # This is the first time that we've seen this user
+            # we need to add them to the db
+            new_user = CliqueUser(slack_id=slack_id)
+            new_user.save()
+            group_users.append(new_user)
+
+    new_group = CliqueGroup(
+        creator=CliqueUser.objects.get(slack_id=requesting_user_id),
+        name=args[0]
+    )
+    new_group.save()
+    for clique_user in group_users:
+        new_group.members.add(clique_user)
+
+    new_group.save()
+    # Testing response string
+    resp_string = 'Group <{0}> has been created with users:'.format(args[0])
+    resp_string += ' '.join(format_user(user.slack_id) for user in new_group.members.all())
+    return JsonResponse({"replace_original": True, "text": resp_string})
+
+
+@verify_clique_sig
+def clique_send_msg(request):
+    """
+    Send a message to a Clique group
+    Arguments: /group-message "groupname" "message"
+    """
+    args = re.findall(DOUBLE_QUOTE_ARG_REGEX, request.POST.get('text'))
+    # Boilerplate error checking before continuing the function
+    if len(args) != 2:
+        return make_clique_group_error("Error in arguments (Double quotes are required!). Usage:\n"
+                                       "`/group-message \"groupName\" \"message\"")
+
+    if CliqueGroup.objects.filter(name=args[0]).count() == 0:
+        return make_clique_group_error("This group <{}> doesn't exist!".format(args[0]))
+
+    group = CliqueGroup.objects.get(name=args[0])
+    request_args = {
+        "token": settings.CLIQUE_SLACK_OATH_TOKEN,
+        "channel": request.POST.get('channel_id'),
+        "text": ("@{}".format(args[0]) +
+                 " { " + " ".join(format_user(user.slack_id) for user in group.members.all()) +
+                 " }:\n" + args[1]),
+        "as_user": True,
+    }
+    post("https://slack.com/api/chat.postMessage", data=request_args)
+    # Best practice to return _something_ so we give a 200
+    return HttpResponse('')
+
+
+@verify_clique_sig
+def clique_add_users(request):
+    """
+    Add a user to an existing group
+    Arguments: /group-add-users "groupname" "@user1 @user2"
+    """
+    args = re.findall(DOUBLE_QUOTE_ARG_REGEX, request.POST.get('text'))
+    # Boilerplate error checking before continuing the function
+    if len(args) != 2:
+        return make_clique_group_error("Error in arguments (Double quotes are required!). Usage:\n"
+                                       "`/group-add-users \"groupName\" \"@user1 @user2\"")
+
+    if CliqueGroup.objects.filter(name=args[0]).count() == 0:
+        return make_clique_group_error("This group <{}> doesn't exist!".format(args[0]))
+
+    group = CliqueGroup.objects.get(name=args[0])
+    raw_group_members = re.findall(SLACK_ID_REGEX, args[1])
+    new_group_users = []
+    for slack_id in raw_group_members:
+        try:
+            new_group_users.append(CliqueUser.objects.get(slack_id=slack_id))
+        except CliqueUser.DoesNotExist:
+            # This is the first time that we've seen this user
+            # we need to add them to the db
+            new_user = CliqueUser(slack_id=slack_id)
+            new_user.save()
+            new_group_users.append(new_user)
+
+    for clique_user in new_group_users:
+        group.members.add(clique_user)
+
+    group.save()
+
+    response = {
+        "response_type": "ephemeral",
+        "text": ("Added " +
+                 " ".join(format_user(user.slack_id) for user in new_group_users) +
+                 "to <{}>.\n".format(args[0]) +
+                 "Group now contains:\n{" +
+                 ", ".join(format_user(user.slack_id) for user in group.members.all()).strip(',') +
+                 " }"),
+    }
+    return JsonResponse(response)
+
+
+@verify_clique_sig
+def clique_remove_users(request):
+    """
+    Remove a user from an existing group
+    Arguments: /group-remove-users "groupname "@user1 @user2"
+    """
+    args = re.findall(DOUBLE_QUOTE_ARG_REGEX, request.POST.get('text'))
+    # Boilerplate error checking before continuing the function
+    if len(args) != 2:
+        return make_clique_group_error("Error in arguments (Double quotes are required!). Usage:\n"
+                                       "`/group-remove-users \"groupName\" \"@user1 @user2\"")
+
+    if CliqueGroup.objects.filter(name=args[0]).count() == 0:
+        return make_clique_group_error("This group <{}> doesn't exist!".format(args[0]))
+
+    group = CliqueGroup.objects.get(name=args[0])
+    raw_group_members = re.findall(SLACK_ID_REGEX, args[1])
+    users_to_remove = []
+    for slack_id in raw_group_members:
+        try:
+            users_to_remove.append(CliqueUser.objects.get(slack_id=slack_id))
+        except CliqueUser.DoesNotExist:
+            # We don't care that this fails,
+            # we are removing people anyway
+            pass
+
+    for clique_user in users_to_remove:
+        group.members.remove(clique_user)
+
+    group.save()
+
+    response = {
+        "response_type": "ephemeral",
+        "text": ("<{}> now contains:\n".format(args[0]) +  "{" +
+                 ", ".join(format_user(user.slack_id) for user in group.members.all()).strip(',') +
+                 " }"),
+    }
+    return JsonResponse(response)
+
+
+@verify_clique_sig
+def clique_delete(request):
+    """
+    Delete an existing group
+    Arguments: /group-delete "groupname"
+    """
+    args = re.findall(DOUBLE_QUOTE_ARG_REGEX, request.POST.get('text'))
+    # Boilerplate error checking before continuing the function
+    if len(args) != 1:
+        return make_clique_group_error("Error in arguments (Double quotes are required!). Usage:\n"
+                                       "`/group-delete \"groupName\"")
+
+    if CliqueGroup.objects.filter(name=args[0]).count() == 0:
+        return make_clique_group_error("This group <{}> doesn't exist!".format(args[0]))
+
+    group = CliqueGroup.objects.get(name=args[0])
+
+    group.delete()
+
+    response = {
+        "response_type": "ephemeral",
+        "text": "<{}> was deleted.".format(args[0])
+    }
+    return JsonResponse(response)
+
+
+@verify_clique_sig
+def clique_list(request):
+    """
+    List all members of all groups, if group is specified only list members of that group
+    Arguments: /group-list ["groupname"]
+    """
+
+    args = re.findall(DOUBLE_QUOTE_ARG_REGEX, request.POST.get('text'))
+    # Boilerplate error checking before continuing the function
+    if len(args) > 1:
+        return make_clique_group_error("Error in arguments (Double quotes are required!). Usage:\n"
+                                       "`/group-list (optional: \"groupName\")")
+
+    # Split into two helper functions to handle the different control flows
+    if len(args) == 1:
+        if CliqueGroup.objects.filter(name=args[0]).count() == 0:
+            return make_clique_group_error("This group <{}> doesn't exist!".format(args[0]))
+        return describe_clique(args[0])
+    else:
+        return describe_all_cliques()
+
+
+def describe_clique(group_name):
+    """
+    Helper to list members of a specific CliqueGroup
+    :param group_name: Regex matched group name that we KNOW exists
+    """
+    group = CliqueGroup.objects.get(name=group_name)
+
+    response = {
+        "response_type": "ephemeral",
+        "text": ("Members of group <{}>:\n".format(group.name) + "{" +
+                 ", ".join(format_user(user.slack_id) for user in group.members.all()).strip(',') +
+                 "}")
+    }
+    return JsonResponse(response)
+
+
+def describe_all_cliques():
+    """
+    Iterate through all CliqueGroup objects and list their members
+    """
+    final_string = ""
+    for group in CliqueGroup.objects.all():
+        final_string += (
+            "Members of group <{}>:\n".format(group.name) + "{" +
+            ", ".join(format_user(user.slack_id) for user in group.members.all()).strip(',') +
+            "}"
+        )
+        final_string += "\n"
+
+    response = {
+        "response_type": "ephemeral",
+        "text": final_string,
+    }
     return JsonResponse(response)

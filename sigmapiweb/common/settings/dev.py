@@ -65,4 +65,8 @@ EMAIL_HOST_PASSWORD = None
 DEFAULT_FROM_EMAIL = None
 SERVER_EMAIL = None
 
+# Placeholders for slack integrations
 SIGMA_POLLS_SLACK_CLIENT_SECRET = b'NotARealSecret'
+
+CLIQUE_SLACK_SIGNING_SECRET = b'AlsoAfakeSecret'
+CLIQUE_SLACK_OATH_TOKEN = b'YepThatsOAuth2'
