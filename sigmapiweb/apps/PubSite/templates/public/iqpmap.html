@@ -30,10 +30,10 @@
 
   <div class="mapdiv", id="mapdiv">
     <script>
-      var map = L.map('mapdiv', {
+      let map = L.map('mapdiv', {
           zoom: 5,
           minZoom: 2,
-          maxZoom: 20,
+          maxZoom: 18,
           maxBoundsViscosity: 1.0
           });
 
@@ -42,24 +42,63 @@
     id: 'mapbox.streets'
     }).addTo(map);
 
+  // List of locations
+  var locations = [];
+
+  // List of brothers at each location
+  var brothers = [];
+
+  // Takes list of brothers and locations from Django and puts them in a Javascript array. Locations and the brothers at
+  // those locations have the same indices in each array.
 
   {% for b in brothers %}
-      var s = document.createElement('script');
-      s.src = 'https://nominatim.openstreetmap.org/search?json_callback=cb&q={{ b.userinfo.iqpCity }},%20{{ b.userinfo.iqpCountry }}&format=json&limit=1';
-      document.getElementsByTagName('head')[0].appendChild(s);
+    // Appends location information
+    var loc = "{{ b.userinfo.iqpCity }}" + ", " + "{{ b.userinfo.iqpCountry }}";
+    // If we already have brothers at this location, append current brother name to preexisting list of brothers at that
+    // location.
+    if(locations.includes(loc)) {
+        var index = locations.indexOf(loc);
+        var temp = brothers[index];
+        temp += ", {{ b.first_name }}" + " " + "{{ b.last_name }}";
+        brothers[index] = temp;
+    }
+    // Otherwise, just add a location and the brother at that location.
+    else {
+        locations.push(loc);
+        brothers.push("{{ b.first_name }}" + " " + "{{ b.last_name }}");
+    }
+  {% endfor %}
 
-      function cb(json) {
-          if (typeof json[0] !== 'undefined') {
-              L.marker([json[0].lat, json[0].lon]).addTo(map)
-                  .bindPopup('<b>{{ b.first_name }} {{ b.last_name }}</b><br>{{ b.userinfo.iqpCity }}, {{ b.userinfo.iqpCountry }}</br>')
-                  .openPopup();
-              console.log({{ b.userinfo.first_name }});
-              console.log({{ b.userinfo.iqpLon }});
-          }
+  // Now we have a list of brothers at each location, accounting for duplicates.
+
+  // For each location, get the coords and place a pin on the map with the names of each brother there at those coords.
+  for(let i = 0; i < locations.length; i++) {
+    const Http = new XMLHttpRequest();
+    const url='https://nominatim.openstreetmap.org/search?q=' + locations[i] + '&format=json&limit=1';
+    Http.open("GET", url);
+    Http.send();
+    Http.onreadystatechange=function() {
+        if(this.readyState === 4) {
+            cb(Http.responseText, i);
+        }
+    }
+  }
+
+  // Callback function that takes a JSON response containing lat and lon for a location and an index that indicates
+  // which brothers/locations these coordinates refer to. This function places the actual pin on the map.
+  function cb(json, i) {
+      console.log(brothers);
+      console.log(locations);
+      console.log(i);
+      json = JSON.parse(json);
+      if (typeof json !== 'undefined') {
+          L.marker([json[0].lat, json[0].lon]).addTo(map)
+              .bindPopup('<b>' + brothers[i] + '</b><br>' + locations[i] + '</br>').openPopup();
       }
-    {% endfor %}
+  }
 
-    map.setView([0,-16.7699181], 2);
+  // Make map visible
+  map.setView([0,-16.7699181], 2);
     </script>
 
   </div>
