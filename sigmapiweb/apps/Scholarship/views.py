@@ -95,7 +95,7 @@ def index(_request):
     """
     TODO: Docstring
     """
-    return redirect('scholarship-resources')
+    return redirect('scholarship-library')
 
 
 @login_required

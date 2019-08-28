@@ -3,15 +3,6 @@
 {% block module_nav %}
 	<div class="sub-nav">
 		<ul class="nav nav-pills">
-			{% if '/scholarship/resources/' in request.path %}
-			<li class="active">
-			{% else %}
-			<li>
-			{% endif %}
-				<a href="{% url 'scholarship-resources' %}">
-					Academic Resources
-				</a>
-			</li>
 
 			{% if '/scholarship/library/' in request.path %}
 			<li class="active">
@@ -20,6 +11,16 @@
 			{% endif %}
 				<a href="{% url 'scholarship-library' %}">
 					Library
+				</a>
+			</li>
+
+			{% if '/scholarship/resources/' in request.path %}
+			<li class="active">
+			{% else %}
+			<li>
+			{% endif %}
+				<a href="{% url 'scholarship-resources' %}">
+					Academic Resources
 				</a>
 			</li>
 
