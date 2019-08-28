@@ -39,7 +39,7 @@ echo "";
 echo "Copying REPO $REPO/$DJANGOAPP/$STATIC TO PROD $PROD_STATIC_WEBAPP";
 rm -rf $PROD_STATIC_WEBAPP/*;
 cd $PROD_PYTHON_WEBAPP/$DJANGOAPP;
-make static_prod;
+$PYTHON devl.py static_prod;
 #rm -rf $PROD_PYTHON_WEBAPP/$DJANGOAPP/$STATIC;
 echo "";
 
