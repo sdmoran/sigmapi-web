@@ -241,7 +241,7 @@ def r_static():
 
 @describe('Compile SASS files, then run collectstatic')
 def r_static_prod():
-    format_and_call('{MANAGE} compilecss')
+    format_and_call('{MANAGE} compilescss')
     format_and_call('{MANAGE} collectstatic --noinput')
 
 @describe('Migrate the database')
