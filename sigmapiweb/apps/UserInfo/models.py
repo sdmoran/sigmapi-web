@@ -56,7 +56,8 @@ class UserInfo(ModelMixin, models.Model):
     pledgeClass = models.ForeignKey(
         PledgeClass,
         default=1,
-        on_delete=models.SET_DEFAULT
+        on_delete=models.SET_DEFAULT,
+        blank=True
     )
 
     def __str__(self):
