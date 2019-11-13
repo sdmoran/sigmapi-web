@@ -287,10 +287,10 @@
         </div>
         <div class="col-sm-6 col-xs-12 ratio-box">
           <div class="ratio-box-inner">
-            <div class="ratio-title">Most Guests</div>
+            <div class="ratio-title">Best Ratio</div>
             <template v-if="bestBrother">
               <div class="ratio-number">{{ bestBrother.name }}</div>
-              <div class="ratio-number">{{ bestBrother.totalCount }} Guest{{ bestBrother.totalCount > 1 ? 's' : '' }} ({{ bestBrother.ratioText }} Ratio)</div>
+              <div class="ratio-number">{{ ratioText }} (F to M)</div>
             </template>
           </div>
         </div>
