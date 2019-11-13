@@ -352,7 +352,7 @@ $(document).ready(() =>
                         name: brother
                     })
                 );
-                return _.maxBy(grouped, 'totalCount');
+                return _.maxBy(grouped, 'ratio');
             },
             countsData: function() {
                 return this.countHistory.map(entry => ({
