@@ -231,7 +231,7 @@ def r_dumpdata():
 
 @describe('Migrate database with --run-syncdb')
 def r_syncdb():
-    format_and_call('{MANAGE}  migrate --run-syncdb')
+    format_and_call('{MANAGE} migrate --run-syncdb')
 
 
 @describe('Collect static files')
