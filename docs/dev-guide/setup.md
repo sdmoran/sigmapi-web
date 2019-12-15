@@ -39,7 +39,9 @@ $ cd sigmapi-web
 ```
 
 
-### 2. [Optional] Create and activate the Python virtual environment.
+### 2. [Optional] Create a seprate coding environment.
+
+#### A) Create and activate the Python virtual environment.
 
 This creates a local python virtualenv and activates it. This is recommended in order to isolate this Python environment from any others which are on your computer currently or may be installed in the future.
 
@@ -56,6 +58,45 @@ Linux/Mac/WSL/Other Systems Using Bash:
 $ python3.6 -m venv ./venv
 $ source venv/bin/activate
 ```
+
+#### B) Use a Vagrant box.
+
+[Vagrant](https://www.vagrantup.com/) is a tool for creating identical production and development envrionments. It will create a VM (managed by virtualbox) that you can interact with the `vagrant` command on your command line
+
+For all systems:
+
+1. Install [Virtualbox](https://www.virtualbox.org/)
+   1. You may need to enable hardware virtualization in your BIOS
+2. Install Vagrant (linked above)
+
+For a first time run:
+```bash
+$ vagrant plugin install vagrant-vbguest
+$ vagrant up
+```
+
+The `devl.py` script will be run for you, so you can skip step 3.
+
+To continue following along in the setup, execute
+
+```bash
+$ vagrant ssh
+```
+
+to be dropped into your VM.
+
+Extra Vagrant info:
+  - To 'freeze' your vm when you are done developing
+    - `vagrant suspend`
+  - To start your vm from off or a suspended state
+    - `vagrant up`
+  - To completely turn off your vm
+    - `vagrant halt`
+  - To fix some sync issues or restart the vm:
+    - `vagrant reload`
+  - To nuke your vm from orbit:
+    -  `vagrant destroy`
+  - The correct ports have been forwarded so you'll be able to access the website as described below.
 
 ### 3. Set up the development environment
 
