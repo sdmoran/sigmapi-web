@@ -180,6 +180,12 @@
         <div class="name">{{ guest.name }}</div>
         <div class="details">Added by {{ guest.addedBy.name }}</div>
         <span v-if="guest.prepartyAccess && !guest.everSignedIn && party.hasPreparty" class="preparty-label">preparty</span>
+        <span v-if="guest.prepartyAccess && !guest.everSignedIn && party.hasPreparty"
+              class="downgrade-preparty"
+              @click="downgradeInvite">downgrade</span>
+        <span v-else-if="!guest.prepartyAccess && !guest.everSignedIn && party.hasPreparty && guest.addedBy.id == userId"
+              class="upgrade-preparty"
+              @click="upgradeInvite">upgrade</span>
         <span v-if="guest.timeFirstSignedIn" class="checked-in-time">{{ guest.timeFirstSignedIn }}</span>
       </div>
       {% endverbatim %}
