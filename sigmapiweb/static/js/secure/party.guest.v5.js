@@ -46,7 +46,9 @@ $(document).ready(() =>
         signIn: {method: 'POST', url: 'guests/signIn{/id}/'},
         signOut: {method: 'POST', url: 'guests/signOut{/id}/'},
         add: {method: 'POST', url: 'guests/create/', emulateJSON: true},
-        destroy: {method: 'DELETE', url: 'guests/destroy{/id}/'}
+        destroy: {method: 'DELETE', url: 'guests/destroy{/id}/'},
+        upgrade: {method: 'POST', url: 'guests/upgrade{/id}/'},
+        downgrade: {method: 'POST', url: 'guests/downgrade{/id}/'},
     });
 
     const partyResource = Vue.resource('', {}, {
@@ -129,7 +131,20 @@ $(document).ready(() =>
                     message,
                     primaryText: "Ok"
                 });
-            }
+            },
+            upgradeInvite: function() {
+                // FIXME(Tom): This prop doesn't have access to the selectedBrother field, find alternative
+                guestResource.upgrade({id: this.guest.id}, {selectedBrother: this.selectedBrother}).then(response => {
+                    this.$root.$emit('guest-update', response.body);
+                })
+                .catch(modalErrorFunc.bind(this));
+            },
+            downgradeInvite: function() {
+                guestResource.downgrade({id: this.guest.id}, {}).then(response => {
+                    this.$root.$emit('guest-update', response.body);
+                })
+                .catch(modalErrorFunc.bind(this));
+            },
         }
     });
 
