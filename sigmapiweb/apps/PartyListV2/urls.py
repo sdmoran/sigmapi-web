@@ -86,22 +86,6 @@ urlpatterns = [
     ),
     url(
         regex=(
-            r'^api/(?P<party_id>[\d]+)/guests/upgrade/'
-            r'(?P<party_guest_id>[\d]+)/$'
-        ),
-        view=api.upgrade_preparty,
-        name='partlist-api-upgrade',
-    ),
-    url(
-        regex=(
-            r'^api/(?P<party_id>[\d]+)/guests/downgrade/'
-            r'(?P<party_guest_id>[\d]+)/$'
-        ),
-        view=api.downgrade_preparty,
-        name='partlist-api-downgrade',
-    ),
-    url(
-        regex=(
             r'^api/(?P<party_id>[\d]+)/guests/signIn/'
             r'(?P<party_guest_id>[\d]+)/$'
         ),

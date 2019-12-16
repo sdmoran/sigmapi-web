@@ -207,33 +207,6 @@ $greylisting-bg: #444;
         background-color: #333;
         padding: 0px 8px 1px 8px;
     }
-
-    > .upgrade-preparty
-    {
-        &:hover
-        {
-            color: rgb(150, 150, 150);
-            cursor: pointer;
-        }
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        font-size: 8pt;
-        padding: 0px 8px 1px 8px;
-    }
-
-    > .downgrade-preparty
-    {
-        &:hover
-        {
-            color: rgb(150, 150, 150);
-            cursor: pointer;
-        }
-        position: absolute;
-        right: 6rem;
-        bottom: 0;
-        font-size: 8pt;
-    }
 }
 
 $male-color: rgb(130, 200, 240);
