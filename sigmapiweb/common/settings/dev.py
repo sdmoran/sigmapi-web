@@ -65,6 +65,11 @@ EMAIL_HOST_PASSWORD = None
 DEFAULT_FROM_EMAIL = None
 SERVER_EMAIL = None
 
+# Override other email constants
+EC_EMAIL = "gr-sigmapi@local.dev"
+ACTIVES_EMAIL = "sigmapiactives@local.dev"
+ALUMNI_EMAIL = "sigmapialumni@local.dev"
+
 # Placeholders for slack integrations
 SIGMA_POLLS_SLACK_CLIENT_SECRET = b'NotARealSecret'
 
