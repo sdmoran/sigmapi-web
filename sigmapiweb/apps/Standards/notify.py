@@ -50,45 +50,54 @@ def summons_sent(summons):
     """
     Get a message for receiving a summons.
     """
-    subject = 'Standards Board: Summons Received'
+    subject = 'Standards Board: Summoning Request Approved'
 
     if summons.spokeWith:
         summons_info = (
-            'The recorded outcome of your '
-            'conversation with the summoner is:\n\n{0}.'
+            'The recorded details of your '
+            'conversation with the summoner is:\n\n\t"{0}"\n\n'
             'The summoner has requested this case be '
             'sent to the Standards Board '
-            'for the following reason:\n\n{1}').format(
+            'for the following reason:\n\n\t"{1}"').format(
                 summons.outcomes, summons.standards_action
         )
     else:
         summons_info = (
             "The reason for your summons is as follows:"
-            "\n\n{0}".format(
+            "\n\n\t\"{0}\"".format(
                 summons.special_circumstance))
 
     message_context = {
         'date': 'Date: {0}.'.format(
             summons.dateSummonsSent.strftime('%Y-%m-%d')),
         'summoner_info': (
+            # This is all treated as one string, so there is only one
+            # format at the end
+            '{0},\n\n'
             'You are receiving this email because you have'
-            ' been summoned by {0} {1}.'.format(
+            ' been summoned by {1} {2}.'.format(
+                summons.summonee.first_name,
                 summons.summoner.first_name,
                 summons.summoner.last_name
             )
         ),
         'summons_info': summons_info,
         'outcome': (
-            'Please come to the next Standards meeting, '
-            'where the summons will be heard. '
+            'Please come to the next Standards meeting following your case'
+            'being anounced at a house meeting. '
+            'This is the meeting where you case will be heard. '
             'You will have the opportunity to make your case, '
-            'after which time the Standards board will decide on an action. '
-            'If you cannot make the meeting, '
+            'after which time the Standards board will decide if an '
+            'appropriate sanction should be imposed. '
+            'If you cannot make the meeting for a legitimate purpose, '
             'please speak with the Parliamentarian.'
+            '\n\nAs per the bylaws, chosing not to come without an excuse '
+            'will be considered as an affirmation of fault and may have '
+            'adverse consequences.'
         ),
     }
     message = (
-        '{date}\n\n{summoner_info}\n\n'
+        '{date}\n\n{summoner_info} '
         '{summons_info}\n\n{outcome}'.format(**message_context)
     )
     fourth = User.objects.get(groups__name='4th Counselor')
