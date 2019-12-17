@@ -447,9 +447,14 @@
         "summons"
       ],
       [
-        "change_summons",
+        "change_summonsrequest",
         "Standards",
-        "summons"
+        "summonsrequest"
+      ],
+      [
+        "delete_summonsrequest",
+        "Standards",
+        "summonsrequest"
       ],
       [
         "add_userinfo",
