@@ -447,9 +447,14 @@
         "summons"
       ],
       [
-        "change_summons",
+        "change_summonsrequest",
         "Standards",
-        "summons"
+        "summonsrequest"
+      ],
+      [
+        "delete_summonsrequest",
+        "Standards",
+        "summonsrequest"
       ],
       [
         "add_userinfo",
@@ -2766,26 +2771,6 @@
   "fields": {
     "name": "Omega",
     "dateInitiated": "2000-01-01"
-  }
-},
-{
-  "model": "Standards.summons",
-  "pk": 1,
-  "fields": {
-    "summoner": [
-      "prchair"
-    ],
-    "summonee": [
-      "scholarshipchair"
-    ],
-    "approver": [
-      "admin"
-    ],
-    "spokeWith": true,
-    "outcomes": "This is the first section.",
-    "standards_action": "This is the second section.",
-    "special_circumstance": "",
-    "dateSummonsSent": "2019-12-16"
   }
 }
 ]

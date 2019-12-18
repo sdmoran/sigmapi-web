@@ -56,7 +56,15 @@
 	 				<tr>
 	 					<td>{{ summons.dateSummonsSent }}</td>
 	 					<td>{{ summons|full_name:"summonee" }}</td>
-	 					<td id="reason_{{ summons.pk }}">{{ summons.reason }}</td>
+	 					<td id="reason_{{ summons.pk }}">
+							{% if summons.spokeWith %}
+								<strong>Conversation outcome: </strong>{{ summons.outcomes }}
+								<br>
+								<strong>Further action requested because: </strong>{{summons.standards_action}}
+							{% else %}
+								<strong>Special circumstance: </strong>{{summons.special_circumstance}}
+							{% endif %}
+						</td>
 	 					<td>{{ summons|full_name:"summoner" }}</td>
 	 					<td>{{ summons|full_name:"approver" }}</td>
 	 					<td>

@@ -52,7 +52,11 @@
 	 					<td>{{ summons.dateRequestSent }}</td>
 	 					<td>{{ summons|full_name:"summonee" }}</td>
 						{% if summons.spokeWith %}
-	 					<td><strong>Conversation outcome:</strong> {{ summons.outcomes }}. <strong>Further action requested because:</strong> {{summons.standards_action}}</td>
+						<td>
+							<strong>Conversation outcome: </strong>{{ summons.outcomes }}
+							<br>
+							<strong>Further action requested because: </strong>{{summons.standards_action}}
+						</td>
 						{% else %}
 						<td><strong>Special circumstance: </strong>{{summons.special_circumstance}}</td>
 						{% endif %}

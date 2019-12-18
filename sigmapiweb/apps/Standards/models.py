@@ -20,7 +20,7 @@ def _get_reason(summons):
     return (
         (
             'Conversation outcome: ' + summons.outcomes +
-            '. Further action required because: ' + summons.standards_action
+            '\nFurther action required because: ' + summons.standards_action
         )
         if summons.spokeWith
         else summons.special_circumstance
