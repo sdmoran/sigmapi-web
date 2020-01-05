@@ -205,7 +205,7 @@
 
 		$("#accept-summons-form").attr('action', newAction);
 
-		$("#accept-summons #archive-summons-description textarea").val($("#reason_" + id).html());
+		$("#accept-summons #archive-summons-description textarea").val(populate_summons_modal(id));
 
 		$("#accept-summons").modal('show');
 	});
@@ -219,10 +219,27 @@
 
 		$("#reject-summons-form").attr('action', newAction);
 
-		$("#reject-summons #reject-summons-description textarea").val($("#reason_" + id).html());
+		$("#reject-summons #reject-summons-description textarea").val(populate_summons_modal(id));
 
 		$("#reject-summons").modal('show');
 	});
+
+	/**
+	 * Okay so this is where things get funky.
+	 * Because we use html to style the description of summons,
+	 * we need to do some JS voodoo down here to prefill the
+	 * modal in the general case and not have trailing
+	 * whitespace everywhere.
+	 */
+	const populate_summons_modal = function(id) {
+		return $.makeArray($("#reason_" + id).contents()
+			.map(
+				// trim any of the whitepace from the html file
+				(index, obj) => obj.textContent.trim()
+			)
+		// Join the new array of textContent and trim any remaining whitespace
+		).join('\n').trim();
+	}
 
 </script>
 {% endblock %}
