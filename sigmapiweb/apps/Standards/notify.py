@@ -108,3 +108,35 @@ def summons_sent(summons):
         to_emails=[summons.summonee.email],
         cc_emails=[fourth.email, standards.email, settings.EC_EMAIL],
     )
+
+
+def notify_outcome(summons_record):
+    """
+    Inform the summoned of the outcome if action was taken
+    """
+    subject = 'Standards Board: Action Taken'
+
+    text = (
+        "{0},\n\n"
+        "In the summoning filed by {1} "
+        "against you, the standards board has decided to take action. "
+        "The sanction against you, as voted on by the justices, is:\n\n"
+        "\t\"{2}\"\n\n"
+        "If you believe that you do not deserve this sanction or that the "
+        "standards board has erred, you may appeal the decision at the next "
+        "house meeting during new business. If you have questions on how to "
+        "appeal, or what the process will be like, "
+        "please contact the Parliamentarian.".format(
+            summons_record.summonee.first_name,
+            summons_record.summoner.first_name,
+            summons_record.resultReason,
+        )
+    )
+
+    p_email = User.objects.get(groups__name='Parliamentarian').email
+    send_email(
+        subject=subject,
+        body=text,
+        to_emails=[summons_record.summonee.email],
+        cc_emails=[summons_record.summoner.email, p_email],
+    )
