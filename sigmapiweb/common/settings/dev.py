@@ -51,6 +51,12 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
+# Describe to django where to find fixtures
+# useful for loading fixture data during testing
+FIXTURE_DIRS = (
+    os.path.join(BASE_DIR, 'fixtures'),
+)
+
 FILE_UPLOAD_TEMP_DIR = BASE_DIR
 
 # Make this unique, and don't share it with anybody.
