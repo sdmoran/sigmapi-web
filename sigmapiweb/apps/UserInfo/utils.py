@@ -4,7 +4,7 @@ Utility functions and classes for use within the UserInfo modules.
 from datetime import date
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.db import IntegrityError
@@ -66,6 +66,8 @@ def create_user(username, first_name, last_name, major, year):
         user_info_obj.graduationYear = year
 
         user_obj.save()
+        # Add the Pledge group by default
+        Group.objects.get(name='Pledges').user_set.add(user_obj)
         user_info_obj.save()
 
         if not settings.DEBUG:
