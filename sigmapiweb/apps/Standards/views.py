@@ -311,6 +311,8 @@ def accept_summons(request, summons):
         )
         summons_history.save()
 
+        notify.notify_outcome(summons_history)
+
         summons_obj.delete()
 
         request.session['standards_summons_msg'] = (
