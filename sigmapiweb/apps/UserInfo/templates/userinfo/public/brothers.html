@@ -3,7 +3,7 @@
 {% load sass_tags %}
 {% block module_includes %}
   {{ block.super }}
-  {% load staticfiles %}
+  {% load static %}
   <link rel="stylesheet" type="text/css" href='{% sass_src "css/public/brothers.scss" %}?v=1' />
 {% endblock %}
 
