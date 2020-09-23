@@ -33,7 +33,7 @@ urlpatterns = [
     ),
     url(
         regex=r'^login',
-        view=dsl.LoginView,
+        view=dsl.LoginView.as_view(),
         name='pub-login',
     ),
     url(
