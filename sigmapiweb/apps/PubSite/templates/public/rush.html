@@ -1,0 +1,36 @@
+{% extends 'public/_article_base.html' %}
+{% block title %}Sigma Pi Gamma Iota - Service{% endblock %}
+{% load staticfiles %}
+
+{% block content_title %}
+  Rush Sigma Pi!
+{% endblock %}
+{% block article %}
+  <div class="container content-top-margin">
+    <h2>Essential Links</h2>
+    <div class="text-block">
+      <div class="image-wrapper float-md-right">
+        <img src="{% static 'img/service/ace.jpg' %}">
+      </div>
+    </div>
+    <br>
+    <h2>Upcoming Events:</h2>
+    <div class="text-block">
+      <ul>
+        <li>Month/Day (Hour:Minute): Event Title (zoomlink)</li>
+        <li>Month/Day (Hour:Minute): Event Title (zoomlink)</li>
+        <li>Month/Day (Hour:Minute): Event Title (zoomlink)</li>
+        <li>Month/Day (Hour:Minute): Event Title (zoomlink)</li>
+        <li>Month/Day (Hour:Minute): Event Title (zoomlink)</li>
+      </ul>
+    </div>
+    <h2>Contact Us</h2>
+    <div class="text-block">
+      <p>
+        Rush Co-Chair: Owen , Class Year: Year, Phone: Phone, Email: email
+        Rush Co-Chair: Jason , Class Year: Year, Phone: Phone, Email: email
+        President:: Owen , Class Year: Year, Phone: Phone, Email: email
+      </p>
+    </div>
+  </div>
+{% endblock %}

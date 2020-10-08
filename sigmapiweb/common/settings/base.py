@@ -157,6 +157,7 @@ PUBLIC_PAGES = [
     {'title': 'Home', 'view': 'pub-index'},
     {'title': 'About', 'view': 'pub-about'},
     {'title': 'Service & Activities', 'view': 'pub-service'},
+    {'title': 'Rush Sigma Pi', 'view': 'pub-rush'},
     {'title': 'Brothers', 'view': 'userinfo-users'},
     {'title': 'Donate', 'target': '_blank',
      'url': ('https://paypal.me/sigmapigammaiota?locale.x=en_US')},  # reasons why I hate python, this single string looks like three
