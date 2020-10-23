@@ -43,9 +43,15 @@ def users(request):
     herald = check_user_exists('Herald', 'newHerald')
 
     # Get the rest of the users.  Exclude pledges or any execs.
+    gradstudents = User.objects.filter(groups__name='Brothers')
+    gradstudents = gradstudents.filter(
+        userinfo__graduationYear__lte=senior_year,
+        groups__name="Brothers"
+    ).prefetch_related('userinfo').order_by("last_name")
+
     seniors = User.objects.filter(groups__name='Brothers')
     seniors = seniors.filter(
-        userinfo__graduationYear__lte=senior_year,
+        userinfo__graduationYear=senior_year,
         groups__name="Brothers"
     ).prefetch_related('userinfo').order_by("last_name")
 
@@ -90,6 +96,7 @@ def users(request):
     for exec_brother in exec_board:
         user = exec_brother[0]
         if user is not None:
+            gradstudents = gradstudents.exclude(username=user.username)
             seniors = seniors.exclude(username=user.username)
             juniors = juniors.exclude(username=user.username)
             sophomores = sophomores.exclude(username=user.username)
@@ -106,7 +113,12 @@ def users(request):
                 'count': 6
             },
             {
-                'group_title': 'Seniors',
+                'group_title': 'Graduate Students',
+                'brothers': gradstudents,
+                'count': len(gradstudents)
+            },
+            {
+                'group_title': 'Seniors CHECK',
                 'brothers': seniors,
                 'count': len(seniors)
             },

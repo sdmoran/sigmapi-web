@@ -37,6 +37,16 @@ def activities(request):
         _get_context('Service & Activities'),
     )
 
+def rush(request):
+    """
+    View for the static chapter service page.
+    """
+    return render(
+        request,
+        'public/rush.html',
+        _get_context('Rush'),
+    )
+
 
 def permission_denied(request):
     """
