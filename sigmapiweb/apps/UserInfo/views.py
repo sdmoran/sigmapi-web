@@ -45,7 +45,7 @@ def users(request):
     # Get the rest of the users.  Exclude pledges or any execs.
     gradstudents = User.objects.filter(groups__name='Brothers')
     gradstudents = gradstudents.filter(
-        userinfo__graduationYear__lte=senior_year,
+        userinfo__graduationYear__lt=senior_year,
         groups__name="Brothers"
     ).prefetch_related('userinfo').order_by("last_name")
 
@@ -118,7 +118,7 @@ def users(request):
                 'count': len(gradstudents)
             },
             {
-                'group_title': 'Seniors CHECK',
+                'group_title': 'Seniors',
                 'brothers': seniors,
                 'count': len(seniors)
             },
