@@ -1,0 +1,43 @@
+@import "variables";
+
+.article {
+  margin-bottom: 30px;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: $sp-purple;
+  }
+
+  font-size: 16px;
+
+  .iframe-wrapper {
+    position: relative;
+    padding: 0 20px 5px 20px;
+
+    &.full-width {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    @media (max-width: $md-max) {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    @media (min-width: $md-min) {
+      &.float-md-right,
+      &.float-md-left {
+        width: 50%;
+      }
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+    }
+  }
+}
