@@ -33,4 +33,5 @@ jobs:
         #flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run test cases
       run: |
-        python3 sigmapiweb/manage.py test
+        # Need to go into sigmapiweb/ directory for fixtures to be found correctly
+        cd sigmapiweb && python3 manage.py test
