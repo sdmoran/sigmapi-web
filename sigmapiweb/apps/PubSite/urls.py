@@ -6,6 +6,7 @@ from django.contrib.auth import views as dsl
 from django.views.generic.base import RedirectView
 from django.contrib.auth import views as auth_views
 
+from django.urls import path
 
 from . import views
 
@@ -21,11 +22,7 @@ urlpatterns = [
         views.ResetPasswordDone.as_view(),
         name='password_reset_done'
     ),
-    url(
-        r'^password_reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-        views.ResetPasswordConfirm.as_view(),
-        name='password_reset_confirm'
-    ),
+    path('password_reset/<uidb64>/<token>', views.ResetPasswordConfirm.as_view(), name='password_reset_confirm'),
     url(
         r'^password_reset/complete/$',
         views.ResetPasswordComplete.as_view(),
